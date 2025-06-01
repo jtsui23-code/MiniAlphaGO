@@ -59,53 +59,69 @@ class Board:
 
 
     def isValidMove(self, x,y,player):
-
         
-        # This is checking if there are any surround stones at all that fully circle the currently placed move.
-        surroundingStones = self.getSurroundingStones(x,y)
-
-        placingInEnemySurroundingStone = True
-
-        # Now this is checks if the surround stones are enemy stones because this may be an illegal move.
-        for stone in surroundingStones:
-            if self.board[stone[0], stone[1]] != self.enemyStone:
-                placingInEnemySurroundingStone = False
+        # Checks if the move in in the board if its not then the move is invalid
+        if not (0 <= x < self.size and 0 <= y < self.size):
+            return False
         
+        # Making a simulated board where the player's move has already occured to check if the move will capture first beofre a suicide move.
+        tempBoard = self.board.copy()
+        tempBoard[x,y] = player
+
+
+        enemyStone = -player
 
         # This is checking if the suicide move captures first, if it does then this move is legal else the move is invalid.
-        captureFirst = False
+        captured = False
+
 
         # This is checking the liberties of the enemy stones. If this move removes the final liberty of the surround stone, then
         # this is a legal move else it is not.
-        for stone in surroundingStones:
-            checkLiberties = self.checkLiberties(stone, player)
-            if checkLiberties == 0:
-                captureFirst = True
+        for (nx,ny) in self.getSurroundingStones(x,y):
 
+            # This checks if the surrounding possible stones are in the board are enemy stones.
+            if 0 <= nx < self.size and 0 <= ny < self.size and tempBoard[nx,ny] == enemyStone:
 
-        if placingInEnemySurroundingStone and captureFirst:
+                # If a surrounding enemy stone can be captured from this suicide move then its valid and simulate the capture.
+                if self.checkLiberties((nx,ny), enemyStone, visited=set()) == 0:
+                    captured = True
+                    tempBoard[nx, ny] = 0
+
+        # This checks the player's own group of stones if this move removes the final liberty of the group which is a suicide move.
+        # If the player's move doesn't remove the final liberty of the group then its fine and is a valid move. 
+        if self.checkLiberties((x,y), player, visited=set()) > 0:
             return True
-        elif not placingInEnemySurroundingStone:
+        
+        # If it is the case where the move is a suicide move BUT captures the enemy stone then its is valid.
+        elif captured:
             return True
+        
+        # However, if the move is a suicide move and doesn't capture then its an illegal move.
         else: 
             return False
+
 
 
     
     def playMove(self, x,y, player):
 
-        isValidMove = self.isValidMove
+        isValidMove = self.isValidMove(x,y,player)
+
+
         # If the coordinate on the board does not equal zero, 
         # that means that position is not empty or it is out of bound.
         # Meaning that played move is illegal 
-        if self.board[x,y] !=0 and isValidMove:
+        if self.board[x,y] !=0:
             return False
         
         # Player is either a -1 or a 1 meaning the player is either playing as white or black stones
         self.board[x,y] = player
         self.history.append((x,y,player))
 
-        return True
+        if isValidMove:
+            return True
+        else:
+            return False
 
 
 
