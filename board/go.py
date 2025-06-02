@@ -61,6 +61,7 @@ class Board:
         stoneColor (int):      The color of the stone/group (1 for black, -1 for white) whose liberties are being checked.
         visited (set, optional): A set of (x,y) coordinates that have already been visited during the current liberty check (used for recursion). 
                                Defaults to None and is initialized as an empty set in the first call.
+        board           :      The temporary board from the isValidMove method is passed in to reduce the actual recquired liberty if capture is possible.
 
     RETURN:
         int: The total number of unique liberties for the stone or group of stones connected to the initial 'position'.
@@ -75,8 +76,10 @@ class Board:
         - If the position contains an opponent's stone, it's not a liberty for 'stoneColor', returning 0.
         - If the position contains a stone of 'stoneColor', it recursively calls checkLiberties for its unvisited neighbors.
     """
-    def checkLiberties(self, position, stoneColor, visited = None):
-
+    def checkLiberties(self, position, stoneColor, visited = None, board=None):
+        
+        if board is None:
+            board = self.board
         # If this is the fist iteration of the recursion then create the set that will store all of the 
         # positions that have had their liberties checked.
         if visited == None:
@@ -98,11 +101,11 @@ class Board:
         visited.add((x,y))
         
         # This means that there is a liberty at this position
-        if self.board[x,y] == 0:
+        if board[x,y] == 0:
             return 1
 
         # Do not count any position that has enemy stone there. 
-        if self.board[x,y] != stoneColor:
+        if board[x,y] != stoneColor:
             return 0
 
         # Creates counter for liberties
@@ -111,7 +114,7 @@ class Board:
         # Recursively checking the liberties of neighboring stones because connected stones share liberties.
         for (nx, ny) in self.getSurroundingStones(x,y):
             
-            liberties += self.checkLiberties((nx,ny), stoneColor, visited)
+            liberties += self.checkLiberties((nx,ny), stoneColor, visited, board)
         
 
         return liberties
@@ -169,9 +172,9 @@ class Board:
             if self.board[x,y] != color:
                 return
             
-            # If the stone passes all of the previous conditions, then it is a stone to eliminate.
-            # You do not need to check the liberties because this removeStones method is only called after
-            # checking liberties so it would be redundant.
+            if self.checkLiberties((x,y), color, visited=set(), board=self.board) > 0:
+                return
+            
             toRemove.add((x,y))
 
             # This recurisvely checks if there are any connected stones that need to be removed as well.
@@ -269,20 +272,19 @@ class Board:
             if 0 <= nx < self.size and 0 <= ny < self.size and tempBoard[nx,ny] == enemyStone:
 
                 # If a surrounding enemy stone can be captured from this suicide move then its valid and simulate the capture.
-                if self.checkLiberties((nx,ny), enemyStone, visited=set()) == 0:
+                if self.checkLiberties((nx,ny), enemyStone, visited=set(), board=tempBoard) == 0:
                     captured = True
                     tempBoard[nx, ny] = 0
 
 
         # This checks the player's own group of stones if this move removes the final liberty of the group which is a suicide move.
         # If the player's move doesn't remove the final liberty of the group then its fine and is a valid move. 
-        if self.checkLiberties((x,y), player, visited=set()) > 0:
+        if self.checkLiberties((x,y), player, visited=set(), board=tempBoard) > 0:
             return True
         
         # If it is the case where the move is a suicide move BUT captures the enemy stone then its is valid.
         elif captured:
-            # The captured stones from the simulated board is transfered to the actual board if the capture is possible.
-            self.board = tempBoard
+
             return True
         
         # However, if the move is a suicide move and doesn't capture then its an illegal move.
@@ -367,19 +369,23 @@ if __name__ == "__main__":
     b.playMove(1, 2, 1)  # black
     b.playMove(2, 1, 1)  # black
 
-    b.playMove(0, 2, -1)  # white goes in the middle
     b.playMove(1, 3, -1)  # white goes in the middle
     b.playMove(2, 2, -1)  # white goes in the middle
+    b.playMove(0, 2, -1)  # white goes in the middle
 
 
+    print("Before:")
 
-    print("Before capture:")
+    # print("Before capture:")
     b.printBoard()
+
 
 
     b.playMove(1, 1, -1)  # white goes in the middle
 
-    print("After capture:")
+    print("After:")
+    # print("After capture:")
+
     b.printBoard()
 
 
