@@ -10,8 +10,6 @@ class Board:
 
 
 
-
-
     def checkLiberties(self, position, stoneColor, visited = None):
 
         # If this is the fist iteration of the recursion then create the set that will store all of the 
@@ -22,7 +20,8 @@ class Board:
         # Checking if the position is out of bound of the board.
         x, y = position
 
-        if not( 0<= x < self.size and 0<= y < self.size):
+
+        if not(0 <= x < self.size and 0 <= y < self.size):
             return 0
         
         # If you already visited this stone then don't check it again.
@@ -51,11 +50,53 @@ class Board:
         
 
         return liberties
+    
+    # This method removes stones that are connected together.
+    def removeStones(self, position, color):
+
+        toRemove = set()
+        visited = set()
+
+        def dfs(pos):
+            x, y = pos
+
+            # Do not traverse through stones that already have been visited.
+            if (x, y) in visited: 
+                return 
+            visited.add((x,y))
+
+            # Do not traverse through 'stones' that are outside of the board.
+            if not (0 <= x < self.size and 0 <= y < self.size):
+                return
+
+            # If the stone is not the same color stone as the one you are trying to 
+            # remove then ignore it.
+            if self.board[x,y] != color:
+                return
+            
+            # If the stone passes all of the previous conditions, then it is a stone to eliminate.
+            # You do not need to check the liberties because this removeStones method is only called after
+            # checking liberties so it would be redundant.
+            toRemove.add((x,y))
+
+            # This recurisvely checks if there are any connected stones that need to be removed as well.
+            for nx, ny in self.getSurroundingStones(x,y):
+                dfs((nx,ny))
+
+        
+        dfs(position)
+
+        # Removes all of the stones that were select for removal.
+        for x, y in toRemove:
+            self.board[x,y] = 0
+    
 
     def getSurroundingStones(self,x,y):
 
         surroundStones = [[x+1, y], [x-1,y], [x,y+1], [x, y-1]]
         return surroundStones
+
+
 
 
     def isValidMove(self, x,y,player):
@@ -87,6 +128,7 @@ class Board:
                     captured = True
                     tempBoard[nx, ny] = 0
 
+
         # This checks the player's own group of stones if this move removes the final liberty of the group which is a suicide move.
         # If the player's move doesn't remove the final liberty of the group then its fine and is a valid move. 
         if self.checkLiberties((x,y), player, visited=set()) > 0:
@@ -94,6 +136,8 @@ class Board:
         
         # If it is the case where the move is a suicide move BUT captures the enemy stone then its is valid.
         elif captured:
+            # The captured stones from the simulated board is transfered to the actual board if the capture is possible.
+            self.board = tempBoard
             return True
         
         # However, if the move is a suicide move and doesn't capture then its an illegal move.
@@ -114,14 +158,51 @@ class Board:
         if self.board[x,y] !=0:
             return False
         
-        # Player is either a -1 or a 1 meaning the player is either playing as white or black stones
-        self.board[x,y] = player
-        self.history.append((x,y,player))
+        
 
         if isValidMove:
+            # Player is either a -1 or a 1 meaning the player is either playing as white or black stones
+            self.board[x,y] = player
+            self.history.append((x,y,player))
+
             return True
         else:
             return False
+        
+        
+        
+    def printBoard(self):
+        symbols = {1: '●', -1: '○', 0: '+'}
+        for row in self.board:
+            print(' '.join(symbols[val] for val in row))
+        print()
+
+        
+        
+if __name__ == "__main__":
+    b = Board(size=5)
+
+    # Example: surround a white stone and capture it
+    b.playMove(1, 0, 1)  # black
+    b.playMove(0, 1, 1)  # black
+    b.playMove(1, 2, 1)  # black
+    b.playMove(2, 1, 1)  # black
+
+    b.playMove(0, 2, -1)  # white goes in the middle
+    b.playMove(1, 3, -1)  # white goes in the middle
+    b.playMove(2, 2, -1)  # white goes in the middle
+
+
+
+    print("Before capture:")
+    b.printBoard()
+
+
+    b.playMove(1, 1, -1)  # white goes in the middle
+
+    print("After capture:")
+    b.printBoard()
+
 
 
 
