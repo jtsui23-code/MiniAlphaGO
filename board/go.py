@@ -1,6 +1,50 @@
 import numpy as np
 
+"""
+CLASS: Board
+
+ATTRIBUTES:
+    int size:             Stores the dimension of the Go board (e.g., 9 for a 9x9 board).
+    numpy.ndarray board:  A 2D array representing the Go board. 
+                          0 indicates an empty intersection, 
+                          1 indicates a black stone, and 
+                          -1 indicates a white stone.
+    list history:         Stores a history of moves made on the board. Each entry is a tuple (x, y, player).
+
+METHODS:
+    __init__(size=9):                       Constructor to initialize the board.
+    checkLiberties(position, stoneColor, visited=None): Calculates the number of liberties for a stone or group of stones.
+    removeStones(position, color):          Removes a stone and any connected stones of the same color that have no liberties.
+    getSurroundingStones(x, y):             Returns a list of coordinates for positions adjacent to (x,y).
+    isValidMove(x, y, player):              Checks if placing a stone by 'player' at (x,y) is a valid move according to Go rules.
+    playMove(x, y, player):                 Attempts to place a stone for 'player' at (x,y) and updates the board state.
+    printBoard():                           Prints a text-based representation of the current board state.
+
+PACKAGES:
+    import numpy as np: Used for efficient numerical operations, especially for the board representation as a 2D array.
+
+DESCRIPTION:
+    The Board class encapsulates the logic and state of a Go game board. 
+    It handles the placement of stones, checks for valid moves (including suicide and ko - though ko is not explicitly implemented here but isValidMove structure allows for it), 
+    calculates liberties, captures opponent stones, and maintains the history of moves.
+    The board is represented as a 2D numpy array where 0 signifies an empty point, 1 signifies a black stone, and -1 signifies a white stone.
+"""
 class Board:
+
+    """
+    METHOD: __init__
+
+    INPUT:
+        size (int, optional): The dimension of one side of the square Go board. Defaults to 9.
+
+    RETURN:
+        N/A
+
+    DESCRIPTION:
+        Constructor for the Board class. Initializes an empty Go board of the specified size.
+        The board is represented by a 2D numpy array filled with zeros.
+        It also initializes an empty list to store the history of moves.
+    """
     def __init__(self, size=9):
         self.size = size
 
@@ -9,7 +53,28 @@ class Board:
         self.history = []
 
 
+    """
+    METHOD: checkLiberties
 
+    INPUT:
+        position (tuple):      (x,y) coordinates of the stone whose liberties are to be checked.
+        stoneColor (int):      The color of the stone/group (1 for black, -1 for white) whose liberties are being checked.
+        visited (set, optional): A set of (x,y) coordinates that have already been visited during the current liberty check (used for recursion). 
+                               Defaults to None and is initialized as an empty set in the first call.
+
+    RETURN:
+        int: The total number of unique liberties for the stone or group of stones connected to the initial 'position'.
+
+    DESCRIPTION:
+        This method recursively counts the number of empty adjacent intersections (liberties) for a given stone
+        and all connected stones of the same color (a group).
+        It uses a 'visited' set to avoid recounting liberties or getting into infinite loops with circular groups.
+        - If the position is off-board, it contributes 0 liberties.
+        - If the position has already been visited in the current check, it contributes 0 liberties to avoid double counting.
+        - If the position is an empty intersection (self.board[x,y] == 0), it's a liberty, returning 1.
+        - If the position contains an opponent's stone, it's not a liberty for 'stoneColor', returning 0.
+        - If the position contains a stone of 'stoneColor', it recursively calls checkLiberties for its unvisited neighbors.
+    """
     def checkLiberties(self, position, stoneColor, visited = None):
 
         # If this is the fist iteration of the recursion then create the set that will store all of the 
@@ -51,18 +116,48 @@ class Board:
 
         return liberties
     
-    # This method removes stones that are connected together.
+    """
+    METHOD: removeStones
+    
+    INPUT: 
+        position (tuple): (x,y) pair for the coordinate of which stone to start the removal check from.
+        color (int):      The stone color (1 for black, -1 for white) of the stones to be removed. 
+    
+    RETURN: 
+        N/A
+    
+    DESCRIPTION:
+        This method removes a group of stones of the specified 'color' starting from 'position' if they have no liberties.
+        It uses a Depth First Search (DFS) to find all connected stones of the given 'color'.
+        All stones identified as part of the group to be removed are set to 0 (empty) on the board.
+        This method is typically called after a check (like checkLiberties) has determined that the group at 'position'
+        is indeed captured (has zero liberties).
+    """
     def removeStones(self, position, color):
 
         toRemove = set()
         visited = set()
 
+        #   """
+        #   SUB-METHOD: dfs (nested function)
+        #
+        #   INPUT:
+        #       pos (tuple): (x,y) coordinate of the current stone being visited.
+        #
+        #   RETURN:
+        #       N/A
+        #
+        #   DESCRIPTION:
+        #       Performs a Depth First Search to find all connected stones of the specified 'color'
+        #       starting from the initial 'pos'. Adds stones to be removed to the 'toRemove' set.
+        #   """
         def dfs(pos):
             x, y = pos
 
             # Do not traverse through stones that already have been visited.
             if (x, y) in visited: 
                 return 
+            
             visited.add((x,y))
 
             # Do not traverse through 'stones' that are outside of the board.
@@ -89,8 +184,23 @@ class Board:
         # Removes all of the stones that were select for removal.
         for x, y in toRemove:
             self.board[x,y] = 0
+
     
 
+    """
+    METHOD: getSurroundingStones
+
+    INPUT:
+        x (int): The x-coordinate of the central stone.
+        y (int): The y-coordinate of the central stone.
+
+    RETURN:
+        list: A list of [x,y] coordinate pairs representing the positions immediately adjacent (up, down, left, right)
+              to the input (x,y) coordinate. Does not check if these coordinates are within board boundaries.
+
+    DESCRIPTION:
+        A helper method that returns the four orthogonal neighboring coordinates of a given point (x,y) on the board.
+    """
     def getSurroundingStones(self,x,y):
 
         surroundStones = [[x+1, y], [x-1,y], [x,y+1], [x, y-1]]
@@ -98,7 +208,42 @@ class Board:
 
 
 
+    """
+    METHOD: isValidMove
 
+    INPUT:
+        x (int):      The x-coordinate of the proposed move.
+        y (int):      The y-coordinate of the proposed move.
+        player (int): The color of the player making the move (1 for black, -1 for white).
+
+    RETURN:
+        bool: True if the move is valid according to Go rules, False otherwise.
+
+    DESCRIPTION:
+        Checks if placing a stone for 'player' at (x,y) is a legal move.
+        A move is invalid if:
+        1. It is outside the board boundaries.
+        2. The position is already occupied (handled in playMove, but good to be aware).
+        3. It is a "suicide" move: placing the stone results in the newly placed stone (or its group) having zero liberties,
+           UNLESS placing this stone captures one or more opponent stones, thereby giving the new stone/group liberties.
+        This method simulates the move on a temporary board to check for captures and self-capture (suicide) conditions.
+
+
+
+
+
+
+        Note: Ko rule is not explicitly implemented here but this is where it would be checked.
+
+
+
+
+
+
+
+
+
+    """
     def isValidMove(self, x,y,player):
         
         # Checks if the move in in the board if its not then the move is invalid
@@ -146,10 +291,26 @@ class Board:
 
 
 
-    
-    def playMove(self, x,y, player):
+    """
+    METHOD: playMove
 
-        isValidMove = self.isValidMove(x,y,player)
+    INPUT:
+        x (int):      The x-coordinate where the stone is to be played.
+        y (int):      The y-coordinate where the stone is to be played.
+        player (int): The color of the player making the move (1 for black, -1 for white).
+
+    RETURN:
+        bool: True if the move was successfully played, False if the move was illegal.
+
+    DESCRIPTION:
+        Attempts to play a stone for the given 'player' at coordinates (x,y).
+        1. Checks if the target intersection (x,y) is empty.
+        2. Validates the move using `isValidMove` (checks for out-of-bounds, suicide).
+        3. If valid, places the stone on the board and adds the move to history.
+        4. Checks adjacent enemy stones/groups. If any are captured (no liberties), they are removed using `removeStones`.
+        This method updates the actual game board.
+    """
+    def playMove(self, x,y, player):
 
 
         # If the coordinate on the board does not equal zero, 
@@ -158,21 +319,39 @@ class Board:
         if self.board[x,y] !=0:
             return False
         
-        
-
-        if isValidMove:
-            # Player is either a -1 or a 1 meaning the player is either playing as white or black stones
-            self.board[x,y] = player
-            self.history.append((x,y,player))
-
-            return True
-        else:
+        if not self.isValidMove(x,y, player):
             return False
+
+        # Player is either a -1 or a 1 meaning the player is either playing as white or black stones
+        self.board[x,y] = player
+        self.history.append((x,y,player))
+
+        enemy = -player
+
+        # This checks to remove any possible dead stones around where the player placed their move
+        for nx, ny in self.getSurroundingStones(x,y):
+            if (0 <= nx < self.size and 0 <= ny < self.size and self.board[nx,ny] == enemy):
+                self.removeStones((nx,ny), enemy)
+            
         
         
-        
+    """
+    METHOD: printBoard
+
+    INPUT:
+        N/A
+
+    RETURN:
+        N/A
+
+    DESCRIPTION:
+        Prints a simple text-based representation of the current Go board state to the console.
+        '●' represents a black stone.
+        '○' represents a white stone.
+        '+' represents an empty intersection.
+    """
     def printBoard(self):
-        symbols = {1: '●', -1: '○', 0: '+'}
+        symbols = {1: 'b', -1: 'w', 0: '+'}
         for row in self.board:
             print(' '.join(symbols[val] for val in row))
         print()
@@ -180,7 +359,7 @@ class Board:
         
         
 if __name__ == "__main__":
-    b = Board(size=5)
+    b = Board(size=9)
 
     # Example: surround a white stone and capture it
     b.playMove(1, 0, 1)  # black
