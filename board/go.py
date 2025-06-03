@@ -50,6 +50,8 @@ class Board:
 
         # 0=empty, 1 = black, -1 = white
         self.board = np.zeros((size, size), dtype=int) 
+
+        # Stores the board states as bytes to make them hashable with easy look up for detecting ko violations.
         self.history = []
 
 
@@ -137,6 +139,7 @@ class Board:
         is indeed captured (has zero liberties).
     """
     def removeStones(self, position, color):
+        
 
         toRemove = set()
         visited = set()
@@ -274,7 +277,17 @@ class Board:
                 # If a surrounding enemy stone can be captured from this suicide move then its valid and simulate the capture.
                 if self.checkLiberties((nx,ny), enemyStone, visited=set(), board=tempBoard) == 0:
                     captured = True
-                    tempBoard[nx, ny] = 0
+                    # Simluates capturing the stone for checking for suicides captures or ko.
+                    self.simulatedCapture(tempBoard, (nx,ny), enemyStone)
+
+
+
+        # Checking for ko violations.
+        # Turning the simulationed board into bytes to efficiently check if there is any repeating board states
+        # that would cause a ko. self.history[1] is the last board state.
+        if len(self.history) > 0:
+            if tempBoard.tobytes() == self.history[-1]:
+                return False
 
 
         # This checks the player's own group of stones if this move removes the final liberty of the group which is a suicide move.
@@ -284,7 +297,7 @@ class Board:
         
         # If it is the case where the move is a suicide move BUT captures the enemy stone then its is valid.
         elif captured:
-
+            
             return True
         
         # However, if the move is a suicide move and doesn't capture then its an illegal move.
@@ -326,7 +339,8 @@ class Board:
 
         # Player is either a -1 or a 1 meaning the player is either playing as white or black stones
         self.board[x,y] = player
-        self.history.append((x,y,player))
+        # Storing the board states as bytes to make them hashable with easy look up for detecting ko violations.
+        self.history.append(self.board.copy().tobytes())
 
         enemy = -player
 
@@ -358,6 +372,54 @@ class Board:
             print(' '.join(symbols[val] for val in row))
         print()
 
+    """
+    METHOD: simulatedCapture
+    
+    INPUT: 
+        board           : The temporary board that is simulating the capture of a stone. 
+        position (tuple): (x,y) pair for the coordinate of which stone to start the removal check from.
+        color (int):      The stone color (1 for black, -1 for white) of the stones to be removed. 
+    
+    RETURN: 
+        N/A
+    
+    DESCRIPTION:
+        This method simulates removing a group of stones of the specified 'color' starting from 'position' if they have no liberties.
+        It uses a Depth First Search (DFS) to find all connected stones of the given 'color'.
+        All stones identified as part of the group to be removed are set to 0 (empty) on the board.
+        This method is typically called after a check (like checkLiberties) has determined that the group at 'position'
+        is indeed captured (has zero liberties).
+    """
+    def simulatedCapture(self, board, position, color):
+        toRemove = set()
+        visited = set()
+
+        def dfs(pos):
+            x, y = pos 
+            if (x,y) in visited:
+                return
+
+            visited.add((x,y)) 
+
+            if not (0 <= x < self.size and 0 <= y < self.size):
+                return
+
+            if board[x,y] != color:
+                return 
+            
+            # Don't check liberties again, we already know this group is captured
+            toRemove.add((x,y))
+
+            for (nx, ny) in self.getSurroundingStones(x,y):
+                dfs((nx,ny))
+            
+            dfs(position)
+
+            # Remove captured stones from the temporary board
+            for x,y in toRemove:
+                board[x,y] = 0
+
+
         
         
 if __name__ == "__main__":
@@ -365,13 +427,11 @@ if __name__ == "__main__":
 
     # Example: surround a white stone and capture it
     b.playMove(1, 0, 1)  # black
-    b.playMove(0, 1, 1)  # black
-    b.playMove(1, 2, 1)  # black
-    b.playMove(2, 1, 1)  # black
+    b.playMove(2, 0, -1)  # black
+    b.playMove(1, 1, -1)  # black
+    b.playMove(0, 1, -1)  # black
 
-    b.playMove(1, 3, -1)  # white goes in the middle
-    b.playMove(2, 2, -1)  # white goes in the middle
-    b.playMove(0, 2, -1)  # white goes in the middle
+
 
 
     print("Before:")
@@ -379,9 +439,9 @@ if __name__ == "__main__":
     # print("Before capture:")
     b.printBoard()
 
+    b.playMove(0, 0, 1)  # white goes in the middle
 
 
-    b.playMove(1, 1, -1)  # white goes in the middle
 
     print("After:")
     # print("After capture:")
