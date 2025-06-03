@@ -53,6 +53,11 @@ class Board:
 
         # Stores the board states as bytes to make them hashable with easy look up for detecting ko violations.
         self.history = []
+        
+        # This is a flag to prevent player from performing multiple moves a turn.
+        # It will store a -1 - white or 1 - black
+        # Black plays first so it self.currentPlayer is default to black.
+        self.currentPlayer = 1
 
 
     """
@@ -334,6 +339,11 @@ class Board:
         if self.board[x,y] !=0:
             return False
         
+        # Players playing on not their turn is not valid.
+        # This prevents players from playing multiple moves per turn.
+        if self.currentPlayer != player:
+            return False
+        
         if not self.isValidMove(x,y, player):
             return False
 
@@ -348,6 +358,10 @@ class Board:
         for nx, ny in self.getSurroundingStones(x,y):
             if (0 <= nx < self.size and 0 <= ny < self.size and self.board[nx,ny] == enemy):
                 self.removeStones((nx,ny), enemy)
+
+
+        # Switches to the next player's turn.
+        self.currentPlayer *= -1
             
         
         
@@ -425,55 +439,132 @@ class Board:
 if __name__ == "__main__":
     b = Board(size=9)
 
-    # Example: surround a white stone and capture it
-    b.playMove(1, 2, 1)  
-    b.playMove(3, 2, 1)  
-    b.playMove(2, 3, 1)  
 
-    b.playMove(2, 0, -1)  
+    # Check for ko -----------------------------------------------------------------------------------------------------------------------------------------------------
+    # Example: surround a white stone and capture it
+    # b.playMove(1, 2, 1)  
+    # b.playMove(3, 2, 1)  
+    # b.playMove(2, 3, 1)  
+
+    # b.playMove(2, 0, -1)  
+    # b.playMove(1, 1, -1)  
+    # b.playMove(3, 1, -1)  
+    # b.playMove(2, 2, -1)  
+
+
+
+
+
+    # print("Before:")
+
+    # # print("Before capture:")
+    # b.printBoard()
+
+    # b.playMove(2, 1, 1)  # white goes in the middle
+
+
+
+    # print("After:")
+    # # print("After capture:")
+
+    # b.printBoard()
+
+    # print("Ko Check:")
+    # # print("After capture:")
+
+    # b.playMove(2, 2, -1)  # white goes in the middle
+
+    # b.printBoard()
+
+    # print("Ko Redo:")
+    # # print("After capture:")
+
+    # b.playMove(2, 5, -1)  # white goes in the middle
+
+    # b.printBoard()
+
+
+    # print("Ko again:")
+    # # print("After capture:")
+
+    # b.playMove(2, 2, -1)  # white goes in the middle
+
+    # b.printBoard()
+
+    # Check for ko -----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+    # Check for Turn Manager -----------------------------------------------------------------------------------------------------------------------------------------------------
+
+    turnCount = 1
+    print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    turnCount += 1
+
+
+    b.playMove(1, 4, 1)  
+    b.playMove(3, 4, 1)  
+    b.playMove(2, 4, 1)  
+
+    b.printBoard()
+
+    print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    turnCount += 1
+    # print("Before capture:")
+
+
+
+
     b.playMove(1, 1, -1)  
     b.playMove(3, 1, -1)  
     b.playMove(2, 2, -1)  
 
+    b.printBoard()
 
 
 
+    print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    turnCount += 1
 
-    print("Before:")
+    b.playMove(3, 4, 1)  
 
     # print("Before capture:")
     b.printBoard()
 
-    b.playMove(2, 1, 1)  # white goes in the middle
 
 
+    print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    turnCount += 1
 
-    print("After:")
-    # print("After capture:")
+    b.playMove(3, 5, 1)  
 
-    b.printBoard()
-
-    print("Ko Check:")
-    # print("After capture:")
-
-    b.playMove(2, 2, -1)  # white goes in the middle
-
-    b.printBoard()
-
-    print("Ko Redo:")
-    # print("After capture:")
-
-    b.playMove(2, 5, -1)  # white goes in the middle
-
+    # print("Before capture:")
     b.printBoard()
 
 
-    print("Ko again:")
-    # print("After capture:")
+    print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    turnCount += 1
 
-    b.playMove(2, 2, -1)  # white goes in the middle
+    b.playMove(3, 7, -1)  
 
+    # print("Before capture:")
     b.printBoard()
+
+
+    print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    turnCount += 1
+
+    b.playMove(3, 7, 1)  
+
+    # print("Before capture:")
+    b.printBoard()
+
+    # Check for Turn Manager -----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
 
 
 
