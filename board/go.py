@@ -426,10 +426,15 @@ if __name__ == "__main__":
     b = Board(size=9)
 
     # Example: surround a white stone and capture it
-    b.playMove(1, 0, 1)  # black
-    b.playMove(2, 0, -1)  # black
-    b.playMove(1, 1, -1)  # black
-    b.playMove(0, 1, -1)  # black
+    b.playMove(1, 2, 1)  
+    b.playMove(3, 2, 1)  
+    b.playMove(2, 3, 1)  
+
+    b.playMove(2, 0, -1)  
+    b.playMove(1, 1, -1)  
+    b.playMove(3, 1, -1)  
+    b.playMove(2, 2, -1)  
+
 
 
 
@@ -439,7 +444,7 @@ if __name__ == "__main__":
     # print("Before capture:")
     b.printBoard()
 
-    b.playMove(0, 0, 1)  # white goes in the middle
+    b.playMove(2, 1, 1)  # white goes in the middle
 
 
 
@@ -447,6 +452,29 @@ if __name__ == "__main__":
     # print("After capture:")
 
     b.printBoard()
+
+    print("Ko Check:")
+    # print("After capture:")
+
+    b.playMove(2, 2, -1)  # white goes in the middle
+
+    b.printBoard()
+
+    print("Ko Redo:")
+    # print("After capture:")
+
+    b.playMove(2, 5, -1)  # white goes in the middle
+
+    b.printBoard()
+
+
+    print("Ko again:")
+    # print("After capture:")
+
+    b.playMove(2, 2, -1)  # white goes in the middle
+
+    b.printBoard()
+
 
 
 
