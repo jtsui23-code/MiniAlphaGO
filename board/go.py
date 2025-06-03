@@ -449,6 +449,23 @@ class Board:
                 board[x,y] = 0
 
 
+    def scoreBoard(self):
+        
+        region = set()
+        visited = set()
+        def floodFill(x,y):
+
+            if not (0<= x < self.size and 0 <= y < self.size):
+                return
+            
+            if (x,y) in visited:
+                return
+            
+            visited.add((x,y))
+            region.add((x,y))
+            
+
+
         
         
 if __name__ == "__main__":
