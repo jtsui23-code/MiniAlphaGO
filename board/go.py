@@ -59,6 +59,9 @@ class Board:
         # Black plays first so it self.currentPlayer is default to black.
         self.currentPlayer = 1
 
+        # Need to count the number of consecutive passes because if there are 2 consecutive passes then the game ends.
+        self.passCount = 0
+
 
     """
     METHOD: checkLiberties
@@ -318,6 +321,7 @@ class Board:
         x (int):      The x-coordinate where the stone is to be played.
         y (int):      The y-coordinate where the stone is to be played.
         player (int): The color of the player making the move (1 for black, -1 for white).
+        passTurn (bool): Checks if the player wants to pass this turn.
 
     RETURN:
         bool: True if the move was successfully played, False if the move was illegal.
@@ -330,7 +334,18 @@ class Board:
         4. Checks adjacent enemy stones/groups. If any are captured (no liberties), they are removed using `removeStones`.
         This method updates the actual game board.
     """
-    def playMove(self, x,y, player):
+    def playMove(self, x,y, player, passTurn=False):
+
+        # If the player is passing, switch turns and increment the self.passCount.
+        # Need to keep track of consecutive passes because if there is 2 consecutive passes then 
+        # the game ends.
+        if passTurn:
+            self.currentPlayer *= -1
+            self.passCount += 1
+            return
+        else: 
+            # Resets self.passCount back to zero because only keeping track of consecutive passes not total.
+            self.passCount = 0
 
 
         # If the coordinate on the board does not equal zero, 
@@ -495,7 +510,83 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
     # Check for Turn Manager -----------------------------------------------------------------------------------------------------------------------------------------------------
+
+    # turnCount = 1
+    # print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    # turnCount += 1
+
+
+    # b.playMove(1, 4, 1)  
+    # b.playMove(3, 4, 1)  
+    # b.playMove(2, 4, 1)  
+
+    # b.printBoard()
+
+    # print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    # turnCount += 1
+    # # print("Before capture:")
+
+
+
+
+    # b.playMove(1, 1, -1)  
+    # b.playMove(3, 1, -1)  
+    # b.playMove(2, 2, -1)  
+
+    # b.printBoard()
+
+
+
+    # print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    # turnCount += 1
+
+    # b.playMove(3, 4, 1)  
+
+    # # print("Before capture:")
+    # b.printBoard()
+
+
+
+    # print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    # turnCount += 1
+
+    # b.playMove(3, 5, 1)  
+
+    # # print("Before capture:")
+    # b.printBoard()
+
+
+    # print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    # turnCount += 1
+
+    # b.playMove(3, 7, -1)  
+
+    # # print("Before capture:")
+    # b.printBoard()
+
+
+    # print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    # turnCount += 1
+
+    # b.playMove(3, 7, 1)  
+
+    # # print("Before capture:")
+    # b.printBoard()
+
+    # Check for Turn Manager -----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+    # Check for Passing  -----------------------------------------------------------------------------------------------------------------------------------------------------
 
     turnCount = 1
     print("Turn", turnCount, "------------------------------------------------------------------------------------")
@@ -503,21 +594,16 @@ if __name__ == "__main__":
 
 
     b.playMove(1, 4, 1)  
-    b.playMove(3, 4, 1)  
-    b.playMove(2, 4, 1)  
+ 
 
     b.printBoard()
 
+
     print("Turn", turnCount, "------------------------------------------------------------------------------------")
     turnCount += 1
-    # print("Before capture:")
 
 
-
-
-    b.playMove(1, 1, -1)  
-    b.playMove(3, 1, -1)  
-    b.playMove(2, 2, -1)  
+    b.playMove(3, 4, -1)  
 
     b.printBoard()
 
@@ -526,46 +612,34 @@ if __name__ == "__main__":
     print("Turn", turnCount, "------------------------------------------------------------------------------------")
     turnCount += 1
 
-    b.playMove(3, 4, 1)  
+    print("Passed turn here-----------------------")
+    b.playMove(1, 4, 1, passTurn=True)  
+ 
 
-    # print("Before capture:")
-    b.printBoard()
-
-
-
-    print("Turn", turnCount, "------------------------------------------------------------------------------------")
-    turnCount += 1
-
-    b.playMove(3, 5, 1)  
-
-    # print("Before capture:")
     b.printBoard()
 
 
     print("Turn", turnCount, "------------------------------------------------------------------------------------")
     turnCount += 1
 
-    b.playMove(3, 7, -1)  
 
-    # print("Before capture:")
+    b.playMove(1, 6, 1)  
+ 
+
     b.printBoard()
 
 
     print("Turn", turnCount, "------------------------------------------------------------------------------------")
     turnCount += 1
 
-    b.playMove(3, 7, 1)  
 
-    # print("Before capture:")
+    b.playMove(1, 6, -1)  
+ 
+
     b.printBoard()
 
-    # Check for Turn Manager -----------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-
-
-
+    # Check for Passing  -----------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
