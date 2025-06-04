@@ -69,7 +69,7 @@ class Board:
     INPUT:
         position (tuple):      (x,y) coordinates of the stone whose liberties are to be checked.
         stoneColor (int):      The color of the stone/group (1 for black, -1 for white) whose liberties are being checked.
-        visited (set, optional): A set of (x,y) coordinates that have already been visited during the current liberty check (used for recursion). 
+        visited (set): A set of (x,y) coordinates that have already been visited during the current liberty check (used for recursion). 
                                Defaults to None and is initialized as an empty set in the first call.
         board           :      The temporary board from the isValidMove method is passed in to reduce the actual recquired liberty if capture is possible.
 
@@ -311,6 +311,99 @@ class Board:
         # However, if the move is a suicide move and doesn't capture then its an illegal move.
         else: 
             return False
+    
+    """
+    METHOD: floodFill
+
+    INPUT:
+        x (int):      The x-coordinate where the stone is to be played.
+        y (int):      The y-coordinate where the stone is to be played.
+        visited (set): A set of (x,y) coordinates that have already been visited during the current liberty check (used for recursion). 
+
+
+    RETURN:
+        territory (set): Contains all of the empty space surrounded by groups of stone.
+        borderColor (set): Contains all of the stone colors that surround the territory only want this to be one color else the territory is netrual.
+
+    DESCRIPTION:
+        This method iteratively finds adjacent groups of stones that will be return for scoring purposes. The method will be 
+        called after the removal of dead groups of stones so the method does not have to account for them.
+    """
+    def floodFill(self, x, y, visited):
+        territory = set()
+        borderColor = set()
+        queue = [(x,y)]
+
+        while queue: 
+            cx, cy = queue.pop()
+            if (cx, cy) in visited:
+                continue
+            
+            territory((cx,cy))
+            visited((cx,cy))
+
+            for nx, ny in self.getSurroundingStones(cx,cy):
+                if not (0<= nx < self.size and 0<= ny < self.size):
+                    continue
+                if self.board[nx,ny] == 0 and not visited:
+                    queue.append((nx,ny))
+                
+                elif self.board[nx,ny] != 0:
+
+                    borderColor.add(self.board[nx,ny])
+
+        if len(borderColor) == 1:
+            return territory, borderColor.pop()
+        return territory, 0
+
+
+    """
+    METHOD: getGroup
+
+    INPUT:
+        x (int):      The x-coordinate where the stone is to be played.
+        y (int):      The y-coordinate where the stone is to be played.
+   
+
+    RETURN:
+        group: Set of all the connect stones which will be counted as points towards a player's score.
+
+    DESCRIPTION:
+        This method iteratively finds adjacent groups of stones that will be return for scoring purposes. The method will be 
+        called after the removal of dead groups of stones so the method does not have to account for them.
+    """
+    def getGroup(self, x,y):
+
+        # Derives the color of stone we are getting the group of based off of coordinates
+        color = self.board[x,y]
+
+        # If the color is 0 that means its an empty space so there is no need to count the groups of 'stones'
+        if color == 0:
+            return set()
+        
+
+        # group is a set of all the group of stones that will be return.
+        group = set()
+
+        # This stack is the means to track which coordinate to traverse and count next.
+        stack = [(x,y)]
+
+        # This for loop will continue until there is no more connected groups of stones of the same color to include in the 
+        # group set to be returned.
+        while stack:
+            cx, cy = stack.pop
+
+            # This if statement is here to prevent visiting the same position multiple times.
+            if (cx, cy) not in group:
+                group.add(cx,cy)
+
+                # This for loop is searching for any other possible neighboring stones that would be in 
+                for nx, ny in self.getSurroundingStones(cx, cy):
+                    if (0 <= nx < self.size and 0 <= ny < self.size and self.board[nx,ny] == color):
+                        stack.append(nx,ny)
+                        
+        return group
+
 
 
 
@@ -449,21 +542,7 @@ class Board:
                 board[x,y] = 0
 
 
-    def scoreBoard(self):
-        
-        region = set()
-        visited = set()
-        def floodFill(x,y):
 
-            if not (0<= x < self.size and 0 <= y < self.size):
-                return
-            
-            if (x,y) in visited:
-                return
-            
-            visited.add((x,y))
-            region.add((x,y))
-            
 
 
         
