@@ -1,5 +1,6 @@
 import numpy as np
 
+
 """
 CLASS: Board
 
@@ -241,22 +242,6 @@ class Board:
         3. It is a "suicide" move: placing the stone results in the newly placed stone (or its group) having zero liberties,
            UNLESS placing this stone captures one or more opponent stones, thereby giving the new stone/group liberties.
         This method simulates the move on a temporary board to check for captures and self-capture (suicide) conditions.
-
-
-
-
-
-
-        Note: Ko rule is not explicitly implemented here but this is where it would be checked.
-
-
-
-
-
-
-
-
-
     """
     def isValidMove(self, x,y,player):
         
@@ -323,38 +308,169 @@ class Board:
 
     RETURN:
         territory (set): Contains all of the empty space surrounded by groups of stone.
-        borderColor (set): Contains all of the stone colors that surround the territory only want this to be one color else the territory is netrual.
+        borderColor (set): Contains all of the stone colors that surround the territory only want this to be one color else the territory is neutral.
 
     DESCRIPTION:
         This method iteratively finds adjacent groups of stones that will be return for scoring purposes. The method will be 
         called after the removal of dead groups of stones so the method does not have to account for them.
     """
     def floodFill(self, x, y, visited):
+
+        # Set for containing all of the empty space for a territory.
         territory = set()
+
+        # Set for keeping track of the color stone that is surround the territory.
+        # If there is only one color then that means the territory belongs to that stone color.
+        # Else the territory is neutral so no one gains points from it. 
         borderColor = set()
+
+        # The queue is a means for traversing through new positions on the border for territory counting.
         queue = [(x,y)]
 
-        while queue: 
+        while queue:    
             cx, cy = queue.pop()
+
+            # Do not count the same position more than once.
             if (cx, cy) in visited:
                 continue
             
             territory((cx,cy))
             visited((cx,cy))
 
+            # Check neighboring positions if they need to be counted for territory status.
             for nx, ny in self.getSurroundingStones(cx,cy):
                 if not (0<= nx < self.size and 0<= ny < self.size):
                     continue
+
+                # If the position is empty and has not been visited yet this is for (nx,ny) not (cx, cy) above.
+                # Then proceed to check its territory status and its neighboring squares too.
                 if self.board[nx,ny] == 0 and not visited:
                     queue.append((nx,ny))
                 
+                # If the position is not empty that means a stone is occupying that space. Add the color stone to the set.
+                # Since this is a set it won't have duplicates.
                 elif self.board[nx,ny] != 0:
 
                     borderColor.add(self.board[nx,ny])
 
+        # If there is only one stone color bordering the territory then the territory belongs to that stone.
         if len(borderColor) == 1:
             return territory, borderColor.pop()
+        
+        # Else the territory is neutral counting for no one.
         return territory, 0
+    
+
+    """
+    METHOD: hasTwoEyes
+
+    INPUT:
+        group (set):      Contains a group of connect stones that are the same color.
+   
+
+    RETURN:
+        bool: If a group of stones has two or more eyes than this method returns True else False.
+
+    DESCRIPTION:
+        This method iteratively checks the surrounding empty neighbors of the group of stones passed into the method. 
+        Then the method checks the surround of those empty positions to check if they are completely surrounded by stones of the 
+        same color has the group passed in. If an empty space is compeltely surround by a group of the same stone color that is an eye.
+        A group of stones needs at least two eyes to be considered alive.
+
+    """
+    def hasTwoEyes(self, group):
+        eyes = 0
+
+        # Gets all of the empty neighboring positions to the grid because some of those empty surround spaces could be an eye.
+        for x, y in group:
+            emptyNeighbors = [
+                (nx,ny) for nx,ny in self.getSurroundingStones(x,y)
+                if 0 <= nx < self.size and 0 <= ny < self.size and self.board[nx,ny] == 0
+            ]
+
+            # Now checks in reverse the surround of the empty neighboring positions to check if any of them are surround by the 
+            # same color stone as the group because that would make the empty space a potiential eye.
+
+            for ex, ey in emptyNeighbors:
+                neighbors = self.getSurroundingStones(ex,ey)
+
+                # This line checks if a single empty point (a potential "eye")
+                # is completely surrounded by stones of the same color as the group.
+                # If it is, we count it as a valid eye.
+                if (0 <= nx < self.size and 0 <= ny < self.size and self.board[nx, ny] == self.board[x,y] for nx,ny in neighbors):
+                    eyes += 1
+
+        return eyes >= 2
+
+    
+
+
+
+    """
+    METHOD: score
+
+    INPUT:
+        N/A
+
+    RETURN:
+        finalScore (dict): The keys are the player (-1, 1) and their respective score after considering dead stones and alive groups and territory.
+
+    DESCRIPTION:
+        This method is using the Chinese Scoring system which includes the stones in the score as well. The method 
+        iteratively checks for alive groups of stones
+        that maybe inside of enemy territory to properly score the player's points.
+        Then the method iteratively counts the amount of territory for each respective player and returns a dictionary with each 
+        player's score.
+    """
+ 
+    def score(self):
+
+        # A marker to prevent counting the same position mutliple times in the territory count.
+
+        visited = set()
+
+        # Dictionary for tracking the current territory of each player.
+        territory = {1: 0, -1: 0}
+
+        # Dictionary for tracking the current number of alive groups of stones which maybe inside an enemy's territory.
+        aliveStones = {1:0, -1:0}
+
+        # The purpose of check is for seeing if a group of stones has two eyes while visited is pertains towards the territory.
+        checked = set()
+
+        for x in range(self.size):
+            for y in range(self.size):
+                if self.board[x,y] != 0 and (x,y) not in checked:
+                    group = self.getGroup(x,y)
+                    checked.update(group)
+
+                    if self.hasTwoEyes(group):
+                        # You are incrementing by the length of the group because that is the total number of stones in the group.
+                        aliveStones[self.board[x,y]] += len(group)
+
+        for x in range(self.size):
+            for y in range(self.size):
+                if self.board[x,y] == 0 and (x,y) is not visited:
+
+                    # self.floodFill returns a set of the coordinates of the terriotry and (1 or -1 or 0) to indicate the 
+                    # owner of that territory.
+                    area, owner = self.floodFill(x,y, visited)
+
+                    # If there is an owner of the territory or owner is not 0 then 
+                    # you can increment that territory to a player's score.
+                    if owner in territory:
+                        # You have to use len(area) because area is a set of all of the positions on the board that consist of 
+                        # that territory not the numeric value of how large the territory is.
+                        territory[owner] += len(area)
+
+        # Calculates the final score of each player and returns it.
+        finalScore = {
+            1: territory[1] + aliveStones[1],
+            -1: territory[-1] + aliveStones[-1]
+        } 
+
+        return finalScore
+
 
 
     """
