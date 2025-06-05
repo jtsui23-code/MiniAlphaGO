@@ -63,6 +63,14 @@ class Board:
         # Need to count the number of consecutive passes because if there are 2 consecutive passes then the game ends.
         self.passCount = 0
 
+        # Need to tally captured stones for scoring.
+        # These are the captured stones that the player playing white has.
+        self.whiteStonePrisoners = 0
+
+        # These are the captured stones that the player black has.
+        self.blackStonePrisoners = 0
+
+
 
     """
     METHOD: checkLiberties
@@ -198,6 +206,13 @@ class Board:
 
         # Removes all of the stones that were select for removal.
         for x, y in toRemove:
+            
+            # Keeping track of the captured stones for scoring purposes.
+            if self.board[x,y] == 1:
+                self.whiteStonePrisoners += 1
+
+            elif self.board[x,y] == -1:
+                self.blackStonePrisoners += 1
             self.board[x,y] = 0
 
     
@@ -344,7 +359,7 @@ class Board:
 
                 # If the position is empty and has not been visited yet this is for (nx,ny) not (cx, cy) above.
                 # Then proceed to check its territory status and its neighboring squares too.
-                if self.board[nx,ny] == 0 and not visited:
+                if self.board[nx,ny] == 0 and (nx,y) not in visited:
                     queue.append((nx,ny))
                 
                 # If the position is not empty that means a stone is occupying that space. Add the color stone to the set.
@@ -440,6 +455,7 @@ class Board:
                 if self.board[dx,dy] != groupColor:
                     enemyOrEmpty += 1
 
+
     
     def findEyeSpace(self, group, groupColor):
 
@@ -465,23 +481,76 @@ class Board:
 
         return eyeRegion
     
-    def getConnectedEmptyRegion(self, startX, startY, groupColor, visitedSpaces):
+
+
+    """
+    METHOD: getConnectedEmptyRegion
+
+    INPUT:
+        startX (int):                   The x-coordinate where the empty space region starts.
+        starty (int):                   The y-coordinate where the empty space region starts.
+        groupColor (int):               Color of the stones surround the empty space to know whose territory it is.
+        globalVisitedSpaces (set):      Contains a group of connect stones that are the same color.
+   
+
+    RETURN:
+        region (set): A group empty connect spaces that may potientially be an eye.
+
+    DESCRIPTION:
+        This method iteratively checks for the all of the connected empty space in a surrounding territory this is 
+        for searching for potiential eye spaces which is useful for detecting 2 eyes.
+
+    """
+    
+    def getConnectedEmptyRegion(self, startX, startY, groupColor, globalVisitedSpaces):
+
+        # Region is the conenected group os empty space.
         region = set()
+
+        # Queue stores all of the starting position and its neighboring spaces.
         queue = [(startX, startY)]
+
+        # localVisitedSpaces prevents the repeat of already visited spaces.
         localVisitedSpace = set()
 
         while queue:
 
             x,y = queue.pop(0)
+
+            # Prevents repeats.
             if (x,y) in localVisitedSpace:
                 continue
-
+            
+            # Prevent out of board positions.
             if not (0 <= x < self.size and 0 <= y < self.size):
                 continue
-
+            
+            # Only checking empty spaces not stones.
             if self.board[x,y] != 0:
                 continue
             
+            # If the surround stone color around the empty space is different then
+            # the empty space are not connected together.
+            if not (self.isSpaceSurroundedByColor(x,y, groupColor)):
+                continue
+            
+            # If the empty space passes all of these rules then it will be marked as a connect empty region.
+            localVisitedSpace.add((x,y))
+            globalVisitedSpaces.add((x,y))
+            region.add((x,y))
+
+            # Searches for other empty spaces that could potientially be comprised in the same potiential eye space.
+            for nx, ny in self.getSurroundingStones(x,y):
+                if (0 <= x < self.size and 0 <= y < self.size and self.board[nx,ny] == 0):
+
+                    if (nx,ny) not in localVisitedSpace:
+                        queue.append((nx,ny))
+
+        # Returns the region of the connected empty region.
+        return region
+    
+    def isSpaceSurroundedByColor(self, x, y, groupColor):
+        pass
 
 
     
