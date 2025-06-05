@@ -334,8 +334,8 @@ class Board:
             if (cx, cy) in visited:
                 continue
             
-            territory((cx,cy))
-            visited((cx,cy))
+            territory.add((cx,cy))
+            visited.add((cx,cy))
 
             # Check neighboring positions if they need to be counted for territory status.
             for nx, ny in self.getSurroundingStones(cx,cy):
@@ -378,29 +378,111 @@ class Board:
         A group of stones needs at least two eyes to be considered alive.
 
     """
+    # def hasTwoEyes(self, group):
+    #     eyes = 0
+
+    #     # Gets all of the empty neighboring positions to the grid because some of those empty surround spaces could be an eye.
+    #     for x, y in group:
+    #         emptyNeighbors = [
+    #             (nx,ny) for nx,ny in self.getSurroundingStones(x,y)
+    #             if 0 <= nx < self.size and 0 <= ny < self.size and self.board[nx,ny] == 0
+    #         ]
+
+    #         # Now checks in reverse the surround of the empty neighboring positions to check if any of them are surround by the 
+    #         # same color stone as the group because that would make the empty space a potiential eye.
+
+    #         for ex, ey in emptyNeighbors:
+    #             neighbors = self.getSurroundingStones(ex,ey)
+
+    #             # This line checks if a single empty point (a potential "eye")
+    #             # is completely surrounded by stones of the same color as the group.
+    #             # If it is, we count it as a valid eye.
+    #             if (0 <= nx < self.size and 0 <= ny < self.size and self.board[nx, ny] == self.board[x,y] for nx,ny in neighbors):
+    #                 eyes += 1
+
+    #     return eyes >= 2
+
     def hasTwoEyes(self, group):
-        eyes = 0
+        if not group:
+            False
 
-        # Gets all of the empty neighboring positions to the grid because some of those empty surround spaces could be an eye.
+        samplePos = next(iter(group))
+        groupColor = self.board[samplePos[0], samplePos[1]]
+
+        eyes = []
+
+        checkedEyes = set()
+
         for x, y in group:
-            emptyNeighbors = [
-                (nx,ny) for nx,ny in self.getSurroundingStones(x,y)
-                if 0 <= nx < self.size and 0 <= ny < self.size and self.board[nx,ny] == 0
-            ]
+            for nx, ny in self.getSurroundingStones(x,y):
+                if 0<= nx < self.size and 0<= ny < self.size and self.board[nx,ny] == 0 and (nx,ny) not in checkedEyes:
 
-            # Now checks in reverse the surround of the empty neighboring positions to check if any of them are surround by the 
-            # same color stone as the group because that would make the empty space a potiential eye.
+                    if self.isEye((nx,ny),groupColor):
+                        eyes.append((nx,ny))
+                        checkedEyes.add((nx,ny))
 
-            for ex, ey in emptyNeighbors:
-                neighbors = self.getSurroundingStones(ex,ey)
 
-                # This line checks if a single empty point (a potential "eye")
-                # is completely surrounded by stones of the same color as the group.
-                # If it is, we count it as a valid eye.
-                if (0 <= nx < self.size and 0 <= ny < self.size and self.board[nx, ny] == self.board[x,y] for nx,ny in neighbors):
-                    eyes += 1
+        return len(eyes) >= 2
+    
+    def isEye(self, pos, groupColor):
+        x, y = pos
 
-        return eyes >= 2
+        for nx,ny in self.getSurroundingStones(x,y):
+            if 0 <= nx < self.size and 0 <= ny < self.size:
+                if self.board[nx,ny] != groupColor:
+                    return False
+
+        diagonals = [(x+1, y+1) ,(x+1, y-1), (x-1, y+1)(x-1, y-1)]
+        enemyOrEmpty = 0
+
+        for dx, dy in diagonals:
+            if 0 <= dx < self.size and 0 <= dy < self.size:
+                if self.board[dx,dy] != groupColor:
+                    enemyOrEmpty += 1
+
+    
+    def findEyeSpace(self, group, groupColor):
+
+        if not group:
+            return []
+        
+        potientialEyeSpace = set()
+
+        for gx, gy in group:
+            for nx, ny in self.getSurroundingStones(gx,gy):
+                if (0 <= nx < self.size and 0 <= ny < self.size and self.board[nx, ny] == 0):
+                    potientialEyeSpace.add((nx,ny))
+
+        eyeRegion = []
+        visitedSpaces = set()
+
+        for x, y in potientialEyeSpace:
+            if (x,y) not in visitedSpaces:
+                region = self.getConnectedEmptyRegion(x,y, groupColor, visitedSpaces)
+
+                if region:
+                    eyeRegion.append(region)
+
+        return eyeRegion
+    
+    def getConnectedEmptyRegion(self, startX, startY, groupColor, visitedSpaces):
+        region = set()
+        queue = [(startX, startY)]
+        localVisitedSpace = set()
+
+        while queue:
+
+            x,y = queue.pop(0)
+            if (x,y) in localVisitedSpace:
+                continue
+
+            if not (0 <= x < self.size and 0 <= y < self.size):
+                continue
+
+            if self.board[x,y] != 0:
+                continue
+            
+
 
     
 
@@ -450,7 +532,7 @@ class Board:
 
         for x in range(self.size):
             for y in range(self.size):
-                if self.board[x,y] == 0 and (x,y) is not visited:
+                if self.board[x,y] == 0 and (x,y) not in visited:
 
                     # self.floodFill returns a set of the coordinates of the terriotry and (1 or -1 or 0) to indicate the 
                     # owner of that territory.
@@ -507,7 +589,7 @@ class Board:
         # This for loop will continue until there is no more connected groups of stones of the same color to include in the 
         # group set to be returned.
         while stack:
-            cx, cy = stack.pop
+            cx, cy = stack.pop()
 
             # This if statement is here to prevent visiting the same position multiple times.
             if (cx, cy) not in group:
