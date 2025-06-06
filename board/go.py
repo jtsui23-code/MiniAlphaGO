@@ -137,6 +137,11 @@ class Board:
         
 
         return liberties
+
+   
+
+
+                
     
     """
     METHOD: removeStones
@@ -456,22 +461,134 @@ class Board:
                     enemyOrEmpty += 1
 
 
+    """
+    METHOD: isValidEye
+
+    INPUT:
+        eyeRegion (set):                Contains a region of empty space that is potientially an eye.
+        groupColor (int):               Color of the stones surround the empty space to know whose territory it is.
+   
+
+    RETURN:
+        Bool : Returns True if the empty space is a valid eye.
+
+    DESCRIPTION:
+        This method iteratively checks for the all of the surrounding stones around a empty region if its surrounded by 
+        the correct stone color to be deemed an eye along with checking for the diagonal positions of single space regions
+        because they are weaker.
+
+    """
+    def isValidEye(self, eyeRegion, groupColor):
+
+        # If there is no empty space then there is no eye.
+        if not eyeRegion:
+            return False
+        
+        # Checks the surround stone color around this empty space.
+        for x, y in eyeRegion:
+            if not self.isSpaceSurroundedByColor(x,y, groupColor):
+                return False
+
+        # If the empty space is only one large then have to check diagonal positions too not just adjacent ones
+        # because the single space points are weaker.
+        if len(eyeRegion) == 1:
+            x,y = next(iter(eyeRegion))
+            return self.checkSinglePointEyeDiagonals(x,y, groupColor)
+
+        return True
     
+
+
+
+
+    """
+    METHOD: checkSinglePointEyeDiagonals
+
+    INPUT:
+        X (int):                        The x-coordinate of empty space.
+        y (int):                        The y-coordinate of empty space.
+        groupColor (int):               Color of the stones surround the empty space to know whose territory it is.
+   
+
+    RETURN:
+        Bool : Returns whether or not the single space is a valid eye or not.
+
+    DESCRIPTION:
+        This method iteratively checks for the all of the diagonals of a single empty space region because 
+        single space regions are weaker in that they have a limit on how many diagonals they can have occupied by an 
+        enemy to invalidate them as an eye.
+
+    """
+    def checkSinglePointEyeDiagonals(self, x, y, groupColor):
+
+
+        diagonals = [(x+1, y+1), (x+1, y-1), (x-1, y+1), (x-1, y-1)]
+        enemyDiagonals = 0
+
+
+        # Need to check the relative position of the single empty space because corner positions are 
+        # weaker than center or edge positions on the board when it comes to creating a valid eye.
+        onEdgeX = (x == 0 or x == self.size -1)
+        onEdgeY = (y == 0 or y == self.size -1)
+        onCorner = (onEdgeX and onEdgeY)
+
+        # Checks the diagonals of the empty space and counts the number of enemy stones occupy its diagonal.
+        for dx, dy in diagonals:
+            if 0 <= dx < self.size and 0 <= dy < self.size:
+                if self.board[dx,dy] != groupColor and self.board[dx,dy] != 0:
+                    enemyDiagonals += 1
+
+        # If the empty space is on a corner, then it cannot have any enemy stone occupying its diagonal.
+        if onCorner:
+            return enemyDiagonals == 0
+        # Otherwise a max of 1 enemy in a diagonal is fine.
+        else:
+            return enemyDiagonals <= 1
+     
+
+
+
+
+
+
+    """
+    METHOD: findEyeSpace
+
+    INPUT:
+        group (set):      Contains a group of connect stones that are the same color.
+        groupColor (int):               Color of the stones surround the empty space to know whose territory it is.
+   
+
+    RETURN:
+        eyeRegion (array): A list of coordinates of eye spaces this needs to be a list because some eyes are bigger than 1 space.
+
+    DESCRIPTION:
+        This method iteratively checks for the all of the neighboring empty spaces around a group of stones and then checks if
+        those empty spaces have the potiential of being an eye. Then checks if the eye space is surround by the correct stone color
+        for eye detection.
+
+    """
     def findEyeSpace(self, group, groupColor):
 
+        # If group is empty, then there is no potiential eye there.
         if not group:
             return []
         
         potientialEyeSpace = set()
 
+        # Derives the empty neighboring spaces around the group of stones.
         for gx, gy in group:
             for nx, ny in self.getSurroundingStones(gx,gy):
                 if (0 <= nx < self.size and 0 <= ny < self.size and self.board[nx, ny] == 0):
                     potientialEyeSpace.add((nx,ny))
 
+
         eyeRegion = []
         visitedSpaces = set()
 
+        # Checks for any connected empty spaces because they are potiential eye spaces. 
+        # Then checks if the eye space is surround by the correct stone color
+        # for eye detection which occurs in the getConnectedEmptyRegion method.
         for x, y in potientialEyeSpace:
             if (x,y) not in visitedSpaces:
                 region = self.getConnectedEmptyRegion(x,y, groupColor, visitedSpaces)
@@ -490,7 +607,7 @@ class Board:
         startX (int):                   The x-coordinate where the empty space region starts.
         starty (int):                   The y-coordinate where the empty space region starts.
         groupColor (int):               Color of the stones surround the empty space to know whose territory it is.
-        globalVisitedSpaces (set):      Contains a group of connect stones that are the same color.
+        globalVisitedSpaces (set):      Contains a coordinates of already visited spaces to prevent repeats.
    
 
     RETURN:
@@ -529,8 +646,8 @@ class Board:
             if self.board[x,y] != 0:
                 continue
             
-            # If the surround stone color around the empty space is different then
-            # the empty space are not connected together.
+            # Checks if the correct color stones are surrounding this region of empty space if so 
+            # then this empty space is home to an eye.
             if not (self.isSpaceSurroundedByColor(x,y, groupColor)):
                 continue
             
@@ -549,8 +666,42 @@ class Board:
         # Returns the region of the connected empty region.
         return region
     
+
+    """
+    METHOD: isSpaceSurroundedByColor
+
+    INPUT:
+        X (int):                        The x-coordinate of empty space.
+        y (int):                        The y-coordinate of empty space.
+        groupColor (int):               Color of the stones surround the empty space to know whose territory it is.
+   
+
+    RETURN:
+        bool : Boolean of whether this specific empty space has any surround friendly stones.
+
+    DESCRIPTION:
+        This method iteratively checks for the all of the connected empty space in a surrounding territory this is 
+        for searching for potiential eye spaces which is useful for detecting 2 eyes.
+
+    """
     def isSpaceSurroundedByColor(self, x, y, groupColor):
-        pass
+
+        # If the coordinate is not of an empty, it is not valid.
+        if self.board[x,y] != 0:
+            return False
+        
+        # Check the neighbors of this empty space
+        for nx, ny in self.getSurroundingStones(x,y):
+            if 0 <= nx < self.size and 0 <= ny < self.size:
+
+                # Checking if the surround stones to the empty space contains only enemy stones if so 
+                # then if space cannot be an eye space.
+                if self.board[nx,ny] != groupColor and self.board[nx,ny] != 0:
+                    return False
+                
+        return True
+                
+
 
 
     
