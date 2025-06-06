@@ -854,63 +854,98 @@ class Board:
         N/A
 
     RETURN:
-        finalScore (dict): The keys are the player (-1, 1) and their respective score after considering dead stones and alive groups and territory.
+        finalScore (dict): The keys are the player (-1, 1) and their respective score after considering 
+        stone count, territory count and prisoner stones and captured stones..
 
     DESCRIPTION:
         This method is using the Chinese Scoring system which includes the stones in the score as well. The method 
-        iteratively checks for alive groups of stones
-        that maybe inside of enemy territory to properly score the player's points.
-        Then the method iteratively counts the amount of territory for each respective player and returns a dictionary with each 
-        player's score.
+        iteratively checks for dead stones to remove from the board and use for scoring. Also, the method iteratively
+        checks for the stone count of alive stones and territory count for the scoring process.
     """
  
     def score(self):
+        
+        # Gets all of the dead stones on the board.
+        deadStones = self.identifyDeadStones()
 
-        # A marker to prevent counting the same position mutliple times in the territory count.
+        # Creating copy of board with the dead stones removed.
+        scoringBoard = self.board.copy()
+        
+        # Storing prisoner stones derived from dead stones.
+        prisonerStones = {
+             1:0, 
+            -1: 0
+        }
+
+        # Filters through the dead stones to get all of the prisoner stones. 
+        for x, y in deadStones:
+            
+            # If the dead stone color is black, then its white's prisoner.
+            if scoringBoard[x,y] == 1:
+                prisonerStones[-1] += 1
+
+            # If the dead stone is white, then its black's prisoner.
+            elif scoringBoard[x,y] == -1:
+                prisonerStones[1] += 1
+
+            # Make remove the dead stone in the temporary scoring board.
+            scoringBoard[x,y] == 0
+
+
+        # Saves the original board because it be needed.
+        originalBoard = self.board
+
+        # Use the scoring board.
+        self.board = scoringBoard
 
         visited = set()
 
-        # Dictionary for tracking the current territory of each player.
-        territory = {1: 0, -1: 0}
+        # Counts all of the territory.
+        territoryScore = {1: 0, -1: 0}
 
-        # Dictionary for tracking the current number of alive groups of stones which maybe inside an enemy's territory.
-        aliveStones = {1:0, -1:0}
+        # Counts all of the stones surrounding the territory.
+        stoneCount = {1:0, -1:0}
 
-        # The purpose of check is for seeing if a group of stones has two eyes while visited is pertains towards the territory.
-        checked = set()
-
+        # Parse through the entire board and start counting alive stones.
         for x in range(self.size):
             for y in range(self.size):
-                if self.board[x,y] != 0 and (x,y) not in checked:
-                    group = self.getGroup(x,y)
-                    checked.update(group)
 
-                    if self.hasTwoEyes(group):
-                        # You are incrementing by the length of the group because that is the total number of stones in the group.
-                        aliveStones[self.board[x,y]] += len(group)
-
+                if self.board[x,y] != 0:
+                    stoneCount[self.board[x,y]] += 1
+        
+        # Parse through the entire board and start counting territory.
         for x in range(self.size):
             for y in range(self.size):
+                
+                # Checks for the area of the territory and its owner.
                 if self.board[x,y] == 0 and (x,y) not in visited:
 
-                    # self.floodFill returns a set of the coordinates of the terriotry and (1 or -1 or 0) to indicate the 
-                    # owner of that territory.
+                    # floodFill returns a set representing the individual positions in territory and a 1/-1 for its owner.
+                    # if the second returned value is a 0 then no one owns the territory.
                     area, owner = self.floodFill(x,y, visited)
 
-                    # If there is an owner of the territory or owner is not 0 then 
-                    # you can increment that territory to a player's score.
-                    if owner in territory:
-                        # You have to use len(area) because area is a set of all of the positions on the board that consist of 
-                        # that territory not the numeric value of how large the territory is.
-                        territory[owner] += len(area)
+                    if owner in territoryScore:
+                        # Have to use len() for area because area is a set which stores all of the coordinates in the 
+                        # territory not an int value representing the magnitude of the area.
+                        territoryScore[owner] += len(area)
 
-        # Calculates the final score of each player and returns it.
-        finalScore = {
-            1: territory[1] + aliveStones[1],
-            -1: territory[-1] + aliveStones[-1]
-        } 
+        # Reverts back to the original board.
+        self.board = originalBoard
 
-        return finalScore
+        # Calculates the final score for both players including stone count, territory count and prisoner stones and 
+        # captured stones.
+        # The difference between prisonerStones[1] and self.blackStonePrisoners is that 
+        # prisonerStones[1] is from dead stones on the board when scoring while self.blackStonePrisoner is from captured stones.
+        # Same thing goes for prisonerStone[-1] and self.whiteStonePrisoner.
+        finalScores = {
+            1: territoryScore[1] + stoneCount[1] + prisonerStones[1] + self.blackStonePrisoners,
+            -1: territoryScore[-1] + stoneCount[-1] + prisonerStones[-1] + self.whiteStonePrisoners
+        }
+
+
+        return finalScores
+
+                    
 
 
 
