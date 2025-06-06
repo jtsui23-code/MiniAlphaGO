@@ -536,6 +536,106 @@ class Board:
 
         return True
     
+    """
+    METHOD: identifyDeadStones
+
+    INPUT:
+        N/A
+
+    RETURN:
+        deadStones (set):   Contains all of the groups of dead stones on the board.
+
+    DESCRIPTION:
+        This method iteratively checks for the all of the groups of stones on the board and detects whether or not 
+        the group of stones are dead or alive and returns all of the groups of dead stones it found as a set.
+
+    """
+    def identifyDeadStones(self):
+
+        # Creates a set for storing all of the found dead stones 
+        # and visited positions on the board to prevent repeats.
+        deadStones = set()
+        visited = set()
+
+        # Checks every position on the board.
+        for x in range(self.size):
+            for y in range(self.size):
+
+                # If the position is not an empty space, it is occupied by a stone so check for its group if its alive or 
+                # dead.
+                if self.board[x,y] != 0 and (x,y) not in visited:
+                    group = self.getGroup(x,y)
+                    visited.update(group)
+
+                    # Checking for the liberties of the group and its number of eyes.
+                    liberties = self.checkLiberties((x,y),self.board[x,y])
+                    hasTwoEyes = self.hasTwoEyes(group)
+
+                    # A group without 2 eyes is dead.
+                    if not hasTwoEyes:
+                        deadStones.update(group)
+                    
+                    
+                    elif liberties <= 1 and not hasTwoEyes and self.isInEnemyTerritory(group):
+                        deadStones.update(group)
+
+        return deadStones
+    
+    """
+    METHOD: isInEnemyTerritory
+
+    INPUT:
+        group (set):      Contains a group of connect stones that are the same color.
+
+    RETURN:
+        Bool :            Returns True if you are in enemy territory.
+
+    DESCRIPTION:
+        This method iteratively checks for the surrounding radius of the group of stones for the ratio of 
+        enemy stones there are. If there are more than 60% of enemy stones surround a group of stones then 
+        they are considered to be inside of enemy territory.
+
+    """
+    def isInEnemyTerritory(self,group):
+
+        # If there is no group then end the method.
+        if not group: 
+            return False
+        
+        # Getting the stone color of the group and the enemy.
+        samplePos = next(iter(group))
+        groupColor = self.board[samplePos[0], samplePos[1]]
+        enemyColor = -groupColor
+
+        # Counters for the total enemy of stones in the radius and everthing else 
+        # for getting a ratio of enemies in the surrounding.
+        enemyCount = 0
+        totalCount = 0
+
+        # Checks the the radius of 2 positions around each of the stones in the group for 
+        # what is surrounding the group.
+        for gx,gy in group:
+            
+            # Checking with a radius of 2 needs to include negative values for dx/dy otherwise it would only 
+            # Check one direction horizontally and vertically.
+            for dx in range(-2,3):
+                for dy in range(-2,3):
+                    
+                    # Getting the radius positions to check what is there. 
+                    nx, ny = gx + dx, gy + dy
+
+                    # If there is an enemy there increment enemyCount but you always increment totalCount whether its 
+                    # empty, friendly stone, or and enemy stone.
+                    if 0<= nx < self.size and 0 <= ny < self.size:
+                        totalCount += 1
+                        
+                        if self.board[nx,ny] == enemyColor:
+                            enemyCount += 1
+
+        
+        # If there is more than 60% of enemy stones in the surrounding area then 
+        # you are considered inside of enemy territory.
+        return totalCount > 0 and (enemyCount/totalCount) > 0.6
 
 
 
