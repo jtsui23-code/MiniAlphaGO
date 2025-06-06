@@ -422,43 +422,82 @@ class Board:
 
     #     return eyes >= 2
 
-    def hasTwoEyes(self, group):
-        if not group:
-            False
+    # def hasTwoEyes(self, group):
+    #     if not group:
+    #         False
 
+    #     samplePos = next(iter(group))
+    #     groupColor = self.board[samplePos[0], samplePos[1]]
+
+    #     eyes = []
+
+    #     checkedEyes = set()
+
+    #     for x, y in group:
+    #         for nx, ny in self.getSurroundingStones(x,y):
+    #             if 0<= nx < self.size and 0<= ny < self.size and self.board[nx,ny] == 0 and (nx,ny) not in checkedEyes:
+
+    #                 if self.isEye((nx,ny),groupColor):
+    #                     eyes.append((nx,ny))
+    #                     checkedEyes.add((nx,ny))
+
+
+    #     return len(eyes) >= 2
+    
+
+
+    """
+    METHOD: hasTwoEyes
+
+    INPUT:
+        group (set):      Contains a group of connect stones that are the same color.
+   
+
+    RETURN:
+        Bool : Returns True if there are at 2 valid eye found in a group of stones.
+
+    DESCRIPTION:
+        This method iteratively checks for the potiential eye space that a given group of stones has and 
+        counts the number of valid eyes it has. If the group has at least 2 eyes then the method returns True.
+
+    """
+    def hasTwoEyes(self, group):
+        if not group: 
+            return False
+        
         samplePos = next(iter(group))
         groupColor = self.board[samplePos[0], samplePos[1]]
 
-        eyes = []
+        eyeRegion = self.findEyeSpace(group, groupColor)
 
-        checkedEyes = set()
+        validEyes = 0
+        
+        for region in eyeRegion:
+            if self.isValidEye(eyeRegion, groupColor):
+                validEyes += 1
 
-        for x, y in group:
-            for nx, ny in self.getSurroundingStones(x,y):
-                if 0<= nx < self.size and 0<= ny < self.size and self.board[nx,ny] == 0 and (nx,ny) not in checkedEyes:
-
-                    if self.isEye((nx,ny),groupColor):
-                        eyes.append((nx,ny))
-                        checkedEyes.add((nx,ny))
+            if validEyes >= 2:
+                return True
+        
+        return False
 
 
-        return len(eyes) >= 2
     
-    def isEye(self, pos, groupColor):
-        x, y = pos
+    # def isEye(self, pos, groupColor):
+    #     x, y = pos
 
-        for nx,ny in self.getSurroundingStones(x,y):
-            if 0 <= nx < self.size and 0 <= ny < self.size:
-                if self.board[nx,ny] != groupColor:
-                    return False
+    #     for nx,ny in self.getSurroundingStones(x,y):
+    #         if 0 <= nx < self.size and 0 <= ny < self.size:
+    #             if self.board[nx,ny] != groupColor:
+    #                 return False
 
-        diagonals = [(x+1, y+1) ,(x+1, y-1), (x-1, y+1)(x-1, y-1)]
-        enemyOrEmpty = 0
+    #     diagonals = [(x+1, y+1) ,(x+1, y-1), (x-1, y+1)(x-1, y-1)]
+    #     enemyOrEmpty = 0
 
-        for dx, dy in diagonals:
-            if 0 <= dx < self.size and 0 <= dy < self.size:
-                if self.board[dx,dy] != groupColor:
-                    enemyOrEmpty += 1
+    #     for dx, dy in diagonals:
+    #         if 0 <= dx < self.size and 0 <= dy < self.size:
+    #             if self.board[dx,dy] != groupColor:
+    #                 enemyOrEmpty += 1
 
 
     """
