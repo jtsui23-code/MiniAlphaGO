@@ -473,7 +473,7 @@ class Board:
         validEyes = 0
         
         for region in eyeRegion:
-            if self.isValidEye(eyeRegion, groupColor):
+            if self.isValidEye(region, groupColor):
                 validEyes += 1
 
             if validEyes >= 2:
@@ -797,10 +797,8 @@ class Board:
 
             # Searches for other empty spaces that could potientially be comprised in the same potiential eye space.
             for nx, ny in self.getSurroundingStones(x,y):
-                if (0 <= x < self.size and 0 <= y < self.size and self.board[nx,ny] == 0):
-
-                    if (nx,ny) not in localVisitedSpace:
-                        queue.append((nx,ny))
+                if (nx,ny) not in localVisitedSpace:
+                    queue.append((nx,ny))
 
         # Returns the region of the connected empty region.
         return region
@@ -889,7 +887,7 @@ class Board:
                 prisonerStones[1] += 1
 
             # Make remove the dead stone in the temporary scoring board.
-            scoringBoard[x,y] == 0
+            scoringBoard[x,y] = 0
 
 
         # Saves the original board because it be needed.
@@ -987,12 +985,12 @@ class Board:
 
             # This if statement is here to prevent visiting the same position multiple times.
             if (cx, cy) not in group:
-                group.add(cx,cy)
+                group.add((cx,cy))
 
                 # This for loop is searching for any other possible neighboring stones that would be in 
                 for nx, ny in self.getSurroundingStones(cx, cy):
                     if (0 <= nx < self.size and 0 <= ny < self.size and self.board[nx,ny] == color):
-                        stack.append(nx,ny)
+                        stack.append((nx,ny))
                         
         return group
 
@@ -1276,59 +1274,94 @@ if __name__ == "__main__":
 
     # Check for Passing  -----------------------------------------------------------------------------------------------------------------------------------------------------
 
-    turnCount = 1
-    print("Turn", turnCount, "------------------------------------------------------------------------------------")
-    turnCount += 1
+    # turnCount = 1
+    # print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    # turnCount += 1
 
 
-    b.playMove(1, 4, 1)  
+    # b.playMove(1, 1, 1)  
  
 
-    b.printBoard()
+    # b.printBoard()
 
 
-    print("Turn", turnCount, "------------------------------------------------------------------------------------")
-    turnCount += 1
+    # print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    # turnCount += 1
 
 
-    b.playMove(3, 4, -1)  
+    # b.playMove(3, 4, -1)  
 
-    b.printBoard()
+    # b.printBoard()
 
 
 
-    print("Turn", turnCount, "------------------------------------------------------------------------------------")
-    turnCount += 1
+    # print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    # turnCount += 1
 
-    print("Passed turn here-----------------------")
-    b.playMove(1, 4, 1, passTurn=True)  
+    # print("Passed turn here-----------------------")
+    # b.playMove(0, 1, 1)  
  
 
-    b.printBoard()
+    # b.printBoard()
 
 
-    print("Turn", turnCount, "------------------------------------------------------------------------------------")
-    turnCount += 1
+    # print("Turn", turnCount, "------------------------------------------------------------------------------------")
+    # turnCount += 1
 
 
-    b.playMove(1, 6, 1)  
+    # b.playMove(1, 6, 1)  
  
 
+    # b.printBoard()
+
+
+
+    # Checking if scoring works -------------------------------------------------------------------------------------------------------------
+
+    turn = 1
+
+    def next_turn():
+        global turn
+        print(f"Turn {turn} --------------------------------------------")
+        turn += 1
+        b.printBoard()
+
+    # Opening - Black makes territory in upper-left
+    b.playMove(0, 0, 1); next_turn()
+    b.playMove(5, 5, -1); next_turn()
+    b.playMove(0, 1, 1); next_turn()
+    b.playMove(5, 6, -1); next_turn()
+    b.playMove(1, 0, 1); next_turn()
+    b.playMove(6, 5, -1); next_turn()
+    b.playMove(1, 1, 1); next_turn()
+    b.playMove(6, 6, -1); next_turn()
+
+    # Black surrounds white stone
+    b.playMove(2, 1, 1); next_turn()
+    b.playMove(2, 2, -1); next_turn()
+    b.playMove(2, 0, 1); next_turn()
+    b.playMove(4, 4, -1); next_turn()
+    b.playMove(3, 1, 1); next_turn()
+    b.playMove(4, 5, -1); next_turn()
+    b.playMove(3, 0, 1); next_turn()
+    b.playMove(7, 7, -1); next_turn()
+
+    # Black finishes off white stone (dead)
+    b.playMove(3, 2, 1); next_turn()
+
+    # Some more moves
+    b.playMove(7, 6, -1); next_turn()
+    b.playMove(4, 0, 1); next_turn()
+    b.playMove(8, 8, -1); next_turn()
+    b.playMove(4, 1, 1); next_turn()
+
+    # Both players pass to end game
+    b.playMove(0, 0, -1, passTurn=True); next_turn()
+    b.playMove(0, 0, 1, passTurn=True); next_turn()
+
+    print("Final Board:")
     b.printBoard()
 
-
-    print("Turn", turnCount, "------------------------------------------------------------------------------------")
-    turnCount += 1
-
-
-    b.playMove(1, 6, -1)  
- 
-
-    b.printBoard()
-
-
-    # Check for Passing  -----------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
+    print("Final Score:")
+    print(b.score())
+  
