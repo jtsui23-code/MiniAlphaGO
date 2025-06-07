@@ -348,7 +348,7 @@ class Board:
         queue = [(x,y)]
 
         while queue:    
-            cx, cy = queue.pop()
+            cx, cy = queue.pop(0)
 
             # Do not count the same position more than once.
             if (cx, cy) in visited:
@@ -364,7 +364,7 @@ class Board:
 
                 # If the position is empty and has not been visited yet this is for (nx,ny) not (cx, cy) above.
                 # Then proceed to check its territory status and its neighboring squares too.
-                if self.board[nx,ny] == 0 and (nx,y) not in visited:
+                if self.board[nx,ny] == 0 and (nx,ny) not in visited:
                     queue.append((nx,ny))
                 
                 # If the position is not empty that means a stone is occupying that space. Add the color stone to the set.
@@ -571,12 +571,9 @@ class Board:
                     liberties = self.checkLiberties((x,y),self.board[x,y])
                     hasTwoEyes = self.hasTwoEyes(group)
 
-                    # A group without 2 eyes is dead.
-                    if not hasTwoEyes:
-                        deadStones.update(group)
-                    
-                    
-                    elif liberties <= 1 and not hasTwoEyes and self.isInEnemyTerritory(group):
+                    # A group without 2 eyes is dead. If a group of stones are in enemy territory without 2 eyes they are also 
+                    # dead.
+                    if not hasTwoEyes and (liberties <= 1 or self.isInEnemyTerritory(group)):
                         deadStones.update(group)
 
         return deadStones
@@ -940,6 +937,10 @@ class Board:
             -1: territoryScore[-1] + stoneCount[-1] + prisonerStones[-1] + self.whiteStonePrisoners
         }
 
+        print("Dead Stones:", deadStones)
+        print("Prisoners:", prisonerStones)
+        print("Territory:", territoryScore)
+        print("Stone Count:", stoneCount)
 
         return finalScores
 
