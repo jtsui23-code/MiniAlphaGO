@@ -1450,3 +1450,39 @@ if __name__ == "__main__":
     # Testing 2 eyes detection variant 2  ---------------------------------------------------------------------------------------
 
 
+    # Testing dead stone in enemy territory variant 2 -------------------------------------------------------------------------------
+
+    print("--- Test 4: Complex Board with Dead Group ---")
+
+    # Black builds a large structure
+    b.playMove(3, 3, 1); next_turn()
+    b.playMove(0, 0, -1); next_turn()
+    b.playMove(3, 4, 1); next_turn()
+    b.playMove(0, 1, -1); next_turn()
+    b.playMove(3, 5, 1); next_turn()
+    b.playMove(0, 2, -1); next_turn()
+    b.playMove(4, 2, 1); next_turn()
+    b.playMove(0, 3, -1); next_turn()
+    b.playMove(5, 3, 1); next_turn()
+    b.playMove(0, 4, -1); next_turn()
+    b.playMove(5, 6, 1); next_turn()
+    b.playMove(0, 5, -1); next_turn()
+    b.playMove(4, 7, 1); next_turn()
+    b.playMove(0, 6, -1); next_turn()
+    b.playMove(3, 6, 1); next_turn()
+    b.playMove(8, 8, -1); next_turn()
+
+    # White tries to live inside
+    b.playMove(2, 4, 1); next_turn()
+    b.playMove(4, 4, -1); next_turn() # White's group starts
+    b.playMove(6, 4, 1); next_turn()
+    b.playMove(4, 5, -1); next_turn()
+    b.playMove(4, 6, 1); next_turn()
+    b.playMove(5, 5, -1); next_turn()
+    b.playMove(5, 4, 1); next_turn()
+    b.playMove(4, 3, -1); next_turn() # White has one eye at (4,4)
+
+
+    print("Final Score:", b.score())
+
+    # Testing dead stone in enemy territory variant 2 -------------------------------------------------------------------------------
