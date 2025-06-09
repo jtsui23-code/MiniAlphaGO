@@ -522,25 +522,25 @@ class Board:
 
 
     # ------------------------------------------------------------------------------------------------------------------------------------
-    # def hasTwoEyes(self, group):
-    #     if not group: 
-    #         return False
+    def hasTwoEyes(self, group):
+        if not group: 
+            return False
         
-    #     samplePos = next(iter(group))
-    #     groupColor = self.board[samplePos[0], samplePos[1]]
+        samplePos = next(iter(group))
+        groupColor = self.board[samplePos[0], samplePos[1]]
 
-    #     eyeRegion = self.findEyeSpace(group, groupColor)
+        eyeRegion = self.findEyeSpace(group, groupColor)
 
-    #     validEyes = 0
+        validEyes = 0
         
-    #     for region in eyeRegion:
-    #         if self.isValidEye(region, groupColor):
-    #             validEyes += 1
+        for region in eyeRegion:
+            if self.isValidEye(region, groupColor):
+                validEyes += 1
 
-    #         if validEyes >= 2:
-    #             return True
+            if validEyes >= 2:
+                return True
         
-    #     return False
+        return False
     # ------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -930,108 +930,182 @@ class Board:
         iteratively checks for dead stones to remove from the board and use for scoring. Also, the method iteratively
         checks for the stone count of alive stones and territory count for the scoring process.
     """
- 
     def score(self):
-        
-        # Gets all of the dead stones on the board.
+  
+
+        # First, identify and remove dead stones
         deadStones = self.identifyDeadStones()
 
 
-        
-
-        # Use the scoring board.
+        capturedDeadStones = {1:0, -1:0}
+        # Create a copy of the board with dead stones removed
         scoringBoard = self.board.copy()
-
-
-        deadStonesType = {1:0, -1:0}
-
-        for x, y in deadStones:
-            deadStonesType[self.board[x,y]] += 1
-
-        # Creating copy of board with the dead stones removed.
-        
-        # Storing prisoner stones derived from dead stones.
-        prisonerStones = {
-             1:0, 
-            -1: 0
-        }
 
         # Filters through the dead stones to get all of the prisoner stones. 
         for x, y in deadStones:
-            
-            # If the dead stone color is black, then its white's prisoner.
+
             if scoringBoard[x,y] == 1:
-                prisonerStones[-1] += 1
+                capturedDeadStones[1] += 1
 
-            # If the dead stone is white, then its black's prisoner.
             elif scoringBoard[x,y] == -1:
-                prisonerStones[1] += 1
+                capturedDeadStones[-1] += 1
 
-            # # Make remove the dead stone in the temporary scoring board.
-            scoringBoard[x,y] = 0
-
-        # Saves the original board because it be needed.
-        originalBoard = self.board.copy()
-        self.board = scoringBoard
-
-
-        visited = set()
-
-        # Counts all of the territory.
-        territoryScore = {1: 0, -1: 0}
-
-        # Counts all of the stones surrounding the territory.
-        stoneCount = {1:0, -1:0}
-
-        # Parse through the entire board and start counting alive stones.
-        for x in range(self.size):
-            for y in range(self.size):
-
-                if self.board[x,y] != 0:
-                    stoneCount[self.board[x,y]] += 1
+            scoringBoard[x, y] = 0
         
-        # Parse through the entire board and start counting territory.
+        # Temporarily update board for scoring
+        originalBoard = self.board
+        self.board = scoringBoard
+        
+        visited = set()
+        territoryScores = {1: 0, -1: 0}
+        stoneCount = {1: 0, -1: 0}
+        
+        # Count living stones
         for x in range(self.size):
             for y in range(self.size):
-                
-                # Checks for the area of the territory and its owner.
-                if self.board[x,y] == 0 and (x,y) not in visited:
+                if self.board[x, y] != 0:
+                    stoneCount[self.board[x, y]] += 1
+        
+        # Count territory
+        for x in range(self.size):
+            for y in range(self.size):
+                if self.board[x, y] == 0 and (x, y) not in visited:
 
                     # floodFill returns a set representing the individual positions in territory and a 1/-1 for its owner.
                     # if the second returned value is a 0 then no one owns the territory.
-                    area, owner = self.floodFill(x,y, visited)
+                    area, owner = self.floodFill(x, y, visited)
+                    
+                    if owner in territoryScores:
 
-                    if owner in territoryScore:
-                        # Have to use len() for area because area is a set which stores all of the coordinates in the 
+                         # Have to use len() for area because area is a set which stores all of the coordinates in the 
                         # territory not an int value representing the magnitude of the area.
-                        territoryScore[owner] += len(area)
+                        territoryScores[owner] += len(area)
 
-
-        # Reverts back to the original board.
+        
+        # Restore original board
         self.board = originalBoard
-
+        
         # Calculates the final score for both players including stone count, territory count and prisoner stones and 
         # captured stones.
         # The difference between prisonerStones[1] and self.blackStonePrisoners is that 
         # prisonerStones[1] is from dead stones on the board when scoring while self.blackStonePrisoner is from captured stones.
         # Same thing goes for prisonerStone[-1] and self.whiteStonePrisoner.
-
         finalScores = {
-            1: territoryScore[1] + stoneCount[1] + prisonerStones[1] + self.blackStonePrisoners,
-            -1: territoryScore[-1] + stoneCount[-1] + prisonerStones[-1] + self.whiteStonePrisoners
+            1: stoneCount[1] + territoryScores[1] + capturedDeadStones[-1],
+            -1: stoneCount[-1] + territoryScores[-1] + capturedDeadStones[1]
         }
 
-        # finalScores = {
-        #     1: territoryScore[1] + stoneCount[1] + prisonerStones[1] + self.blackStonePrisoners,
-        #     -1: territoryScore[-1] + stoneCount[-1] + prisonerStones[-1] + self.whiteStonePrisoners
-        # }
-
-        print("Dead Stones:", deadStones)
-        print("Prisoners:", prisonerStones)
-        print("Territory:", territoryScore)
-        print("Stone Count:", stoneCount)
+        print("dead stones: ", deadStones)
+        print("stone count: ", stoneCount)
+        print("territory :", territoryScores)
+        print("captured dead stones: ", capturedDeadStones)
 
         return finalScores
+
+
+
+
+    # def score(self):
+        
+    #     # Gets all of the dead stones on the board.
+    #     deadStones = self.identifyDeadStones()
+
+
+        
+
+    #     # Use the scoring board.
+    #     scoringBoard = self.board.copy()
+
+
+    #     deadStonesType = {1:0, -1:0}
+
+    #     for x, y in deadStones:
+    #         deadStonesType[self.board[x,y]] += 1
+
+    #     # Creating copy of board with the dead stones removed.
+        
+    #     # Storing prisoner stones derived from dead stones.
+    #     prisonerStones = {
+    #          1:0, 
+    #         -1: 0
+    #     }
+
+    #     # Filters through the dead stones to get all of the prisoner stones. 
+    #     for x, y in deadStones:
+            
+    #         # If the dead stone color is black, then its white's prisoner.
+    #         if scoringBoard[x,y] == 1:
+    #             prisonerStones[-1] += 1
+
+    #         # If the dead stone is white, then its black's prisoner.
+    #         elif scoringBoard[x,y] == -1:
+    #             prisonerStones[1] += 1
+
+    #         # # Make remove the dead stone in the temporary scoring board.
+    #         scoringBoard[x,y] = 0
+
+    #     # Saves the original board because it be needed.
+    #     originalBoard = self.board.copy()
+    #     self.board = scoringBoard
+
+
+    #     visited = set()
+
+    #     # Counts all of the territory.
+    #     territoryScore = {1: 0, -1: 0}
+
+    #     # Counts all of the stones surrounding the territory.
+    #     stoneCount = {1:0, -1:0}
+
+    #     # Parse through the entire board and start counting alive stones.
+    #     for x in range(self.size):
+    #         for y in range(self.size):
+
+    #             if self.board[x,y] != 0:
+    #                 stoneCount[self.board[x,y]] += 1
+        
+    #     # Parse through the entire board and start counting territory.
+    #     for x in range(self.size):
+    #         for y in range(self.size):
+                
+    #             # Checks for the area of the territory and its owner.
+    #             if self.board[x,y] == 0 and (x,y) not in visited:
+
+    #                 # floodFill returns a set representing the individual positions in territory and a 1/-1 for its owner.
+    #                 # if the second returned value is a 0 then no one owns the territory.
+    #                 area, owner = self.floodFill(x,y, visited)
+
+    #                 if owner in territoryScore:
+    #                     # Have to use len() for area because area is a set which stores all of the coordinates in the 
+    #                     # territory not an int value representing the magnitude of the area.
+    #                     territoryScore[owner] += len(area)
+
+
+    #     # Reverts back to the original board.
+    #     self.board = originalBoard
+
+    #     # Calculates the final score for both players including stone count, territory count and prisoner stones and 
+    #     # captured stones.
+    #     # The difference between prisonerStones[1] and self.blackStonePrisoners is that 
+    #     # prisonerStones[1] is from dead stones on the board when scoring while self.blackStonePrisoner is from captured stones.
+    #     # Same thing goes for prisonerStone[-1] and self.whiteStonePrisoner.
+
+    #     finalScores = {
+    #         1: territoryScore[1] + stoneCount[1] + prisonerStones[1] + self.blackStonePrisoners,
+    #         -1: territoryScore[-1] + stoneCount[-1] + prisonerStones[-1] + self.whiteStonePrisoners
+    #     }
+
+    #     # finalScores = {
+    #     #     1: territoryScore[1] + stoneCount[1] + prisonerStones[1] + self.blackStonePrisoners,
+    #     #     -1: territoryScore[-1] + stoneCount[-1] + prisonerStones[-1] + self.whiteStonePrisoners
+    #     # }
+
+    #     print("Dead Stones:", deadStones)
+    #     print("Prisoners:", prisonerStones)
+    #     print("Territory:", territoryScore)
+    #     print("Stone Count:", stoneCount)
+
+    #     return finalScores
 
                     
 
