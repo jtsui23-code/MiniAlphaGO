@@ -381,23 +381,7 @@ class Board:
         return territory, 0
     
 
-    """
-    METHOD: hasTwoEyes
-
-    INPUT:
-        group (set):      Contains a group of connect stones that are the same color.
    
-
-    RETURN:
-        bool: If a group of stones has two or more eyes than this method returns True else False.
-
-    DESCRIPTION:
-        This method iteratively checks the surrounding empty neighbors of the group of stones passed into the method. 
-        Then the method checks the surround of those empty positions to check if they are completely surrounded by stones of the 
-        same color has the group passed in. If an empty space is compeltely surround by a group of the same stone color that is an eye.
-        A group of stones needs at least two eyes to be considered alive.
-
-    """
     # def hasTwoEyes(self, group):
     #     eyes = 0
 
@@ -461,25 +445,76 @@ class Board:
         counts the number of valid eyes it has. If the group has at least 2 eyes then the method returns True.
 
     """
-    def hasTwoEyes(self, group):
-        if not group: 
+
+    def hasTwoEyes(self,group):
+        if not group:
             return False
         
         samplePos = next(iter(group))
+
         groupColor = self.board[samplePos[0], samplePos[1]]
 
-        eyeRegion = self.findEyeSpace(group, groupColor)
 
-        validEyes = 0
-        
-        for region in eyeRegion:
-            if self.isValidEye(region, groupColor):
-                validEyes += 1
+        checkedEyePoints = set()
+        eyeCount = 0
 
-            if validEyes >= 2:
+        emptyNeighbors = set()
+        for x, y in group:
+            for nx, ny in self.getSurroundingStones(x,y):
+                if 0 <= nx < self.size and 0 <= ny < self.size and self.board[nx, ny] == 0:
+                    emptyNeighbors.add((nx,ny))
+
+        for ex,ey in emptyNeighbors:
+            if (ex,ey) in checkedEyePoints:
+                continue
+            
+            region, owner = self.floodFill(ex,ey, visited=checkedEyePoints)
+
+            if owner == groupColor:
+
+                if len(region) == 1:
+                    pointX, pointY = next(iter(region))
+
+                    if self.checkSinglePointEyeDiagonals(pointX, pointY, groupColor):
+                        eyeCount += 1
+
+                else: 
+                    eyeCount += 1
+
+                    
+            if eyeCount >= 2: 
                 return True
+
+                
+        return eyeCount >= 2
+                    
+
+
+    # ------------------------------------------------------------------------------------------------------------------------------------
+    # def hasTwoEyes(self, group):
+    #     if not group: 
+    #         return False
         
-        return False
+    #     samplePos = next(iter(group))
+    #     groupColor = self.board[samplePos[0], samplePos[1]]
+
+    #     eyeRegion = self.findEyeSpace(group, groupColor)
+
+    #     validEyes = 0
+        
+    #     for region in eyeRegion:
+    #         if self.isValidEye(region, groupColor):
+    #             validEyes += 1
+
+    #         if validEyes >= 2:
+    #             return True
+        
+    #     return False
+    # ------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 
 
     
@@ -579,6 +614,8 @@ class Board:
                     # If a group of stones do not have at least 2 eyes then they are dead.
                     if not hasTwoEyes:
                         deadStones.update(group)
+
+
 
 
         return deadStones
@@ -868,13 +905,19 @@ class Board:
         # Gets all of the dead stones on the board.
         deadStones = self.identifyDeadStones()
 
+
+        
+
+        # Use the scoring board.
+        scoringBoard = self.board.copy()
+
+
         deadStonesType = {1:0, -1:0}
 
         for x, y in deadStones:
             deadStonesType[self.board[x,y]] += 1
 
         # Creating copy of board with the dead stones removed.
-        scoringBoard = self.board.copy()
         
         # Storing prisoner stones derived from dead stones.
         prisonerStones = {
@@ -896,12 +939,10 @@ class Board:
             # # Make remove the dead stone in the temporary scoring board.
             scoringBoard[x,y] = 0
 
-
         # Saves the original board because it be needed.
-        originalBoard = self.board
-
-        # Use the scoring board.
+        originalBoard = self.board.copy()
         self.board = scoringBoard
+
 
         visited = set()
 
@@ -933,6 +974,7 @@ class Board:
                         # Have to use len() for area because area is a set which stores all of the coordinates in the 
                         # territory not an int value representing the magnitude of the area.
                         territoryScore[owner] += len(area)
+
 
         # Reverts back to the original board.
         self.board = originalBoard
