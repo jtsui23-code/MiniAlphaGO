@@ -573,8 +573,13 @@ class Board:
 
                     # A group without 2 eyes is dead. If a group of stones are in enemy territory without 2 eyes they are also 
                     # dead.
-                    if not hasTwoEyes and (liberties <= 1 or self.isInEnemyTerritory(group)):
+                    # if not hasTwoEyes and (liberties <= 1 or self.isInEnemyTerritory(group)):
+                    #     deadStones.update(group)
+
+                    # If a group of stones do not have at least 2 eyes then they are dead.
+                    if not hasTwoEyes:
                         deadStones.update(group)
+
 
         return deadStones
     
@@ -863,6 +868,11 @@ class Board:
         # Gets all of the dead stones on the board.
         deadStones = self.identifyDeadStones()
 
+        deadStonesType = {1:0, -1:0}
+
+        for x, y in deadStones:
+            deadStonesType[self.board[x,y]] += 1
+
         # Creating copy of board with the dead stones removed.
         scoringBoard = self.board.copy()
         
@@ -883,7 +893,7 @@ class Board:
             elif scoringBoard[x,y] == -1:
                 prisonerStones[1] += 1
 
-            # Make remove the dead stone in the temporary scoring board.
+            # # Make remove the dead stone in the temporary scoring board.
             scoringBoard[x,y] = 0
 
 
@@ -932,10 +942,16 @@ class Board:
         # The difference between prisonerStones[1] and self.blackStonePrisoners is that 
         # prisonerStones[1] is from dead stones on the board when scoring while self.blackStonePrisoner is from captured stones.
         # Same thing goes for prisonerStone[-1] and self.whiteStonePrisoner.
+
         finalScores = {
             1: territoryScore[1] + stoneCount[1] + prisonerStones[1] + self.blackStonePrisoners,
             -1: territoryScore[-1] + stoneCount[-1] + prisonerStones[-1] + self.whiteStonePrisoners
         }
+
+        # finalScores = {
+        #     1: territoryScore[1] + stoneCount[1] + prisonerStones[1] + self.blackStonePrisoners,
+        #     -1: territoryScore[-1] + stoneCount[-1] + prisonerStones[-1] + self.whiteStonePrisoners
+        # }
 
         print("Dead Stones:", deadStones)
         print("Prisoners:", prisonerStones)
