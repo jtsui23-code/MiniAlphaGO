@@ -1327,42 +1327,86 @@ if __name__ == "__main__":
         turn += 1
         b.printBoard()
 
-    # Opening - Black makes territory in upper-left
-    b.playMove(0, 0, 1); next_turn()
-    b.playMove(5, 5, -1); next_turn()
+    # # Opening - Black makes territory in upper-left
+    # b.playMove(0, 0, 1); next_turn()
+    # b.playMove(5, 5, -1); next_turn()
+    # b.playMove(0, 1, 1); next_turn()
+    # b.playMove(5, 6, -1); next_turn()
+    # b.playMove(1, 0, 1); next_turn()
+    # b.playMove(6, 5, -1); next_turn()
+    # b.playMove(1, 1, 1); next_turn()
+    # b.playMove(6, 6, -1); next_turn()
+
+    # # Black surrounds white stone
+    # b.playMove(2, 1, 1); next_turn()
+    # b.playMove(2, 2, -1); next_turn()
+    # b.playMove(2, 0, 1); next_turn()
+    # b.playMove(4, 4, -1); next_turn()
+    # b.playMove(3, 1, 1); next_turn()
+    # b.playMove(4, 5, -1); next_turn()
+    # b.playMove(3, 0, 1); next_turn()
+    # b.playMove(7, 7, -1); next_turn()
+
+    # # Black finishes off white stone (dead)
+    # b.playMove(3, 2, 1); next_turn()
+
+    # # Some more moves
+    # b.playMove(7, 6, -1); next_turn()
+    # b.playMove(4, 0, 1); next_turn()
+    # b.playMove(8, 8, -1); next_turn()
+    # b.playMove(4, 1, 1); next_turn()
+
+    # # Both players pass to end game
+    # b.playMove(0, 0, -1, passTurn=True); next_turn()
+    # b.playMove(0, 0, 1, passTurn=True); next_turn()
+
+    # print("Final Board:")
+    # b.printBoard()
+
+    # print("Final Score:")
+    # print(b.score())
+
+    # b.playMove(0, 0, 1); next_turn()
+   
+
+    # print("Final Board:")
+    # b.printBoard()
+
+    # print("Final Score:")
+    # print(b.score())
+
+    print("\n--- Test 1: Two-Eye Alive Group (Black should live) ---")
+    # Set up black group with two eyes ---------------------------------------------------------------------------------------
+
+    # b.playMove(1, 1, 1); next_turn()
+    # b.playMove(8, 8, -1); next_turn()
+    # b.playMove(1, 2, 1); next_turn()
+    # b.playMove(8, 7, -1); next_turn()
+    # b.playMove(2, 1, 1); next_turn()
+    # b.playMove(8, 6, -1); next_turn()
+    # b.playMove(2, 3, 1); next_turn()
+    # b.playMove(8, 5, -1); next_turn()
+    # b.playMove(3, 2, 1); next_turn()
+    # print("Final Score:", b.score())
+
+    # Set up black group with two eyes ---------------------------------------------------------------------------------------
+
+
+
+    # Testing dead stone in enemy territory  ---------------------------------------------------------------------------------------
+
+    print("\n--- Test 2: Dead White Stone in Enemy Territory ---")
     b.playMove(0, 1, 1); next_turn()
-    b.playMove(5, 6, -1); next_turn()
-    b.playMove(1, 0, 1); next_turn()
-    b.playMove(6, 5, -1); next_turn()
-    b.playMove(1, 1, 1); next_turn()
-    b.playMove(6, 6, -1); next_turn()
-
-    # Black surrounds white stone
-    b.playMove(2, 1, 1); next_turn()
-    b.playMove(2, 2, -1); next_turn()
-    b.playMove(2, 0, 1); next_turn()
     b.playMove(4, 4, -1); next_turn()
-    b.playMove(3, 1, 1); next_turn()
+    b.playMove(1, 0, 1); next_turn()
     b.playMove(4, 5, -1); next_turn()
-    b.playMove(3, 0, 1); next_turn()
-    b.playMove(7, 7, -1); next_turn()
+    b.playMove(1, 2, 1); next_turn()
+    b.playMove(4, 6, -1); next_turn()
+    b.playMove(2, 1, 1); next_turn()
+    b.playMove(4, 7, -1); next_turn()
+    b.playMove(1, 1, -1); next_turn()  # Surrounded white stone
 
-    # Black finishes off white stone (dead)
-    b.playMove(3, 2, 1); next_turn()
+    print("Final Score:", b.score())
 
-    # Some more moves
-    b.playMove(7, 6, -1); next_turn()
-    b.playMove(4, 0, 1); next_turn()
-    b.playMove(8, 8, -1); next_turn()
-    b.playMove(4, 1, 1); next_turn()
+    # Testing dead stone in enemy territory  ---------------------------------------------------------------------------------------
 
-    # Both players pass to end game
-    b.playMove(0, 0, -1, passTurn=True); next_turn()
-    b.playMove(0, 0, 1, passTurn=True); next_turn()
-
-    print("Final Board:")
-    b.printBoard()
-
-    print("Final Score:")
-    print(b.score())
-  
