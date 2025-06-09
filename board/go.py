@@ -381,6 +381,7 @@ class Board:
         return territory, 0
     
 
+
    
     # def hasTwoEyes(self, group):
     #     eyes = 0
@@ -446,47 +447,77 @@ class Board:
 
     """
 
-    def hasTwoEyes(self,group):
-        if not group:
-            return False
+    # def hasTwoEyes(self,group):
+    #     if not group:
+    #         return False
         
-        samplePos = next(iter(group))
+    #     samplePos = next(iter(group))
 
-        groupColor = self.board[samplePos[0], samplePos[1]]
+    #     groupColor = self.board[samplePos[0], samplePos[1]]
 
+    #     pointsInEye = set()
+    #     eyeCount = 0
 
-        checkedEyePoints = set()
-        eyeCount = 0
+    #     emptyNeighbors = set()
 
-        emptyNeighbors = set()
-        for x, y in group:
-            for nx, ny in self.getSurroundingStones(x,y):
-                if 0 <= nx < self.size and 0 <= ny < self.size and self.board[nx, ny] == 0:
-                    emptyNeighbors.add((nx,ny))
+    #     for x, y in group:
+    #         for nx,ny in self.getSurroundingStones(x,y):
+    #             if 0 <= nx < self.size and 0 <= ny < self.size and self.board[nx, ny] == 0:
+    #                 emptyNeighbors.add((nx,ny))
 
-        for ex,ey in emptyNeighbors:
-            if (ex,ey) in checkedEyePoints:
-                continue
             
-            region, owner = self.floodFill(ex,ey, visited=checkedEyePoints)
+    #     for startPos in emptyNeighbors:
+    #         if startPos in pointsInEye:
+    #             continue
 
-            if owner == groupColor:
+    #         region = set()
+    #         borderColors = set()
 
-                if len(region) == 1:
-                    pointX, pointY = next(iter(region))
+    #         queue = [startPos]
 
-                    if self.checkSinglePointEyeDiagonals(pointX, pointY, groupColor):
-                        eyeCount += 1
+    #         visitedRegion = {startPos}
 
-                else: 
-                    eyeCount += 1
+    #         while queue:
+    #             cx, cy = queue.pop(0)
+    #             region.add((cx,cy))
 
-                    
-            if eyeCount >= 2: 
-                return True
+    #             for nx,ny in self.getSurroundingStones(cx,cy):
+    #                 if not (0 <= nx < self.size and 0 <= ny < self.size):
+    #                     continue
+
+    #                 neighborValue = self.board[nx,ny]
+
+
+    #                 if neighborValue == 0:
+    #                     if (nx,ny) not in visitedRegion:
+                            
+    #                         queue.append((nx,ny))
+    #                         visitedRegion.add((nx,ny))
+    #                 else:
+    #                     borderColors.add(neighborValue)
+
+    #         if borderColors == {groupColor}:
+
+    #             isFalseEye = False
+    #             if len(region) == 1:
+    #                 px, py = next(iter(region))
+    #                 if not self.checkSinglePointEyeDiagonals(px,py, groupColor):
+    #                     isFalseEye = True
 
                 
-        return eyeCount >= 2
+    #             if not isFalseEye:
+    #                 eyeCount += 1
+    #                 pointsInEye.update(region)
+
+    #         if eyeCount >= 2:
+    #             return True
+            
+    #     return eyeCount >= 2
+
+
+
+
+
                     
 
 
