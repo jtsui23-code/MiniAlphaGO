@@ -1395,18 +1395,58 @@ if __name__ == "__main__":
 
     # Testing dead stone in enemy territory  ---------------------------------------------------------------------------------------
 
-    print("\n--- Test 2: Dead White Stone in Enemy Territory ---")
-    b.playMove(0, 1, 1); next_turn()
-    b.playMove(4, 4, -1); next_turn()
-    b.playMove(1, 0, 1); next_turn()
-    b.playMove(4, 5, -1); next_turn()
-    b.playMove(1, 2, 1); next_turn()
-    b.playMove(4, 6, -1); next_turn()
-    b.playMove(2, 1, 1); next_turn()
-    b.playMove(4, 7, -1); next_turn()
-    b.playMove(1, 1, -1); next_turn()  # Surrounded white stone
+    # print("\n--- Test 2: Dead White Stone in Enemy Territory ---")
+    # b.playMove(0, 1, 1); next_turn()
+    # b.playMove(4, 4, -1); next_turn()
+    # b.playMove(1, 0, 1); next_turn()
+    # b.playMove(4, 5, -1); next_turn()
+    # b.playMove(1, 2, 1); next_turn()
+    # b.playMove(4, 6, -1); next_turn()
+    # b.playMove(2, 1, 1); next_turn()
+    # b.playMove(4, 7, -1); next_turn()
+    # b.playMove(1, 1, -1); next_turn()  # Surrounded white stone
 
-    print("Final Score:", b.score())
+    # print("Final Score:", b.score())
 
     # Testing dead stone in enemy territory  ---------------------------------------------------------------------------------------
+
+
+
+
+    # Testing 2 eyes detection variant 2  ---------------------------------------------------------------------------------------
+
+
+    print("--- Test 1: Two-Eye Alive Group (Black should live) ---")
+
+    # Black builds a wall
+    b.playMove(0, 1, 1); next_turn()
+    b.playMove(8, 8, -1); next_turn() # Arbitrary move for white
+    b.playMove(1, 0, 1); next_turn()
+    b.playMove(8, 7, -1); next_turn()
+    b.playMove(2, 0, 1); next_turn()
+    b.playMove(8, 6, -1); next_turn()
+    b.playMove(3, 1, 1); next_turn()
+    b.playMove(8, 5, -1); next_turn()
+    b.playMove(3, 3, 1); next_turn()
+    b.playMove(8, 4, -1); next_turn()
+    b.playMove(2, 4, 1); next_turn()
+    b.playMove(8, 3, -1); next_turn()
+    b.playMove(1, 4, 1); next_turn()
+    b.playMove(8, 2, -1); next_turn()
+    b.playMove(0, 3, 1); next_turn()
+    b.playMove(8, 1, -1); next_turn()
+
+    # Black secures the eyes internally
+    b.playMove(1, 2, 1); next_turn()
+    b.playMove(8, 0, -1); next_turn()
+    b.playMove(2, 2, 1); next_turn()
+
+    # Checking for dead stone detection in enemy territory.
+    b.playMove(1, 1, -1); next_turn()
+
+    
+    print("Final Score:", b.score())
+
+    # Testing 2 eyes detection variant 2  ---------------------------------------------------------------------------------------
+
 
