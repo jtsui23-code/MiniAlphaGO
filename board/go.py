@@ -538,6 +538,9 @@ class Board:
                 validEyes += 1
 
             if validEyes >= 2:
+
+                
+
                 return True
         
         return False
@@ -641,8 +644,6 @@ class Board:
 
                     if not hasTwoEyes:
                         deadStones.update(group)
-
-
 
 
         return deadStones
@@ -851,20 +852,34 @@ class Board:
             if self.board[x,y] != 0:
                 continue
             
-            # Checks if the correct color stones are surrounding this region of empty space if so 
-            # then this empty space is home to an eye.
-            if not (self.isSpaceSurroundedByColor(x,y, groupColor)):
-                continue
+            # # Checks if the correct color stones are surrounding this region of empty space if so 
+            # # then this empty space is home to an eye.
+            # if not (self.isSpaceSurroundedByColor(x,y, groupColor)):
+            #     continue
+
+
             
             # If the empty space passes all of these rules then it will be marked as a connect empty region.
             localVisitedSpace.add((x,y))
             globalVisitedSpaces.add((x,y))
             region.add((x,y))
 
+
             # Searches for other empty spaces that could potientially be comprised in the same potiential eye space.
             for nx, ny in self.getSurroundingStones(x,y):
                 if (nx,ny) not in localVisitedSpace:
                     queue.append((nx,ny))
+
+        # Checks the surrounding of the region to see which stone color is surrounding it.
+        for x,y in region:
+            for nx,ny in self.getSurroundingStones(x,y):
+                if 0 <= nx < self.size and 0 <= ny < self.size:
+
+                    # If there are enemy stones in the surrounding then this region is not
+                    # surrounded by friendly stone color.
+                    if self.board[nx,ny] != groupColor and self.board[nx,ny] !=0:
+                        return set()
+
 
         # Returns the region of the connected empty region.
         return region
@@ -999,6 +1014,7 @@ class Board:
         print("stone count: ", stoneCount)
         print("territory :", territoryScores)
         print("captured dead stones: ", capturedDeadStones)
+
 
         return finalScores
 
@@ -1302,7 +1318,7 @@ class Board:
         
         
 if __name__ == "__main__":
-    b = Board(size=9)
+    b = Board(size=5)
 
 
     # Check for ko -----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1485,6 +1501,10 @@ if __name__ == "__main__":
     turn = 1
 
     def next_turn():
+
+        if b.currentPlayer == 1:
+            b.playMove(0, 1, 1, True)
+
         global turn
         print(f"Turn {turn} --------------------------------------------")
         turn += 1
@@ -1615,37 +1635,76 @@ if __name__ == "__main__":
 
     # Testing dead stone in enemy territory variant 2 -------------------------------------------------------------------------------
 
-    print("--- Test 4: Complex Board with Dead Group ---")
+    # print("--- Test 4: Complex Board with Dead Group ---")
 
     # Black builds a large structure
-    b.playMove(3, 3, 1); next_turn()
-    b.playMove(0, 0, -1); next_turn()
-    b.playMove(3, 4, 1); next_turn()
-    b.playMove(0, 1, -1); next_turn()
-    b.playMove(3, 5, 1); next_turn()
-    b.playMove(0, 2, -1); next_turn()
-    b.playMove(4, 2, 1); next_turn()
-    b.playMove(0, 3, -1); next_turn()
-    b.playMove(5, 3, 1); next_turn()
-    b.playMove(0, 4, -1); next_turn()
-    b.playMove(5, 6, 1); next_turn()
-    b.playMove(0, 5, -1); next_turn()
-    b.playMove(4, 7, 1); next_turn()
-    b.playMove(0, 6, -1); next_turn()
-    b.playMove(3, 6, 1); next_turn()
-    b.playMove(8, 8, -1); next_turn()
+    # b.playMove(3, 3, 1); next_turn()
+    # b.playMove(0, 0, -1); next_turn()
+    # b.playMove(3, 4, 1); next_turn()
+    # b.playMove(0, 1, -1); next_turn()
+    # b.playMove(3, 5, 1); next_turn()
+    # b.playMove(0, 2, -1); next_turn()
+    # b.playMove(4, 2, 1); next_turn()
+    # b.playMove(0, 3, -1); next_turn()
+    # b.playMove(5, 3, 1); next_turn()
+    # b.playMove(0, 4, -1); next_turn()
+    # b.playMove(5, 6, 1); next_turn()
+    # b.playMove(0, 5, -1); next_turn()
+    # b.playMove(4, 7, 1); next_turn()
+    # b.playMove(0, 6, -1); next_turn()
+    # b.playMove(3, 6, 1); next_turn()
+    # b.playMove(8, 8, -1); next_turn()
 
-    # White tries to live inside
-    b.playMove(2, 4, 1); next_turn()
-    b.playMove(4, 4, -1); next_turn() # White's group starts
-    b.playMove(6, 4, 1); next_turn()
-    b.playMove(4, 5, -1); next_turn()
-    b.playMove(4, 6, 1); next_turn()
-    b.playMove(5, 5, -1); next_turn()
-    b.playMove(5, 4, 1); next_turn()
-    b.playMove(4, 3, -1); next_turn() # White has one eye at (4,4)
+    # # White tries to live inside
+    # b.playMove(2, 4, 1); next_turn()
+    # b.playMove(4, 4, -1); next_turn() # White's group starts
+    # b.playMove(6, 4, 1); next_turn()
+    # b.playMove(4, 5, -1); next_turn()
+    # b.playMove(4, 6, 1); next_turn()
+    # b.playMove(5, 5, -1); next_turn()
+    # b.playMove(5, 4, 1); next_turn()
+    # b.playMove(4, 3, -1); next_turn() # White has one eye at (4,4)
 
 
-    print("Final Score:", b.score())
+    # print("Final Score:", b.score())
 
     # Testing dead stone in enemy territory variant 2 -------------------------------------------------------------------------------
+
+
+    # Testing if hasTwoEyes method works properly ---------------------------------------------------------------------------
+
+    b.playMove(0, 1, 1, True); next_turn()
+
+    b.playMove(0, 1, -1); next_turn()
+
+
+    b.playMove(0, 2, -1); next_turn()
+    b.playMove(0, 3, -1); next_turn()
+
+    b.playMove(1, 0, -1); next_turn()
+    b.playMove(1, 4, -1); next_turn()
+
+    b.playMove(2, 0, -1); next_turn()
+    b.playMove(2, 2, -1); next_turn()
+    b.playMove(2, 4, -1); next_turn()
+
+    b.playMove(3, 0, -1); next_turn()
+    b.playMove(3, 4, -1); next_turn()
+
+    b.playMove(4, 1, -1); next_turn()
+    b.playMove(4, 2, -1); next_turn()
+    b.playMove(4, 3, -1); next_turn()
+
+    # Create group: collect all white stones
+    group = set()
+    for x in range(5):
+        for y in range(5):
+            if b.board[x, y] == -1:
+                group.add((x, y))
+
+    # Test for life
+    alive = b.hasTwoEyes(group)
+    print("White group is alive?" , alive)
+    print(b.score())
+
+    # Testing if hasTwoEyes method works properly ---------------------------------------------------------------------------
