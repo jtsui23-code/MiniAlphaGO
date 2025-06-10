@@ -637,12 +637,8 @@ class Board:
                     liberties = self.checkLiberties((x,y),self.board[x,y])
                     hasTwoEyes = self.hasTwoEyes(group)
 
-                    # A group without 2 eyes is dead. If a group of stones are in enemy territory without 2 eyes they are also 
-                    # dead.
-                    # if not hasTwoEyes and (liberties <= 1 or self.isInEnemyTerritory(group)):
-                    #     deadStones.update(group)
-
                     # If a group of stones do not have at least 2 eyes then they are dead.
+
                     if not hasTwoEyes:
                         deadStones.update(group)
 
@@ -666,46 +662,46 @@ class Board:
         they are considered to be inside of enemy territory.
 
     """
-    def isInEnemyTerritory(self,group):
+    # def isInEnemyTerritory(self,group):
 
-        # If there is no group then end the method.
-        if not group: 
-            return False
+    #     # If there is no group then end the method.
+    #     if not group: 
+    #         return False
         
-        # Getting the stone color of the group and the enemy.
-        samplePos = next(iter(group))
-        groupColor = self.board[samplePos[0], samplePos[1]]
-        enemyColor = -groupColor
+    #     # Getting the stone color of the group and the enemy.
+    #     samplePos = next(iter(group))
+    #     groupColor = self.board[samplePos[0], samplePos[1]]
+    #     enemyColor = -groupColor
 
-        # Counters for the total enemy of stones in the radius and everthing else 
-        # for getting a ratio of enemies in the surrounding.
-        enemyCount = 0
-        totalCount = 0
+    #     # Counters for the total enemy of stones in the radius and everthing else 
+    #     # for getting a ratio of enemies in the surrounding.
+    #     enemyCount = 0
+    #     totalCount = 0
 
-        # Checks the the radius of 2 positions around each of the stones in the group for 
-        # what is surrounding the group.
-        for gx,gy in group:
+    #     # Checks the the radius of 2 positions around each of the stones in the group for 
+    #     # what is surrounding the group.
+    #     for gx,gy in group:
             
-            # Checking with a radius of 2 needs to include negative values for dx/dy otherwise it would only 
-            # Check one direction horizontally and vertically.
-            for dx in range(-2,3):
-                for dy in range(-2,3):
+    #         # Checking with a radius of 2 needs to include negative values for dx/dy otherwise it would only 
+    #         # Check one direction horizontally and vertically.
+    #         for dx in range(-2,3):
+    #             for dy in range(-2,3):
                     
-                    # Getting the radius positions to check what is there. 
-                    nx, ny = gx + dx, gy + dy
+    #                 # Getting the radius positions to check what is there. 
+    #                 nx, ny = gx + dx, gy + dy
 
-                    # If there is an enemy there increment enemyCount but you always increment totalCount whether its 
-                    # empty, friendly stone, or and enemy stone.
-                    if 0<= nx < self.size and 0 <= ny < self.size:
-                        totalCount += 1
+    #                 # If there is an enemy there increment enemyCount but you always increment totalCount whether its 
+    #                 # empty, friendly stone, or and enemy stone.
+    #                 if 0<= nx < self.size and 0 <= ny < self.size:
+    #                     totalCount += 1
                         
-                        if self.board[nx,ny] == enemyColor:
-                            enemyCount += 1
+    #                     if self.board[nx,ny] == enemyColor:
+    #                         enemyCount += 1
 
         
-        # If there is more than 60% of enemy stones in the surrounding area then 
-        # you are considered inside of enemy territory.
-        return totalCount > 0 and (enemyCount/totalCount) > 0.6
+    #     # If there is more than 60% of enemy stones in the surrounding area then 
+    #     # you are considered inside of enemy territory.
+    #     return totalCount > 0 and (enemyCount/totalCount) > 0.6
 
 
 
@@ -903,7 +899,11 @@ class Board:
 
                 # Checking if the surround stones to the empty space contains only enemy stones if so 
                 # then if space cannot be an eye space.
-                if self.board[nx,ny] != groupColor and self.board[nx,ny] != 0:
+
+                # if self.board[nx,ny] != groupColor and self.board[nx,ny] != 0:
+                #     return False
+
+                 if self.board[nx,ny] != groupColor:
                     return False
                 
         return True
@@ -939,7 +939,8 @@ class Board:
 
         capturedDeadStones = {1:0, -1:0}
         # Create a copy of the board with dead stones removed
-        scoringBoard = self.board.copy()
+        # np.copy() performs a deep copy while self.board.copy() is a shallow copy
+        scoringBoard = np.copy(self.board)
 
         # Filters through the dead stones to get all of the prisoner stones. 
         for x, y in deadStones:
@@ -954,7 +955,6 @@ class Board:
         
         # Temporarily update board for scoring
         originalBoard = self.board
-        self.board = scoringBoard
         
         visited = set()
         territoryScores = {1: 0, -1: 0}
@@ -963,13 +963,13 @@ class Board:
         # Count living stones
         for x in range(self.size):
             for y in range(self.size):
-                if self.board[x, y] != 0:
+                if scoringBoard[x, y] != 0:
                     stoneCount[self.board[x, y]] += 1
         
         # Count territory
         for x in range(self.size):
             for y in range(self.size):
-                if self.board[x, y] == 0 and (x, y) not in visited:
+                if scoringBoard[x, y] == 0 and (x, y) not in visited:
 
                     # floodFill returns a set representing the individual positions in territory and a 1/-1 for its owner.
                     # if the second returned value is a 0 then no one owns the territory.
@@ -991,8 +991,8 @@ class Board:
         # prisonerStones[1] is from dead stones on the board when scoring while self.blackStonePrisoner is from captured stones.
         # Same thing goes for prisonerStone[-1] and self.whiteStonePrisoner.
         finalScores = {
-            1: stoneCount[1] + territoryScores[1] + capturedDeadStones[-1],
-            -1: stoneCount[-1] + territoryScores[-1] + capturedDeadStones[1]
+            1: stoneCount[1] + territoryScores[1] + capturedDeadStones[-1] + self.blackStonePrisoners,
+            -1: stoneCount[-1] + territoryScores[-1] + capturedDeadStones[1] + self.whiteStonePrisoners
         }
 
         print("dead stones: ", deadStones)
@@ -1538,7 +1538,7 @@ if __name__ == "__main__":
     # print("Final Score:")
     # print(b.score())
 
-    print("\n--- Test 1: Two-Eye Alive Group (Black should live) ---")
+    # print("\n--- Test 1: Two-Eye Alive Group (Black should live) ---")
     # Set up black group with two eyes ---------------------------------------------------------------------------------------
 
     # b.playMove(1, 1, 1); next_turn()
@@ -1579,36 +1579,36 @@ if __name__ == "__main__":
     # Testing 2 eyes detection variant 2  ---------------------------------------------------------------------------------------
 
 
-    print("--- Test 1: Two-Eye Alive Group (Black should live) ---")
+    # print("--- Test 1: Two-Eye Alive Group (Black should live) ---")
 
     # Black builds a wall
-    b.playMove(0, 1, 1); next_turn()
-    b.playMove(8, 8, -1); next_turn() # Arbitrary move for white
-    b.playMove(1, 0, 1); next_turn()
-    b.playMove(8, 7, -1); next_turn()
-    b.playMove(2, 0, 1); next_turn()
-    b.playMove(8, 6, -1); next_turn()
-    b.playMove(3, 1, 1); next_turn()
-    b.playMove(8, 5, -1); next_turn()
-    b.playMove(3, 3, 1); next_turn()
-    b.playMove(8, 4, -1); next_turn()
-    b.playMove(2, 4, 1); next_turn()
-    b.playMove(8, 3, -1); next_turn()
-    b.playMove(1, 4, 1); next_turn()
-    b.playMove(8, 2, -1); next_turn()
-    b.playMove(0, 3, 1); next_turn()
-    b.playMove(8, 1, -1); next_turn()
+    # b.playMove(0, 1, 1); next_turn()
+    # b.playMove(8, 8, -1); next_turn() # Arbitrary move for white
+    # b.playMove(1, 0, 1); next_turn()
+    # b.playMove(8, 7, -1); next_turn()
+    # b.playMove(2, 0, 1); next_turn()
+    # b.playMove(8, 6, -1); next_turn()
+    # b.playMove(3, 1, 1); next_turn()
+    # b.playMove(8, 5, -1); next_turn()
+    # b.playMove(3, 3, 1); next_turn()
+    # b.playMove(8, 4, -1); next_turn()
+    # b.playMove(2, 4, 1); next_turn()
+    # b.playMove(8, 3, -1); next_turn()
+    # b.playMove(1, 4, 1); next_turn()
+    # b.playMove(8, 2, -1); next_turn()
+    # b.playMove(0, 3, 1); next_turn()
+    # b.playMove(8, 1, -1); next_turn()
 
-    # Black secures the eyes internally
-    b.playMove(1, 2, 1); next_turn()
-    b.playMove(8, 0, -1); next_turn()
-    b.playMove(2, 2, 1); next_turn()
+    # # Black secures the eyes internally
+    # b.playMove(1, 2, 1); next_turn()
+    # b.playMove(8, 0, -1); next_turn()
+    # b.playMove(2, 2, 1); next_turn()
 
-    # Checking for dead stone detection in enemy territory.
-    b.playMove(1, 1, -1); next_turn()
+    # # Checking for dead stone detection in enemy territory.
+    # b.playMove(1, 1, -1); next_turn()
 
     
-    print("Final Score:", b.score())
+    # print("Final Score:", b.score())
 
     # Testing 2 eyes detection variant 2  ---------------------------------------------------------------------------------------
 
