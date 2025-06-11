@@ -1173,6 +1173,76 @@ class Board:
                         stack.append((nx,ny))
                         
         return group
+    
+    """
+    METHOD: getAllValidMoves
+
+    INPUT:
+        player (int): The player who you want to get all of their possible valid moves for.
+    RETURN:
+        moves (array): Array of (x,y) tuples of possible valid moves on the board.
+
+    DESCRIPTION:
+        This method gets all of the possible valid moves on the board which is useful for MCT.
+    """
+    def getAllValidMoves(self, player=None):
+
+        # Checking if player was passed in.
+        if player is None:
+            player = self.currentPlayer
+
+        moves = []
+
+        # Checks every position on the board if they are valid moves. 
+        # If the move is valid then append it to moves array.
+        for x in range(self.size):
+            for y in range(self.size):
+                if self.board[x,y] == 0 and self.isValidMove(x,y, player):
+                    moves.append((x,y))
+
+        return moves
+    
+
+    """
+    METHOD: copyBoardState
+
+    INPUT:
+        N/A
+    RETURN:
+        newBoardState (Board): Returns a copy of the current board state.
+
+    DESCRIPTION:
+        This method creates a copy of the current board state which is useful for MCTS Tree simulations.
+    """
+    def copyBoardState(self):
+        # Create new Board object
+        newBoardState = Board(size=9)
+
+        # Initialize all data members to current values of the board state.
+        newBoardState.board = self.board.copy()
+        newBoardState.currentPlayer = self.currentPlayer
+        newBoardState.history = list(self.history)
+        newBoardState.passCount = self.passCount
+        newBoardState.blackStonePrisoners = self.blackStonePrisoners
+        newBoardState.whiteStonePrisoners = self.whiteStonePrisoners
+
+        # Returns the copy of the current board state.
+        return newBoardState
+
+
+    """
+    METHOD: isGameOver
+
+    INPUT:
+        N/A
+    RETURN:
+        Bool: Returns true if there have been 2 consecutive passes.
+
+    DESCRIPTION:
+        This method checks if there have been 2 consecutive passes which will end the game.
+    """
+    def isGameOver(self):
+        return self.passCount >= 2
 
 
 
