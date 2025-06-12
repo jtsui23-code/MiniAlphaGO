@@ -10,7 +10,12 @@ ATTRIBUTES:
                           0 indicates an empty intersection, 
                           1 indicates a black stone, and 
                           -1 indicates a white stone.
-    list history:         Stores a history of moves made on the board. Each entry is a tuple (x, y, player).
+    list history:         Stores a history of moves made on the board. Each entry is a byte representation of previous board states.
+    int komi:             Conpensation White gets because Black is always playing one move ahead.
+    int currentPlayer     Stores a 1 or -1 to represent which player's turn it is.
+    int passCount         Counts consecutive number of passes because 2 consecutive passes end the game.
+    int whiteStonePrisoners Stores all of the captured stones White has
+    int blackStonePrisoners Stores all of the captured stones Black has
 
 METHODS:
     __init__(size=9, komi=7.5):             Constructor to initialize the board.
