@@ -13,13 +13,28 @@ ATTRIBUTES:
     list history:         Stores a history of moves made on the board. Each entry is a tuple (x, y, player).
 
 METHODS:
-    __init__(size=9):                       Constructor to initialize the board.
+    __init__(size=9, komi=7.5):             Constructor to initialize the board.
     checkLiberties(position, stoneColor, visited=None): Calculates the number of liberties for a stone or group of stones.
     removeStones(position, color):          Removes a stone and any connected stones of the same color that have no liberties.
     getSurroundingStones(x, y):             Returns a list of coordinates for positions adjacent to (x,y).
     isValidMove(x, y, player):              Checks if placing a stone by 'player' at (x,y) is a valid move according to Go rules.
     playMove(x, y, player):                 Attempts to place a stone for 'player' at (x,y) and updates the board state.
     printBoard():                           Prints a text-based representation of the current board state.
+    score():                                Utilizes Chinese Rule for scoring the points in the game.
+    floodFill(x, y, visited):               Finds a territory of empty spaces and determines its owner for scoring.
+    hasTwoEyes(group):                      Checks if a group of stones has at least two valid eyes, making it alive.
+    isValidEye(eyeRegion, groupColor):      Determines if a region of empty points constitutes a valid eye.
+    identifyDeadStones():                   Identifies and returns all groups of stones on the board that are considered "dead".
+    checkSinglePointEyeDiagonals(x, y, groupColor): Checks the diagonals of a single-point eye to validate it, considering its position on the board.
+    findEyeSpace(group, groupColor):        Finds all potential eye spaces associated with a given group of stones.
+    getConnectedEmptyRegion(startX, startY, groupColor, globalVisitedSpaces): Finds a contiguous region of empty points bordered by a single color.
+    isSpaceSurroundedByColor(x, y, groupColor): Checks if a single empty point is completely surrounded by stones of a specific color.
+    getGroup(x,y):                          Returns a set of all connected stones of the same color starting from a given coordinate.
+    getAllValidMoves(player):               Returns a list of all possible valid moves for the specified player.
+    copyBoardState():                       Creates and returns a deep copy of the current board state.
+    isGameOver():                           Checks if the game has ended due to two consecutive passes.
+    simulatedCapture(board, position, color): Simulates the removal of stones on a temporary board to check for valid moves (e.g., ko).
+
 
 PACKAGES:
     import numpy as np: Used for efficient numerical operations, especially for the board representation as a 2D array.
@@ -37,6 +52,8 @@ class Board:
 
     INPUT:
         size (int, optional): The dimension of one side of the square Go board. Defaults to 9.
+        komi (int, optional): Points White gets usually 6.5 or 7.5 because Black is always 1 move ahead.
+
 
     RETURN:
         N/A
@@ -46,9 +63,10 @@ class Board:
         The board is represented by a 2D numpy array filled with zeros.
         It also initializes an empty list to store the history of moves.
     """
-    def __init__(self, size=9):
+    def __init__(self, size=9, komi=7.5):
         self.size = size
 
+        self.komi = komi
         # 0=empty, 1 = black, -1 = white
         self.board = np.zeros((size, size), dtype=int) 
 
@@ -1007,7 +1025,7 @@ class Board:
         # Same thing goes for prisonerStone[-1] and self.whiteStonePrisoner.
         finalScores = {
             1: stoneCount[1] + territoryScores[1] + capturedDeadStones[-1] + self.blackStonePrisoners,
-            -1: stoneCount[-1] + territoryScores[-1] + capturedDeadStones[1] + self.whiteStonePrisoners
+            -1: stoneCount[-1] + territoryScores[-1] + capturedDeadStones[1] + self.whiteStonePrisoners + self.komi
         }
 
         print("dead stones: ", deadStones)
@@ -1216,7 +1234,7 @@ class Board:
     """
     def copyBoardState(self):
         # Create new Board object
-        newBoardState = Board(size=9)
+        newBoardState = Board(size=9, komi=7.5)
 
         # Initialize all data members to current values of the board state.
         newBoardState.board = self.board.copy()
