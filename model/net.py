@@ -2,8 +2,78 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+"""
+CLASS: GoNet
+
+ATTRIBUTES:
+    int self.boardSize:                                                Size of the Go board (default 9x9), determines spatial dimensions
+    int self.numChannels:                                              Number of input channels (default 17) for board state representation
+    
+    torch.nn.modules.conv.Conv2d self.convolutional1:                  Initial convolutional layer expanding from input channels to 64 features
+    torch.nn.modules.batchnorm.BatchNorm2d self.batchNormalization1:   Batch normalization for initial convolutional layer output
+    
+    torch.nn.modules.container.ModuleList self.residualBlocks:         List of 4 ResidualBlock instances for deep feature extraction
+    
+    torch.nn.modules.conv.Conv2d self.policyHead:                      Policy head convolutional layer reducing 64 channels to 2
+    torch.nn.modules.batchnorm.BatchNorm2d self.policyHeadBatchNormalization: Batch normalization for policy head features
+    torch.nn.modules.linear.Linear self.policyFullyConnected:          Fully connected layer mapping flattened features to move logits (81 outputs)
+    
+    torch.nn.modules.container.Sequential self.valueHead:             Sequential container for value head layers producing position evaluation
+
+METHODS:
+    __init__(boardSize, channels):     Constructor to initialize the GoNet neural network architecture.
+    forward(x):                        Override method of nn.Module's forward method for inference and training.
+
+PACKAGES:
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+
+DESCRIPTION:
+    The GoNet class implements a neural network architecture designed for playing the game of Go,
+    following principles similar to AlphaZero. The network uses a shared convolutional trunk with
+    residual connections that feeds into two specialized heads: a policy head for move prediction
+    and a value head for position evaluation.
+    
+    The architecture consists of:
+    1. Initial convolution to expand input features from board representation to 64 channels
+    2. Stack of residual blocks for deep pattern recognition while avoiding vanishing gradients
+    3. Policy head that outputs probability distributions over all possible moves (81 for 9x9 board)
+    4. Value head that outputs a scalar evaluation of the position (-1 to 1 range)
+    
+    This dual-head design allows the network to simultaneously learn move selection and position
+    assessment, enabling it to play Go at a high level through self-play reinforcement learning.
+    The residual connections help train deeper networks by providing gradient flow shortcuts.
+"""
 class GoNet(nn.Module):
 
+    """
+    METHOD: __init__
+    INPUT:
+        boardSize (int, optional): Size of the Go board (default=9). For a 9x9 Go board.
+                                This determines the spatial dimensions of input tensors.
+        channels (int, optional): Number of input channels (default=17). 
+                                Includes 8 channels for recent board positions, 8 for 
+                                opponent positions, and 1 for current player indicator.
+    RETURN:
+        None: Constructor method that initializes the GoNet neural network architecture.
+
+    DESCRIPTION:
+        Initializes a neural network designed for playing Go, following an architecture
+        similar to AlphaZero. The network consists of:
+        
+        1. Initial convolutional layer to expand from input channels to 64 feature maps
+        2. Batch normalization for training stability
+        3. Stack of residual blocks for deep feature extraction
+        4. Policy head that outputs move probabilities for all board positions
+        5. Value head that outputs position evaluation (-1 to 1 range)
+        
+        The architecture uses a shared trunk (conv + residual blocks) that feeds into
+        two specialized heads for move prediction and position evaluation. This design
+        allows the network to learn both tactical move selection and strategic position
+        assessment simultaneously.
+        
+    """
     def __init__(self, boardSize=9, channels=17):
         super(GoNet, self).__init__()
 
@@ -47,7 +117,7 @@ class GoNet(nn.Module):
         # This reduces the feature of 2 * 81 = 162 to 81 possible moves 
         # because that is the max number of possible moves on the 
         # board.
-        self.policyFullyConnected = nn.Linear(2 * 9 * 9, 81)
+        self.policyFullyConnected = nn.Linear(2 * self.boardSize * self.boardSize, 81)
 
         # Want an output of -1 to 1 to indicate which player is winning.
         # This is using Sequential object from Pytorch which is a in order 
@@ -62,12 +132,12 @@ class GoNet(nn.Module):
             nn.ReLU(),
 
             # Makes 1x9x9 feature map into a vector size 81.
-            nn.Flatten,
+            nn.Flatten(),
 
             # 81 is fixed because of nn.Conv2d(61,1, kernel_size-1)
             # while 64 is design choice giving an extra layer for 
             # additional thinking. Its power of 2.
-            nn.Linear(1*9*9, 64),
+            nn.Linear(1 * self.boardSize * self.boardSize, 64),
             nn.ReLU(),
 
             # Makes the 64 features from nn.LInear(1*9*9, 64) into a 
@@ -80,24 +150,53 @@ class GoNet(nn.Module):
 
         )       
 
+    """
+    METHOD: forward
+    INPUT:
+        x (torch.Tensor): Input tensor with shape [batch_size, 17, height, width].
+                        This represents the game state features where 17 is the 
+                        number of input channels (likely different board states/features).
+    RETURN:
+        tuple: A tuple containing two elements:
+            - policyLogits (torch.Tensor): Policy logits with shape [batch_size, num_actions].
+                                        Raw scores for each possible action/move.
+            - value (torch.Tensor): State value predictions with shape [batch_size].
+                                Scalar value representing the estimated worth of the position.
+    DESCRIPTION:
+        Performs the forward pass of a neural network architecture. The network has two heads: a policy head
+        that predicts move probabilities of possible moves on the board and a value head that estimates who is 
+        currently winning.
+        
+        The forward pass consists of:
+        1. Initial convolution to expand feature depth from 17 to 64 channels
+        2. Batch normalization and ReLU activation
+        3. Series of residual blocks for deep feature extraction
+        4. Policy head: reduces channels to 2, flattens, and outputs action logits
+        5. Value head: processes features to output a single value prediction
+        
+
+    """
     def forward(self, x):
 
-        # This is using the foward method of nn.Conv2d(17, 64, kernel_size=3, padding=1 )
+        # Initial convolution: expands input channels from 17 to 64
+        # Using nn.Conv2d(17, 64, kernel_size=3, padding=1) to maintain spatial dimensions
         x = self.convolutional1(x)
 
-
+        # Apply batch normalization to stabilize training
         x = self.batchNormalization1(x)
 
+        # Apply ReLU activation for non-linearity
         x = F.relu(x)
 
-        # Takes the output and pass it to the residual blocks.
+        # Pass through residual blocks for deep feature extraction
+        # Each block learns residual mappings F(x) + x to enable deeper networks
         for block in self.residualBlocks: x = block(x)
 
         # Take the output of the body and pass it to the policy head's layers.
         # This reduces the feature dept while retaining the spacial information
         # about move choices.
         p = self.policyHead(x)
-        p = self.policyHeadBatchNormalization(x)
+        p = self.policyHeadBatchNormalization(p)
         p = F.relu(p)
 
         # .vew - reshapes tensors
@@ -113,9 +212,8 @@ class GoNet(nn.Module):
 
         # torch.squeeze(value, dim=-1) Removes redundant dimensions making the 
         # tensor easier to work with
+        # Converts from [batch_size, 1] to [batch_size] if needed
         return policyLogits, torch.squeeze(value, dim=-1)
-
-        
 
 
 
