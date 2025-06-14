@@ -2,6 +2,7 @@ from board.go import Board  # adjust path if needed
 from model.net import GoNet
 from model.mcts import MCTS
 
+print("✅ main.py is running")
 
 board = Board(9)
 network = GoNet(9, 17)
@@ -9,8 +10,11 @@ network = GoNet(9, 17)
 network.eval()
 mct = MCTS(network=network, simulations=800)
 
+print("✅ Created the components")
 
-while not board.isGameOver:
+while not board.isGameOver():
+    print("✅ Reached inside game loop")
+
     print(f"The current player is " , {board.currentPlayer})
     print("------------------------------------------------------------------------------------")
     board.printBoard()

@@ -202,7 +202,7 @@ class MCTS:
                 node = node.select_child(self.exploration_weight)
             
             # Expansion phase
-            if not node.state.is_game_over():
+            if not node.state.isGameOver():
                 with torch.no_grad():
                     state_tensor = node.state.get_state().unsqueeze(0)
                     policy_logits, _ = self.network(state_tensor)
