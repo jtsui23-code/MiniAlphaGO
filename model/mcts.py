@@ -125,7 +125,8 @@ class MCTSNode:
         """
         for move, prob in enumerate(policy_probs):
             if prob > 1e-6:  # Threshold for valid moves
-                new_state = self.state.make_move(move)
+                x,y = divmod(move, 9)
+                new_state = self.state.playMove(x,y, self.state.currentPlayer)
                 if new_state is not None:  # Legal move check
                     child = MCTSNode(new_state, self, move)
                     child.prior = prob

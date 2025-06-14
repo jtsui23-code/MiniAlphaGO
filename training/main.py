@@ -1,4 +1,4 @@
-from board.go import Board  # adjust path if needed
+from board.go import Board  
 from model.net import GoNet
 from model.mcts import MCTS
 
