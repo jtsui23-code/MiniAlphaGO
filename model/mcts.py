@@ -17,7 +17,7 @@ USAGE EXAMPLE (see line 256):
        mcts.update_root(played_move)
        best_move = mcts.search(new_board_state)
 """
-
+from utils.boardToTensor import boardToTensor
 import math
 import numpy as np
 import torch
@@ -204,14 +204,14 @@ class MCTS:
             # Expansion phase
             if not node.state.isGameOver():
                 with torch.no_grad():
-                    state_tensor = node.state.get_state().unsqueeze(0)
+                    state_tensor = boardToTensor(node.state)
                     policy_logits, _ = self.network(state_tensor)
                     policy_probs = torch.softmax(policy_logits, dim=1).numpy()[0]
                 node.expand(policy_probs)
             
             # Simulation phase
             with torch.no_grad():
-                state_tensor = node.state.get_state().unsqueeze(0)
+                state_tensor = boardToTensor(node.state)
                 _, value = self.network(state_tensor)
                 value = value.item()
             

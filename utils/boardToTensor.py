@@ -44,8 +44,10 @@ def boardToTensor(board):
     # The 17 in (17, board.size, board.size) comes from the channel size in the network being 17.
     features = np.zeros((17, board.size, board.size), dtype=np.float32)
 
+    recentHistory = board.history[-8] if len(board.history) >= 8 else board.history
+
     # This reversed(board.history[-8]) is grabbing the latest 8 moves and orders them from newest to oldest.
-    for i, pastBytes in enumerate(reversed(board.history[-8])):
+    for i, pastBytes in enumerate(reversed(recentHistory)):
         
         # Reconstruct board state from stored byte representation
         # Converts compressed byte data back to 2D integer array
