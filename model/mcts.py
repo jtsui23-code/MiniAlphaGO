@@ -3,7 +3,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from collections import defaultdict
-from utils.boardToTensor import boardToTensor  # Make sure to import your actual implementation
+from utils.boardToTensor import boardToTensor  
 
 class Node:
     def __init__(self, parent=None, prior=0, board=None):
