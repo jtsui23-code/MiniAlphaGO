@@ -1,8 +1,6 @@
 """
 MCTS Implementation for Mini AlphaGo (9x9)
 
-(Line 256 for example usage)
-
 This module implements Monte Carlo Tree Search with Neural Network guidance for Go,
 following AlphaGo Zero's approach with simplifications for 9x9 boards.
 
@@ -10,7 +8,7 @@ CLASSES:
     MCTSNode: Represents game states in the search tree
     MCTS: Main search algorithm using neural network for policy/value estimation
 
-USAGE EXAMPLE:
+USAGE EXAMPLE (see line 256):
     1. Initialize with trained GoNet:
        mcts = MCTS(network, exploration_weight=1.0, simulations=800)
     2. Perform search:
