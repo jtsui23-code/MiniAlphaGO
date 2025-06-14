@@ -47,11 +47,12 @@ def boardToTensor(board):
     startIndex = max(0, len(board.history) - 8)
     recentHistory = board.history[startIndex:]
 
-    print(f"History length: {len(board.history)}")
+    #print(f"History length: {len(board.history)}")
 
     for idx, item in enumerate(board.history[:3]):  # Check first 3 items
+        pass
 
-        print(f"History[{idx}] type: {type(item)}, value: {item}")
+        #print(f"History[{idx}] type: {type(item)}, value: {item}")
 
     # This reversed(board.history[-8]) is grabbing the latest 8 moves and orders them from newest to oldest.
     for i, pastBytes in enumerate(reversed(recentHistory)):
