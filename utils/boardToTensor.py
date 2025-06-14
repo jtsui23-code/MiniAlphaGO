@@ -1,19 +1,55 @@
 import torch 
 import numpy as np
 
+"""
+METHOD: boardToTensor
+INPUT:
+    board (Board): A Board object representing the current Go game state. Contains
+                   the game history, current player, board size, and board state.
+                   This is the go engine that tracks all game information.
+RETURN:
+    torch.Tensor: A tensor with shape [1, 17, board.size, board.size] containing
+                  the encoded board state. The tensor has a batch dimension of 1
+                  added for compatibility with neural network forward pass.
+                  Channels 0-7: Black stone positions from 8 most recent moves
+                  Channels 8-15: White stone positions from 8 most recent moves  
+                  Channel 16: Current player indicator (1.0 for black, 0.0 for white)
+DESCRIPTION:
+    Converts a Board object into a tensor representation suitable for input to the
+    GoNet neural network. The function creates a 17-channel feature representation
+    where each channel encodes specific information about the game state:
+    
+    - Channels 0-7: Historical black stone positions (newest to oldest)
+    - Channels 8-15: Historical white stone positions (newest to oldest)
+    - Channel 16: Current player turn indicator
+    
+    The function processes the board's move history to create temporal features,
+    allowing the neural network to understand move sequences and patterns. Each
+    historical board state is reconstructed from stored byte arrays and converted
+    to binary feature maps where 1.0 indicates stone presence and 0.0 indicates
+    empty positions.
+    
+    The current player channel helps the network make player-specific decisions
+    since optimal moves differ depending on whose turn it is. Finally, the tensor
+    is converted to PyTorch format and a batch dimension is added for network
+    compatibility.
+"""
 def boardToTensor(board):
 
-    # Creates a 3D numpy array filled with zeros with each spot storing 
+    # Create 3D numpy array for board state features
+    # Shape: [17 channels, board.size height, board.size width]
+    # 17 channels: 8 for black history + 8 for white history + 1 for current player
     # a 32 bit floating point number. Using 32 bit floating point nubmer instead of 
     # 64 bits to save memory and its faster.
     # The 17 in (17, board.size, board.size) comes from the channel size in the network being 17.
     features = np.zeros((17, board.size, board.size), dtype=np.float32)
 
     # This reversed(board.history[-8]) is grabbing the latest 8 moves and orders them from newest to oldest.
-    # 
     for i, pastBytes in enumerate(reversed(board.history[-8])):
         
-        # Converts the byte representation of the past board state back into an array size 9x9.
+        # Reconstruct board state from stored byte representation
+        # Converts compressed byte data back to 2D integer array
+        # Values: 1 = black stone, -1 = white stone, 0 = empty
         pastBoard = np.frombuffer(pastBytes, dtype=int).reshape(board.size, board.size)
 
         # [pastBoard == 1] creates a 2D array of bools same dimension as the pastBoard matrix but sets positions True
