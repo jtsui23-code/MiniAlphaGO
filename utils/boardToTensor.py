@@ -44,3 +44,20 @@ def boardToTensor(board):
         features[i+8][pastBoard == -1] = 1.0
 
 
+    # If its black's turn then it fills the array at features[16] with 1.0, 
+    # else the array is filled with 0.0. 
+    # This is required because the best move will depend on whose turn it is because 
+    # black's best move is not necessarily white's best move for the same board state 
+    # which is why we are checking whose turn it is.
+    if board.currentPlayer == 1:
+        features[16][:, :] = 1.0
+    else:
+        features[16][:, :] = 0.0
+
+    # torch.tensor(features) is converting the numpy array features into a tesnor which is what GoNet needs.
+    # .unsqueeze(0) is adding a batch size of zero infront of the tensor.
+    # so if the tesnors was [17, 9, 9] -> [1, 17, 9, 9] this is needed because the 
+    # foward methods the model/net.py expects a batch size infront of the tensor even if its just 1. 
+    return torch.tensor(features).unsqueeze(0)
+
+
