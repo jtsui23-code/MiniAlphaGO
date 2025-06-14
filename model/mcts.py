@@ -91,29 +91,30 @@ class MCTS:
         policy = F.softmax(policy_logits, dim=1).squeeze(0).cpu().numpy()
         
         valid_moves = node.board.getAllValidMoves()
-        pass_prior = 0.1  # Fixed prior for pass
         
-        # Add valid moves as children
+        # Add all valid moves as children, including pass if it's valid
         for move in valid_moves:
-            x, y = move
-            action = x * 9 + y
-            if action < len(policy):
-                new_board = node.board.copyBoardState()
-                new_board.playMove(x, y, new_board.currentPlayer)
-                node.children[action] = Node(
+            if move == 'pass':
+                # Pass move (assuming action 81 represents pass)
+                pass_board = node.board.copyBoardState()
+                pass_board.playMove(0, 0, pass_board.currentPlayer, passTurn=True)
+                node.children[81] = Node(
                     parent=node,
-                    prior=policy[action],
-                    board=new_board
+                    prior=policy[81],  # Use network's policy for pass
+                    board=pass_board
                 )
-        
-        # Add pass move
-        pass_board = node.board.copyBoardState()
-        pass_board.playMove(0, 0, pass_board.currentPlayer, passTurn=True)
-        node.children[81] = Node(
-            parent=node,
-            prior=pass_prior,
-            board=pass_board
-        )
+            else:
+                # Regular moves
+                x, y = move
+                action = x * 9 + y
+                if action < len(policy):
+                    new_board = node.board.copyBoardState()
+                    new_board.playMove(x, y, new_board.currentPlayer)
+                    node.children[action] = Node(
+                        parent=node,
+                        prior=policy[action],
+                        board=new_board
+                    )
         
         return value.item()
     
