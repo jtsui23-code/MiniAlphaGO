@@ -49,8 +49,8 @@ def boardToTensor(board):
 
     #print(f"History length: {len(board.history)}")
 
-    for idx, item in enumerate(board.history[:3]):  # Check first 3 items
-        pass
+    # for idx, item in enumerate(board.history[:3]):  # Check first 3 items
+    #     pass
 
         #print(f"History[{idx}] type: {type(item)}, value: {item}")
 
