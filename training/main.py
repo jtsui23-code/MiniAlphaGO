@@ -12,7 +12,9 @@ mct = MCTS(network=network, simulations=800)
 
 print("✅ Created the components")
 
-while not board.isGameOver():
+max = 125
+count = 0
+while count < max + 1:
     print("✅ Reached inside game loop")
 
     print(f"The current player is " , {board.currentPlayer})
@@ -35,6 +37,8 @@ while not board.isGameOver():
         print(f"Player played at ", {x}, {y}, " position on the board")
 
     mct.update_root(move)
+    count = count + 1
 
 
-
+print(board.score())
+print("------------------------------------------------------------------------------------ Game Over ------------------------------------------------------------------------------------")
