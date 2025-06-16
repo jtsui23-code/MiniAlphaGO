@@ -4,62 +4,106 @@ from model.mcts import MCTS
 from training.replayBuffer import ReplayBuffer
 from utils.boardToTensor import boardToTensor  
 
+"""
+METHOD: playOneGame
+INPUT:
+    buffer (ReplayBuffer):  Object of ReplayBuffer for saving the self-play data.
+    network (GoNet)      :  Object of GoNet for play go with mct.
+    mctSimulations       :  Number of simulated games by the mct.
 
-print("✅ main.py is running")
+RETURN:
+    N/A
+DESCRIPTION:
+    This function utilizes the Go network and mct to play a single game of Go and saves the 
+    result of the game for training the network.
+    
+"""
+def playOneGame(buffer, network, mctSimulations=100):
 
-board = Board(9)
-network = GoNet(9, 17)
+    # Creating Board and mct
+    board = Board(9)
 
-network.eval()
-mct = MCTS(network=network, simulations=100)
+    mct = MCTS(network=network, simulations=mctSimulations)
 
-print("✅ Created the components")
+    print("✅ Created the components")
 
-max = 125
-count = 0
+    # Have a counter as a hard cap so the game doesn't loop forever.
+    max = 125
+    count = 0
 
-buffer = ReplayBuffer(capacity=1000)
-gameData = [] # Stores tuple of (state, pi, z) pi - vector of probability of all moves, 
-              #                                z  - tracks all of the moves made by the winner as a +1 and -1 for 
-              #                                     all the moves by the loser.
+    # gameData is the data saved throughout a single game not all of them.
+    gameData = [] # Stores tuple of (state, pi, z) pi - vector of probability of all moves, 
+                #                                z  - tracks all of the moves made by the winner as a +1 and -1 for 
+                #                                     all the moves by the loser.
 
-while count < max + 1:
-    print("✅ Reached inside game loop")
+    while count < max + 1:
+        print("✅ Reached inside game loop")
 
-    print(f"The current player is " , {board.currentPlayer})
-    print("------------------------------------------------------------------------------------")
-    board.printBoard()
-    print("------------------------------------------------------------------------------------")
+        print(f"The current player is " , {board.currentPlayer})
+        print("------------------------------------------------------------------------------------")
+        board.printBoard()
+        print("------------------------------------------------------------------------------------")
 
-    move, pi = mct.search(board)
-    boardState = boardToTensor(board)
+        # Gets the best move and the pi vector which is the probability of all the moves.
+        move, pi = mct.search(board)
 
-    # 0 - 80 are the only valid moves on a 9x9 board. Move 81 is set to being a pass.
-    if move is None or move == 81:
-        print("AI passed")
-        board.playMove(1,1, board.currentPlayer, passTurn=True)
-    else:
-        # Converting move which is a single int representation of the board position into 
-        # a row and col representation of the 9x9 board.
-        x, y = divmod(move, 9)
-        board.playMove(x,y, board.currentPlayer)
+        # Converts the board into a tensor which is the expected form for saving the gameData.
+        boardState = boardToTensor(board)
 
-        print(f"Player played at ", {x}, {y}, " position on the board")
+        # 0 - 80 are the only valid moves on a 9x9 board. Move 81 is set to being a pass.
+        if move is None or move == 81:
+            print("AI passed")
+            # Player passes if that is the move choosen by the mct.
+            board.playMove(1,1, board.currentPlayer, passTurn=True)
+        else:
+            # Converting move which is a single int representation of the board position into 
+            # a row and col representation of the 9x9 board.
+            x, y = divmod(move, 9)
+            
+            # Playing the move choosen by the mct.
+            board.playMove(x,y, board.currentPlayer)
+
+            print(f"Player played at ", {x}, {y}, " position on the board")
 
 
-    gameData.append((boardState, pi, board.currentPlayer))
-    mct.update_root(move)
-    count = count + 1
+        # Saves the game data each turn. 
+        gameData.append((boardState, pi, board.currentPlayer))
+        mct.update_root(move)
+        count = count + 1
 
 
-print(board.score())
-print("------------------------------------------------------------------------------------\n Game Over ------------------------------------------------------------------------------------")
+    print(board.score())
+    print("------------------------------------------------------------------------------------\n Game Over ------------------------------------------------------------------------------------")
 
-# .score() returns 1 or -1 to indicate winner.
-winner = board.score()
-for state, pi, player in gameData:
-    z = 1 if player == winner == 1 else -1
-    buffer.add(state, pi, z)
+    # .score() returns 1 or -1 to indicate winner.
+    winner = board.score()
 
-buffer.saveToFile("selfPlay/selfPlayBuffer1.pk1")
+    # Loops through each turn to see which moves where good and bad. T
+    # This is done through see which moves where done by the winner and the loser.
+    for state, pi, player in gameData:
+        z = 1 if player == winner == 1 else -1
+        buffer.add(state, pi, z)
+
+
+
+if __name__ == "__main__":
+
+    buffer = ReplayBuffer(capacity=10000)
+    network = GoNet(9, 17)
+    network.eval()
+
+    numberOfGames = 100
+    saveInterval = 10
+
+    for i in range(1, numberOfGames + 1):
+        print("------------------------- Starting Game ", i , "-------------------------")
+        playOneGame(buffer=buffer, network=network)
+
+        if i % saveInterval == 0:
+            buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i}.pkl")
+            print(f"Saved replay buffer after {i} games.")
+
+
+
+
 
