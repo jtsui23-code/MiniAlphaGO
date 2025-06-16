@@ -68,7 +68,21 @@ class MCTS:
                 node.visit_count += 1
                 value = -value  # Alternate for opponent
         
-        return self.select_move(self.root)
+        move = self.select_move(self.root)
+        
+        # Array to store the probabilities of all the possible moves on the board.
+        # 82 because 82 represents passing. 9x9 = 81
+        visited_counts = np.zeros(82)
+
+        # Finding the visit count of all the moves on the board.
+        for action, child in self.root.children.items():
+            visited_counts[action] = child.visit_count
+        
+        # pi is a vector of the probabilities of all the moves and the board and passing.
+        pi = visited_counts/ visited_counts.sum()
+
+        # Returns the best move and the pi vector.
+        return move, pi
     
     def select_child(self, node):
         best_score = -float('inf')

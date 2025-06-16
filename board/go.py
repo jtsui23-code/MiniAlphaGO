@@ -960,8 +960,7 @@ class Board:
         N/A
 
     RETURN:
-        finalScore (dict): The keys are the player (-1, 1) and their respective score after considering 
-        stone count, territory count and prisoner stones and captured stones..
+        Returns 1 or -1 to indicate the winner of the game.
 
     DESCRIPTION:
         This method is using the Chinese Scoring system which includes the stones in the score as well. The method 
@@ -1037,9 +1036,12 @@ class Board:
         print("stone count: ", stoneCount)
         print("territory :", territoryScores)
         print("captured dead stones: ", capturedDeadStones)
+        print("Final score: " , finalScores)
 
-
-        return finalScores
+        if finalScores[1] > finalScores[-1]:
+            return 1
+        else: 
+            return -1
 
 
 
