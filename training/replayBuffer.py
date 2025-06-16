@@ -1,6 +1,7 @@
 import random
 import torch
 from utils.boardToTensor import boardToTensor  
+import pickle
 
 class ReplayBuffer:
 
@@ -14,7 +15,20 @@ class ReplayBuffer:
         if len(self.buffer) > self.capacity:
             self.buffer.pop(0)
 
-        
+    def saveToFile(self, fileName):
+        # 'wb' write binary the file will be in binary not human readable format.
+        with open(fileName, 'wb') as f:
+            pickle.dump(self.buffer, f)
+
+    def loadFile(self, fileName):
+        # 'rb' - read buffer different from 'r' because this is binary. 
+        with open(fileName, 'rb') as f:
+            self.buffer = pickle.load(f)
+
+            # Ensures the buffer is in range of the capacity. 
+            # Gets the last number of capacity indexes preventing index overflow.
+            self.buffer = self.buffer[-self.capacity:]
+
     def sample(self, numberOfSamples):
         batch = random.sample(self.buffer, numberOfSamples)
 
