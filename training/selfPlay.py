@@ -18,7 +18,7 @@ DESCRIPTION:
     result of the game for training the network.
     
 """
-def playOneGame(buffer, network, mctSimulations=100):
+def playOneGame(buffer, network, mctSimulations=100, gameNumber=0):
 
     # Creating Board and mct
     board = Board(9)
@@ -37,7 +37,7 @@ def playOneGame(buffer, network, mctSimulations=100):
                 #                                     all the moves by the loser.
 
     while count < max + 1:
-        print("✅ Reached inside game loop")
+        print("--------------- Current Game is ", gameNumber, "----------------")
 
         print(f"The current player is " , {board.currentPlayer})
         print("------------------------------------------------------------------------------------")
@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     for i in range(1, numberOfGames + 1):
         print("------------------------- Starting Game ", i , "-------------------------")
-        playOneGame(buffer=buffer, network=network)
+        playOneGame(buffer=buffer, network=network, gameNumber=i)
 
         if i % saveInterval == 0:
             buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i}.pkl")
