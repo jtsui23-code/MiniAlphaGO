@@ -1,6 +1,9 @@
 from board.go import Board  
 from model.net import GoNet
 from model.mcts import MCTS
+from training.replayBuffer import ReplayBuffer
+from utils.boardToTensor import boardToTensor  
+
 
 print("✅ main.py is running")
 
@@ -14,6 +17,12 @@ print("✅ Created the components")
 
 max = 125
 count = 0
+
+buffer = ReplayBuffer(capacity=1000)
+gameData = [] # Stores tuple of (state, pi, z) pi - vector of probability of all moves, 
+              #                                z  - tracks all of the moves made by the winner as a +1 and -1 for 
+              #                                     all the moves by the loser.
+
 while count < max + 1:
     print("✅ Reached inside game loop")
 
@@ -22,7 +31,8 @@ while count < max + 1:
     board.printBoard()
     print("------------------------------------------------------------------------------------")
 
-    move = mct.search(board)
+    move, pi = mct.search(board)
+    boardState = boardToTensor(board)
 
     # 0 - 80 are the only valid moves on a 9x9 board. Move 81 is set to being a pass.
     if move is None or move == 81:
@@ -36,9 +46,20 @@ while count < max + 1:
 
         print(f"Player played at ", {x}, {y}, " position on the board")
 
+
+    gameData.append((boardState, pi, board.currentPlayer))
     mct.update_root(move)
     count = count + 1
 
 
 print(board.score())
 print("------------------------------------------------------------------------------------\n Game Over ------------------------------------------------------------------------------------")
+
+# .score() returns 1 or -1 to indicate winner.
+winner = board.score()
+for state, pi, player in gameData:
+    z = 1 if player == winner == 1 else -1
+    buffer.add(state, pi, z)
+
+buffer.saveToFile("selfPlay/selfPlayBuffer1.pk1")
+
