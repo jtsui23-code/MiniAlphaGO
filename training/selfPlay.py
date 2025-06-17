@@ -92,7 +92,7 @@ if __name__ == "__main__":
     network = GoNet(9, 17)
     network.eval()
 
-    numberOfGames = 100
+    numberOfGames = 150
     saveInterval = 10
 
     for i in range(1, numberOfGames + 1):
@@ -100,7 +100,7 @@ if __name__ == "__main__":
         playOneGame(buffer=buffer, network=network, gameNumber=i)
 
         if i % saveInterval == 0:
-            buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + 150}.pkl")
+            buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + 350}.pkl")
             print(f"Saved replay buffer after {i} games.")
 
 
