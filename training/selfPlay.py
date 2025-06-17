@@ -4,6 +4,37 @@ from model.mcts import MCTS
 from training.replayBuffer import ReplayBuffer
 from utils.boardToTensor import boardToTensor  
 
+def modelTesting(blackModel, whiteModel):
+    board = Board(9)
+    model = None
+    mct = None
+
+    count = 0
+    max = 125
+    while not board.isGameOver() and count < max:
+
+        if board.currentPlayer == 1:
+            model = blackModel
+
+        elif board.currentPlayer == -1:
+            model = whiteModel
+
+        mct = MCTS(network=model, simulations=100)
+        move, pi = mct.search(board)
+
+        x,y = divmod(move, 9)
+        board.playMove(x,y, board.currentPlayer)
+        mct.update_root()
+
+        count += 1
+    
+    
+    score = board.score()
+
+    return score
+            
+
+
 """
 METHOD: playOneGame
 INPUT:
