@@ -100,7 +100,7 @@ if __name__ == "__main__":
         playOneGame(buffer=buffer, network=network, gameNumber=i)
 
         if i % saveInterval == 0:
-            buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i}.pkl")
+            buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + 150}.pkl")
             print(f"Saved replay buffer after {i} games.")
 
 
