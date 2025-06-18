@@ -10,7 +10,7 @@ import torch
 
 
 """
-METHOD: runPipline
+METHOD: startPipline
 INPUT:
     numGames (int)      :  How many new games you want to add to the self-play game data set.
 
@@ -22,8 +22,8 @@ DESCRIPTION:
     The new model is then evaluated to see if its the new best model.
     
 """
-def runPipline(numGames):
-    
+def startPipline(numGames=50):
+    print("Entered function")
     # Gets all of the self-play game files and appends them into an array. 
     # This is to prevent override when saving replay buffer and correctly naming the replay buffer as well.
     existingBufferfiles = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
@@ -40,6 +40,7 @@ def runPipline(numGames):
     # This is applied to all of the existing buffer files in selfPlay/
     bufferNumber = [int(f.split("_")[1].split(".")[0]) for f in existingBufferfiles]
     highestBufferNumber = max(bufferNumber, default=0)
+    print("Passed the buffer counting")
 
 
     # Loading the current best model.
@@ -50,11 +51,19 @@ def runPipline(numGames):
 
     # Creating buffer object to save self-play games.
     buffer = ReplayBuffer(capacity=1000)
-    numGames = 5
+
+
+    print("Creating components")
+
+    numGames = numGames
     saveInterval = 10
+
+    print("Right before the for loop")
+
 
     # Playing a set amount of self-play games and saving them.
     for i in range(1, numGames + 1):
+        print(f"-------------------------------------------- Generating self-play game data --------------------------------------------")
         playOneGame(buffer=buffer, network=currentModel, mctSimulations=100, gameNumber=i)
 
         if i % saveInterval == 0:
@@ -74,12 +83,13 @@ def runPipline(numGames):
     candidateModel.load_state_dict(torch.load("models/candidateModel.pt"))
     candidateModel.eval()
 
+    print(f"-------------------------------------------- Evaluating the new model --------------------------------------------")
 
     # Evaluating whether the new model is better than the current one or not.
     evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=20)
 
 
-
+startPipline(numGames=50)
 
 
 

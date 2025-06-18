@@ -4,23 +4,7 @@ from training.train import createModel
 import torch
 
 
-# Creating the new candiateModel
-# The 7th save file was rejected i.e numTrainData=8
 
-createModel(numTrainData=51,fileName="candidateModel")
-
-# Loading the both the champion and candiate model to the network to be used in the 
-# evaulation.
-currentModel = GoNet(boardSize=9, channels=17)
-candidateModel = GoNet(boardSize=9, channels=17)
-
-# currentModel.load_state_dict(torch.load("models/currentModel.pt"))
-
-currentModel.load_state_dict(torch.load("models/bestModel.pt"))
-candidateModel.load_state_dict(torch.load("models/candidateModel.pt"))
-
-currentModel.eval()
-candidateModel.eval()
 
 
 
@@ -77,7 +61,28 @@ def evalateModel(candiateModel, championModel, numGames=20):
     else:
         print("Candiate rejected")
 
-evalateModel(candiateModel=candidateModel, championModel=currentModel)
+
+if __name__ == "__main__":
+    # Loading the both the champion and candiate model to the network to be used in the 
+    # evaulation.
+    currentModel = GoNet(boardSize=9, channels=17)
+    candidateModel = GoNet(boardSize=9, channels=17)
+
+    # currentModel.load_state_dict(torch.load("models/currentModel.pt"))
+
+    currentModel.load_state_dict(torch.load("models/bestModel.pt"))
+    candidateModel.load_state_dict(torch.load("models/candidateModel.pt"))
+
+    currentModel.eval()
+    candidateModel.eval()
+    evalateModel(candiateModel=candidateModel, championModel=currentModel)
+
+    # Creating the new candiateModel
+    # The 7th save file was rejected i.e numTrainData=8
+
+    createModel(numTrainData=51,fileName="candidateModel")
+
+
 
 
 
