@@ -42,7 +42,7 @@ def boardToTensor(board):
     # a 32 bit floating point number. Using 32 bit floating point nubmer instead of 
     # 64 bits to save memory and its faster.
     # The 17 in (17, board.size, board.size) comes from the channel size in the network being 17.
-    features = np.zeros((17, board.size, board.size), dtype=np.float32)
+    features = np.zeros((17, 9, 9), dtype=np.float32)
 
     startIndex = max(0, len(board.history) - 8)
     recentHistory = board.history[startIndex:]

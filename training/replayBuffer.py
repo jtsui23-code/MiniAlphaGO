@@ -23,8 +23,12 @@ class ReplayBuffer:
     def loadFile(self, fileName):
         # 'rb' - read buffer different from 'r' because this is binary. 
         with open(fileName, 'rb') as f:
-            self.buffer = pickle.load(f)
+            newData = pickle.load(f)
 
+            # This appends all of the new data files into self.buffer 
+            # This is the same thing as doing a for loop and just self.buffer.append()
+            self.buffer.extend(newData)
+            
             # Ensures the buffer is in range of the capacity. 
             # Gets the last number of capacity indexes preventing index overflow.
             self.buffer = self.buffer[-self.capacity:]
@@ -38,12 +42,10 @@ class ReplayBuffer:
         # of all of the z. 
         states, pis, zs = zip(*batch)
 
-        # Converting the lists into tensors to be used in the network.
-        # Have to convert the board state into a tensor before using torch.stack.
-        # Have to use for loop because boardToTensor expects a single board state not a list of them.
-        states = [boardToTensor(s) for s in states]
+       
 
-        states = torch.stack(states)
+        # states is already a tensor so doesn't need to be converted from Board State -> Tensor
+        states = torch.stack(states).squeeze(1)
         pis = torch.tensor(pis, dtype=torch.float32)
         zs = torch.tensor(zs, dtype=torch.float32)
 
