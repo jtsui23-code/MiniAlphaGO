@@ -53,18 +53,33 @@ def train(network: GoNet, buffer: ReplayBuffer, batchSize=64, epochs=10, learnin
 
 
 
-def trainModel(numTrainData=6, fileName="models/currentModel.pt"):
+"""
+METHOD: createModel
+INPUT:
+    numTrainData (int)      :  Determines how many save files to load into the model.
+    fileName     (string)   :  The name of the model file.
 
+RETURN:
+    N/A
+DESCRIPTION:
+    This function loads in self-play game data to create a model for playing Go better.
+    
+"""
+def createModel(numTrainData=6, fileName="models/currentModel.pt"):
+
+    # Creating network and replay buffer
     network =  GoNet(boardSize=9, channels=17)
 
     buffer = ReplayBuffer(capacity=1000)
 
+    # For loop for loading in the self-play game data into the buffer.
     for i in range(1, numTrainData):
         buffer.loadFile(f"selfPlay/selfPlayBuffer_{i * 10}.pkl")
 
+    # Using the buffer with the network to create a model which is saved.
     train(network=network, buffer=buffer, batchSize=64, epochs=10)
 
     torch.save(network.state_dict(), f"models/{fileName}.pt")
 
 
-trainModel(7, "candidateModel")
+createModel(numTrainData=7, fileName="candidateModel")

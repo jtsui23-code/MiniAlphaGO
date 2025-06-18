@@ -4,22 +4,46 @@ from model.mcts import MCTS
 from training.replayBuffer import ReplayBuffer
 from utils.boardToTensor import boardToTensor  
 
+
+
+"""
+METHOD: modelTesting
+INPUT:
+    blackModel (GoNet)      :  The model that is playing black this game.
+    whiteModel (GoNet)      :  The model that is playing white this game.
+
+RETURN:
+    score (int)             : Returns 1 if black wins or -1 if white wins.
+DESCRIPTION:
+    This function has two different models play a game of against each other to 
+    see who wins this match. This is used in evalateModel.py to see if a candidate model
+    is the new best one.
+    
+"""
 def modelTesting(blackModel, whiteModel):
+
+    # Creating board, model, and mct.
     board = Board(9)
     model = None
     mct = None
 
+    # Have a turn cap of 125 to end the game.
     count = 0
     max = 125
+
     while not board.isGameOver() and count < max:
 
+        # Loads the model in respect to whose turn it is.
         if board.currentPlayer == 1:
             model = blackModel
 
         elif board.currentPlayer == -1:
             model = whiteModel
 
+        # Loads the specific model into mct depending on whose turn it is.
         mct = MCTS(network=model, simulations=100)
+
+        # Plays move using the specific model according to player's turn.
         move, pi = mct.search(board)
 
         x,y = divmod(move, 9)
@@ -29,6 +53,7 @@ def modelTesting(blackModel, whiteModel):
         count += 1
     
     
+    # Gets the score of the game to see who won.
     score = board.score()
 
     return score
