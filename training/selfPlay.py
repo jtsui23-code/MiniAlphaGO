@@ -24,7 +24,7 @@ def modelTesting(blackModel, whiteModel):
 
         x,y = divmod(move, 9)
         board.playMove(x,y, board.currentPlayer)
-        mct.update_root()
+        
 
         count += 1
     
