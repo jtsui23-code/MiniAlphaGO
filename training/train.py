@@ -74,6 +74,7 @@ def createModel(numTrainData=6, fileName="models/currentModel.pt"):
 
     # For loop for loading in the self-play game data into the buffer.
     for i in range(1, numTrainData):
+ 
         buffer.loadFile(f"selfPlay/selfPlayBuffer_{i * 10}.pkl")
 
     # Using the buffer with the network to create a model which is saved.
