@@ -79,7 +79,7 @@ def runPipline(numGames):
     evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=20)
 
 
-
+runPipline(numGames=5)
 
 
 
