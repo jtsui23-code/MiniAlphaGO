@@ -51,32 +51,20 @@ def train(network: GoNet, buffer: ReplayBuffer, batchSize=64, epochs=10, learnin
         # Print loss values for monitoring
         print(f"[Epoch {epoch + 1}] Total Loss: {loss.item():.4f} | Policy: {loss_pi.item():.4f} | Value: {loss_z.item():.4f}")
 
-"""
-Example usage for training the model
 
-    # Create network instance with board size and input plane count
-    network = GoNet(boardSize=9, inputPlanes=17)
 
-    # Initialize replay buffer with a maximum capacity
-    buffer = ReplayBuffer(capacity=10000)
+def trainModel(numTrainData=6, fileName="models/currentModel.pt"):
 
-    # Load previously saved self-play training data
-    buffer.loadFile("selfPlay/selfPlayBuffer_200.pkl")
+    network =  GoNet(boardSize=9, channels=17)
 
-    # Train the model on the loaded data
-    train(network, buffer, batchSize=64, epochs=10)
+    buffer = ReplayBuffer(capacity=1000)
 
-    # Save the trained model to a file
-    torch.save(network.state_dict(), "models/newModel.pt")
-"""
+    for i in range(1, numTrainData):
+        buffer.loadFile(f"selfPlay/selfPlayBuffer_{i * 10}.pkl")
 
-network =  GoNet(boardSize=9, channels=17)
+    train(network=network, buffer=buffer, batchSize=64, epochs=10)
 
-buffer = ReplayBuffer(capacity=1000)
+    torch.save(network.state_dict(), f"models/{fileName}.pt")
 
-for i in range(1,6):
-    buffer.loadFile(f"selfPlay/selfPlayBuffer_{i * 10}.pkl")
 
-train(network=network, buffer=buffer, batchSize=64, epochs=10)
-
-torch.save(network.state_dict(), "models/currentModel.pt")
+trainModel(7, "candidateModel")
