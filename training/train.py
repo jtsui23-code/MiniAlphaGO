@@ -69,3 +69,14 @@ Example usage for training the model
     # Save the trained model to a file
     torch.save(network.state_dict(), "models/newModel.pt")
 """
+
+network =  GoNet(boardSize=9, channels=17)
+
+buffer = ReplayBuffer(capacity=1000)
+
+for i in range(1,6):
+    buffer.loadFile(f"selfPlay/selfPlayBuffer_{i * 10}.pkl")
+
+train(network=network, buffer=buffer, batchSize=64, epochs=10)
+
+torch.save(network.state_dict(), "models/currentModel.pt")
