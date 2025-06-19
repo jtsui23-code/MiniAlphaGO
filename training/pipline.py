@@ -70,12 +70,10 @@ def startPipline(numGames=50):
             buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + highestBufferNumber}.pkl")
         
     
-    # This is getting the total number of self-play files after the newly self-play games were added.
-    # highestBufferNumber will be the total number of games so for example 500 but there is only 
-    # 50 files. 10 games per file.
-    # Therefore have to divide highestBufferNumber by 10 then add the newly added self-play games.
-    numTrainData = int(highestBufferNumber/10) + numGames
-    createModel(numTrainData=numTrainData, fileName="candidateModel.pt")
+ 
+    numTrainData = len(existingBufferfiles)
+    numBuffers = numTrainData + numGames/10
+    createModel(numTrainData=int(numBuffers), fileName="candidateModel.pt")
 
 
     # Creating candiateModel that uses the newly self-play games as well as the orignal data set.
@@ -90,8 +88,6 @@ def startPipline(numGames=50):
 
 
 startPipline(numGames=50)
-
-
 
 
 
