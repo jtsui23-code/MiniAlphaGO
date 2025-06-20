@@ -1,5 +1,5 @@
 # Mini AlphaGo (9x9) - Work In Progress
-A full web application with login authitication which allows users to play against varying levels of Go AI bots. All of the AI bots are originally made using personally made Go Engine, reinforcement learning, Monte Carlo Tree Search (MCTS), and a neural policy/value network. 
+A full-stack web application with user authentication that allows players to compete against Go AI bots of varying difficulty levels. Each AI is built from the ground up using a custom Go engine, reinforcement learning, Monte Carlo Tree Search (MCTS), and a self-trained neural policy/value network.
 
 ---
 
