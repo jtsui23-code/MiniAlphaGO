@@ -13,7 +13,7 @@ import torch
 METHOD: startPipline
 INPUT:
     numGames (int)      :  How many new games you want to add to the self-play game data set.
-
+    genNum   (int)      :  Generation number so older best models are not overrided for having varying bot difficulties. 
 
 RETURN:
     N/A
@@ -22,7 +22,7 @@ DESCRIPTION:
     The new model is then evaluated to see if its the new best model.
     
 """
-def startPipline(numGames=50):
+def startPipline(numGames=50, genNum=2):
     print("Entered function")
     # Gets all of the self-play game files and appends them into an array. 
     # This is to prevent override when saving replay buffer and correctly naming the replay buffer as well.
@@ -84,10 +84,10 @@ def startPipline(numGames=50):
     print(f"-------------------------------------------- Evaluating the new model --------------------------------------------")
 
     # Evaluating whether the new model is better than the current one or not.
-    evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=20)
+    evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=20, genNum=genNum)
 
 
-startPipline(numGames=50)
+startPipline(numGames=50, genNum=2)
 
 
 

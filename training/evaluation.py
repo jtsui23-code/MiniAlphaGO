@@ -22,7 +22,7 @@ DESCRIPTION:
     the model is saved.
     
 """
-def evalateModel(candiateModel, championModel, numGames=20):
+def evalateModel(candiateModel, championModel, numGames=20, genNum=2):
 
     # Counter of all of the wins by the candiateModel.
     wins = 0
@@ -57,7 +57,7 @@ def evalateModel(candiateModel, championModel, numGames=20):
     print(f"Candiate model has a win rate of {winRate*100}%")
 
     if winRate > 0.55:
-        torch.save(candiateModel.state_dict(), "models/bestModel2.pt")
+        torch.save(candiateModel.state_dict(), f"models/bestModel{genNum}.pt")
     else:
         print("Candiate rejected")
 
