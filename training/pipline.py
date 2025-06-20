@@ -45,7 +45,7 @@ def startPipline(numGames=50, genNum=2):
 
     # Loading the current best model.
     currentModel = GoNet(boardSize=9, channels=17)
-    currentModel.load_state_dict(torch.load("models/bestModel.pt"))
+    currentModel.load_state_dict(torch.load(f"models/bestModel{genNum-1}.pt"))
 
     currentModel.eval()
 
@@ -87,7 +87,7 @@ def startPipline(numGames=50, genNum=2):
     evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum)
 
 
-startPipline(numGames=50, genNum=2)
+startPipline(numGames=100, genNum=3)
 
 
 
