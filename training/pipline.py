@@ -70,9 +70,12 @@ def startPipline(numGames=50, genNum=2):
             buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + highestBufferNumber}.pkl")
         
     
- 
-    numTrainData = len(existingBufferfiles)
-    numBuffers = numTrainData + numGames/10
+    
+    # numTrainData = len(existingBufferfiles)
+    # numBuffers = numTrainData + numGames/10
+    numtTrainData = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
+    numBuffers = len(numtTrainData)
+
     createModel(numTrainData=int(numBuffers), fileName="candidateModel.pt")
 
 
