@@ -90,7 +90,35 @@ def startPipline(numGames=50, genNum=2):
     evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum)
 
 
-startPipline(numGames=100, genNum=3)
+
+def evaludateModel(genNum=3):
+
+    # Loading the current best model.
+    currentModel = GoNet(boardSize=9, channels=17)
+    currentModel.load_state_dict(torch.load(f"models/bestModel{genNum-1}.pt"))
+
+    currentModel.eval()
+
+
+     # numTrainData = len(existingBufferfiles)
+    # numBuffers = numTrainData + numGames/10
+    numtTrainData = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
+    numBuffers = len(numtTrainData)
+
+    createModel(numTrainData=int(numBuffers), fileName="candidateModel.pt")
+
+
+    # Creating candiateModel that uses the newly self-play games as well as the orignal data set.
+    candidateModel = GoNet(boardSize=9, channels=17)
+    candidateModel.load_state_dict(torch.load("models/candidateModel.pt"))
+    candidateModel.eval()
+    evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum)
+
+
+
+# startPipline(numGames=100, genNum=3)
+
+evaludateModel(genNum=3)
 
 
 
