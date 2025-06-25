@@ -91,6 +91,18 @@ def startPipline(numGames=50, genNum=2):
 
 
 
+"""
+METHOD: evaludateModel
+INPUT:
+    genNum   (int)      :  Generation number so older best models are not overrided for having varying bot difficulties. 
+
+RETURN:
+    N/A
+DESCRIPTION:
+    This function evaluates the candidate model compared to the current best model its purpose is to be used separately 
+    whenever the pipline cannot be fully ran because of time contraint.
+    
+"""
 def evaludateModel(genNum=3):
 
     # Loading the current best model.
@@ -116,9 +128,9 @@ def evaludateModel(genNum=3):
 
 
 
-# startPipline(numGames=100, genNum=3)
+startPipline(numGames=100, genNum=4)
 
-evaludateModel(genNum=3)
+# evaludateModel(genNum=3)
 
 
 
