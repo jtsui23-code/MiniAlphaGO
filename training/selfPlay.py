@@ -41,7 +41,7 @@ def modelTesting(blackModel, whiteModel):
             model = whiteModel
 
         # Loads the specific model into mct depending on whose turn it is.
-        mct = MCTS(network=model, simulations=100)
+        mct = MCTS(network=model, simulations=200)
 
         # Plays move using the specific model according to player's turn.
         move, pi = mct.search(board)
