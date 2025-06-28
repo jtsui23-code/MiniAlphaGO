@@ -58,8 +58,10 @@ def evalateModel(candiateModel, championModel, numGames=20, genNum=2):
 
     if winRate > 0.55:
         torch.save(candiateModel.state_dict(), f"models/bestModel{genNum}.pt")
+        return 1
     else:
         print("Candiate rejected")
+        return -1
 
 
 if __name__ == "__main__":
