@@ -87,7 +87,7 @@ def startPipline(numGames=50, genNum=2):
     print(f"-------------------------------------------- Evaluating the new model --------------------------------------------")
 
     # Evaluating whether the new model is better than the current one or not.
-    evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum)
+    return evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum)
 
 
 
@@ -126,11 +126,14 @@ def evaludateModel(genNum=3):
     candidateModel.eval()
     evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum)
 
+counter = 4
+while counter < 11:
 
+    evalResult = startPipline(numGames=100, genNum=counter)
+    if evalResult == 1:
+        counter+= 1
 
-startPipline(numGames=100, genNum=4)
-
-# evaludateModel(genNum=3)
+# evaludateModel(genNum=4)
 
 
 
