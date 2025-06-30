@@ -5,6 +5,7 @@ from training.train import createModel
 from training.selfPlay import playOneGame
 from training.replayBuffer import ReplayBuffer
 import torch
+import re # For pattern recognition in strings
 
 
 
@@ -69,8 +70,9 @@ def startPipline(numGames=50, genNum=2):
         if i % saveInterval == 0:
             buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + highestBufferNumber}.pkl")
         
-    
-    
+
+
+
     # numTrainData = len(existingBufferfiles)
     # numBuffers = numTrainData + numGames/10
     numtTrainData = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
@@ -88,6 +90,17 @@ def startPipline(numGames=50, genNum=2):
 
     # Evaluating whether the new model is better than the current one or not.
     return evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum)
+
+
+def extractFileNum(fileName):
+
+    # r"" is a raw string
+    # (\d+)\ is the number we want in the file that starts with selfPlayBuffer_ and ends with .pkl
+    match = re.search(r"selfPlayBuffer_(\d+)\.pkl", fileName)
+
+    # match.group(1) would be the file number so if fileName is selfPlayBuffer_510.pkl
+    # match.group(1) is 510
+    return int(match.group(1)) if match else -1
 
 
 
@@ -112,12 +125,16 @@ def evaludateModel(genNum=3):
     currentModel.eval()
 
 
-     # numTrainData = len(existingBufferfiles)
+    # numTrainData = len(existingBufferfiles)
     # numBuffers = numTrainData + numGames/10
-    numtTrainData = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
-    numBuffers = len(numtTrainData)
+    allDataFiles = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
 
-    createModel(numTrainData=int(numBuffers), fileName="candidateModel.pt")
+    # key=extractFileNum means each file name in allDataFiels will be passed into extractFileNum function.
+    sortedFiles = sorted(allDataFiles, key=extractFileNum)
+    
+    latestFiles = sortedFiles[-50]
+
+    createModel(numTrainData=latestFiles, fileName="candidateModel.pt")
 
 
     # Creating candiateModel that uses the newly self-play games as well as the orignal data set.

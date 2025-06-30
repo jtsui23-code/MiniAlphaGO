@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from model.net import GoNet
 from training.replayBuffer import ReplayBuffer
+import os
 
 def train(network: GoNet, buffer: ReplayBuffer, batchSize=64, epochs=10, learningRate=1e-3):
     # Skip training if buffer doesn't have enough samples
@@ -56,7 +57,7 @@ def train(network: GoNet, buffer: ReplayBuffer, batchSize=64, epochs=10, learnin
 """
 METHOD: createModel
 INPUT:
-    numTrainData (int)      :  Determines how many save files to load into the model.
+    fileLIst     (list)     :  Stores all of the files that will be loaded into the model.
     fileName     (string)   :  The name of the model file.
 
 RETURN:
@@ -65,7 +66,7 @@ DESCRIPTION:
     This function loads in self-play game data to create a model for playing Go better.
     
 """
-def createModel(numTrainData=6, fileName="models/currentModel.pt"):
+def createModel(fileLIst, fileName="models/currentModel.pt"):
 
     # Creating network and replay buffer
     network =  GoNet(boardSize=9, channels=17)
@@ -73,9 +74,8 @@ def createModel(numTrainData=6, fileName="models/currentModel.pt"):
     buffer = ReplayBuffer(capacity=1000)
 
     # For loop for loading in the self-play game data into the buffer.
-    for i in range(1, numTrainData):
- 
-        buffer.loadFile(f"selfPlay/selfPlayBuffer_{i * 10}.pkl")
+    for fileName in fileLIst:
+        buffer.loadFile(os.path.join("selfPlay", fileName))
 
     # Using the buffer with the network to create a model which is saved.
     train(network=network, buffer=buffer, batchSize=64, epochs=10)
@@ -83,4 +83,3 @@ def createModel(numTrainData=6, fileName="models/currentModel.pt"):
     torch.save(network.state_dict(), f"models/{fileName}.pt")
 
 
-createModel(numTrainData=7, fileName="candidateModel")
