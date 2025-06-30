@@ -126,7 +126,7 @@ def evaludateModel(genNum=3):
     candidateModel.eval()
     evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum)
 
-counter = 4
+counter = 5
 while counter < 11:
 
     evalResult = startPipline(numGames=100, genNum=counter)
