@@ -65,25 +65,35 @@ def startPipline(numGames=50, genNum=2):
     # Playing a set amount of self-play games and saving them.
     for i in range(1, numGames + 1):
         print(f"-------------------------------------------- Generating self-play game data --------------------------------------------")
-        playOneGame(buffer=buffer, network=currentModel, mctSimulations=200, gameNumber=i)
+        playOneGame(buffer=buffer, network=currentModel, mctSimulations=300, gameNumber=i)
 
         if i % saveInterval == 0:
             buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + highestBufferNumber}.pkl")
         
 
 
-
     # numTrainData = len(existingBufferfiles)
     # numBuffers = numTrainData + numGames/10
-    numtTrainData = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
-    numBuffers = len(numtTrainData)
+    allDataFiles = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
 
-    createModel(numTrainData=int(numBuffers), fileName="candidateModel.pt")
+    # key=extractFileNum means each file name in allDataFiels will be passed into extractFileNum function.
+    sortedFiles = sorted(allDataFiles, key=extractFileNum)
+    
+    latestFiles = sortedFiles[-50]
 
+    createModel(fileLIst=latestFiles, fileName="candidateModel.pt")
+
+
+
+    # Using GPU instead of CPU for pipline for faster runtime.
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    
 
     # Creating candiateModel that uses the newly self-play games as well as the orignal data set.
     candidateModel = GoNet(boardSize=9, channels=17)
     candidateModel.load_state_dict(torch.load("models/candidateModel.pt"))
+    # candidateModel.to(device)
     candidateModel.eval()
 
     print(f"-------------------------------------------- Evaluating the new model --------------------------------------------")
@@ -134,7 +144,7 @@ def evaludateModel(genNum=3):
     
     latestFiles = sortedFiles[-50]
 
-    createModel(numTrainData=latestFiles, fileName="candidateModel.pt")
+    createModel(fileLIst=latestFiles, fileName="candidateModel.pt")
 
 
     # Creating candiateModel that uses the newly self-play games as well as the orignal data set.

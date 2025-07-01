@@ -3,6 +3,8 @@ from model.net import GoNet
 from model.mcts import MCTS
 from training.replayBuffer import ReplayBuffer
 from utils.boardToTensor import boardToTensor  
+import torch
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 
@@ -41,7 +43,7 @@ def modelTesting(blackModel, whiteModel):
             model = whiteModel
 
         # Loads the specific model into mct depending on whose turn it is.
-        mct = MCTS(network=model, simulations=200)
+        mct = MCTS(network=model, simulations=300)
 
         # Plays move using the specific model according to player's turn.
         move, pi = mct.search(board)
@@ -104,6 +106,8 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0):
         move, pi = mct.search(board)
 
         # Converts the board into a tensor which is the expected form for saving the gameData.
+        # boardState = boardToTensor(board).to(device)
+
         boardState = boardToTensor(board)
 
         # 0 - 80 are the only valid moves on a 9x9 board. Move 81 is set to being a pass.
@@ -145,7 +149,9 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0):
 if __name__ == "__main__":
 
     buffer = ReplayBuffer(capacity=10000)
+    # network = GoNet(9, 17).to(device)
     network = GoNet(9, 17)
+    
     network.eval()
 
     numberOfGames = 150
