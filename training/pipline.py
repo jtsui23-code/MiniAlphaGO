@@ -79,7 +79,7 @@ def startPipline(numGames=50, genNum=2):
     # key=extractFileNum means each file name in allDataFiels will be passed into extractFileNum function.
     sortedFiles = sorted(allDataFiles, key=extractFileNum)
     
-    latestFiles = sortedFiles[-50]
+    latestFiles = sortedFiles[-50:]
 
     createModel(fileLIst=latestFiles, fileName="candidateModel.pt")
 
@@ -142,7 +142,7 @@ def evaludateModel(genNum=3):
     # key=extractFileNum means each file name in allDataFiels will be passed into extractFileNum function.
     sortedFiles = sorted(allDataFiles, key=extractFileNum)
     
-    latestFiles = sortedFiles[-50]
+    latestFiles = sortedFiles[-50:]
 
     createModel(fileLIst=latestFiles, fileName="candidateModel.pt")
 
@@ -160,7 +160,7 @@ while counter < 11:
     if evalResult == 1:
         counter+= 1
 
-# evaludateModel(genNum=4)
+# evaludateModel(genNum=counter)
 
 
 
