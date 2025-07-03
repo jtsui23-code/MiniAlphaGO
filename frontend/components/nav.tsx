@@ -1,17 +1,17 @@
 
 export default function Nav(){
-    return (<nav className="bg-white shadow-md sticky top-0 z-50 w-full">
+    return (<nav className="bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 shadow-lg sticky top-0 z-50 w-full">
 
 
-            <div className="flex justify-between items-center px-10 py-10 w-full">
-                    <a href="/" className = "hover:text-black transition-colors"> Home </a>
+            <div className="flex justify-between items-center px-10 py-6 w-full text-black font-semibold text-lg">
+                    <a href="/" className = "hover:text-white transition-colors"> Home </a>
 
-                <div className="space-x-6 text-gray-600 font-medium"> 
+                <div className="space-x-6 text-black-600 font-medium"> 
                     
 
-                    <a href="https://online-go.com/play" className = "hover:text-black transition-colors"> Play </a>
-                    <a href="/stats" className= "hover:text-black transition-colors"> Stats </a>
-                    <a href="/settings" className = "hover:text-black transition-colors"> Settings </a>
+                    <a href="https://online-go.com/play" className = "hover:text-white transition-colors"> Play </a>
+                    <a href="/stats" className= "hover:text-white transition-colors"> Stats </a>
+                    <a href="/settings" className = "hover:text-white transition-colors"> Settings </a>
 
                 </div>
             </div>
