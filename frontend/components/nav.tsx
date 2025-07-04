@@ -1,6 +1,15 @@
 
 export default function Nav(){
-    return (<nav className="bg-gradient-to-r from-green-300 via-teal-300 to-emerald-400">
+    // Minit color nav bar
+    // return (<nav className="bg-gradient-to-r from-green-300 via-teal-300 to-emerald-400">
+
+
+    // Dark blue nav bar
+    // return (<nav className="bg-gradient-to-r from-gray-900 via-indigo-800 to-blue-700>
+
+
+    return (<nav className="bg-gradient-to-r from-orange-500 via-pink-500 to-red-500">
+
 
 
             <div className="flex justify-between items-center px-10 py-6 w-full text-black font-semibold text-lg">
