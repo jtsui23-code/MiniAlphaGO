@@ -9,6 +9,12 @@ export default function Nav(){
 
 
     return (<nav className="bg-gradient-to-r from-orange-500 via-pink-500 to-red-500">
+    {/* // return (<nav className="bg-gradient-to-r from-blue-800 via-blue-600 to-indigo-500">
+    // return (<nav className="bg-gradient-to-r from-indigo-800 via-purple-700 to-fuchsia-600">
+    // return (<nav className="bg-gradient-to-r from-yellow-800 via-yellow-700 to-yellow-600 shadow-md sticky top-0 z-50 w-full"> */}
+
+
+
 
 
 
