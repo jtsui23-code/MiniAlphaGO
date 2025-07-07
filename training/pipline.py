@@ -65,7 +65,7 @@ def startPipline(numGames=50, genNum=2):
     # Playing a set amount of self-play games and saving them.
     for i in range(1, numGames + 1):
         print(f"-------------------------------------------- Generating self-play game data --------------------------------------------")
-        playOneGame(buffer=buffer, network=currentModel, mctSimulations=300, gameNumber=i)
+        playOneGame(buffer=buffer, network=currentModel, mctSimulations=400, gameNumber=i)
 
         if i % saveInterval == 0:
             buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + highestBufferNumber}.pkl")
@@ -154,7 +154,7 @@ def evaludateModel(genNum=3):
     evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum)
 
 counter = 5
-while counter < 11:
+while counter < 2000:
 
     evalResult = startPipline(numGames=100, genNum=counter)
     if evalResult == 1:
