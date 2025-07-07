@@ -2,6 +2,7 @@ import random
 import torch
 from utils.boardToTensor import boardToTensor  
 import pickle
+import numpy as np
 
 class ReplayBuffer:
 
@@ -46,7 +47,10 @@ class ReplayBuffer:
 
         # states is already a tensor so doesn't need to be converted from Board State -> Tensor
         states = torch.stack(states).squeeze(1)
-        pis = torch.tensor(pis, dtype=torch.float32)
+
+        # Converting pis into a single dimensionaly numpy array before making it a tensor for 
+        # efficiency.
+        pis = torch.tensor(np.array(pis), dtype=torch.float32)
         zs = torch.tensor(zs, dtype=torch.float32)
 
         return states, pis, zs
