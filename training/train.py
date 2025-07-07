@@ -74,12 +74,12 @@ def createModel(fileLIst, fileName="models/currentModel.pt"):
     buffer = ReplayBuffer(capacity=1000)
 
     # For loop for loading in the self-play game data into the buffer.
-    for fileName in fileLIst:
-        buffer.loadFile(os.path.join("selfPlay", fileName))
+    for file in fileLIst:
+        buffer.loadFile(os.path.join("selfPlay", file))
 
     # Using the buffer with the network to create a model which is saved.
     train(network=network, buffer=buffer, batchSize=64, epochs=10)
 
-    torch.save(network.state_dict(), f"models/{fileName}.pt")
+    torch.save(network.state_dict(), f"models/{fileName}")
 
 
