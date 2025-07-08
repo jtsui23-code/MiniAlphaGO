@@ -75,6 +75,61 @@ export default function Stats() {
           </div>
 
 
+          {/* Recent Games Table */}
+          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+
+            <table className="min-w-full text-sm">
+              <thead className="bg-gray-100 text-gray-700">
+
+                  <tr>
+
+                    <th className="px-6 py-3 text-left">
+                      Opponent
+                    </th>
+                  
+                    <th className="px-6 py-3 text-left">
+                      Result
+                    </th>
+
+                    <th className="px-6 py-3 text-left">
+                      Moves
+                    </th>
+
+                    <th className="px-6 py-3 text-left">
+
+                      Dates
+                    </th>
+
+                    <th className="px-6 py-3">
+
+                      Replay
+                    </th>
+
+
+                  </tr>
+              </thead>
+
+              <tbody>
+                {[...Array(5)].map((_, i) =>(
+                    <tr key={i} className="border-b hover:bg-gray-50">
+
+                      <td className="px-6 py-4">AI v{i}</td>
+                      <td className={`px-6 py-4 %{i % 2 == 0 ? "text-green-600" :"text-red-600"}`}>
+
+                        {i % 2 === 0 ? "Win" : "Loss"}
+                      </td>
+
+                      <td className="px-6 py-4">{40 + i}</td>
+                    </tr>
+
+
+                ))}
+
+
+              </tbody>
+            </table>
+          </div>
+
 
       </div>
 
