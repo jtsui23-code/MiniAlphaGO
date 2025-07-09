@@ -120,6 +120,11 @@ export default function Stats() {
                       </td>
 
                       <td className="px-6 py-4">{40 + i}</td>
+                      <td className="px-6 py-4">2025-07-0{i + 1}</td>
+                      <td className="text-center px-6 py-4">
+
+                        <button className="text-blue-500 hover:underline">View</button>
+                      </td>
                     </tr>
 
 
