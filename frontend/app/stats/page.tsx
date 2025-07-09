@@ -27,7 +27,7 @@ export default function Stats() {
           // src is temporary and will be replaced when have real user avatars
           src="/profile-placeholder.png"
 
-          alt="Profile"
+          alt="ProfilePage"
           width={100}
           height={100}
           className="rounded-full border-2 border-gray-300"
@@ -95,10 +95,15 @@ export default function Stats() {
           </div>
 
 
-          {/* Recent Games Table */}
+      </div>
 
+       {/* Recent Games Table */}
+          
+          <div className="flex justify-center">
+
+          
           {/* Full-width table with soft padding and white card-style background */}
-          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
 
             <table className="min-w-full text-sm">
 
@@ -167,9 +172,7 @@ export default function Stats() {
               </tbody>
             </table>
           </div>
-
-
-      </div>
+          </div>
 
       
       <Board/>
