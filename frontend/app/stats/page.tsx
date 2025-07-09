@@ -5,13 +5,28 @@ import Board
 
 export default function Stats() {
   return (
+
+  // <> Allows to return multiple jsx components i.e the div's etc
   <>
     <Nav/> 
+
+    {/* max-6xl gives content a max width of 6xl  */}
+    {/* mx-auto centers the container */}
+    {/* p-8 creates a padding of 2rem */}
     <div  className="max-6xl mx-auto p-8">
-      <div className="flex flex-col md:flex-ro items-center md:items-start gap-6 mb-10">
+
+      {/* flex makes a flex container */}
+      {/* flex-col uses vertical stacking */}
+      {/* md:flex-w switches to horizontal layout on medium+ screens */}
+      {/* item-center centers items vertically by default */}
+      {/* md:items-start aligns to the top on larger screens */}
+      {/* gap-6 1.5rem space between each item */}
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-10">
 
         <Image
+          // src is temporary and will be replaced when have real user avatars
           src="/profile-placeholder.png"
+
           alt="Profile"
           width={100}
           height={100}
@@ -19,6 +34,7 @@ export default function Stats() {
         />
 
         <div>
+
 
           <h1 className="text-3x1 font-bold">
             Your Username
@@ -39,6 +55,10 @@ export default function Stats() {
 
  
       {/* Stats Summary */}
+
+      {/* grid-cols-1 means that by default there is only 1 column */}
+      {/* sm:grid-cols-3 whenever there screen is small and up it uses 3 columns */}
+      {/* gap-4 puts spacing between stats card */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center mb-10">
           <div className="bg-white shadow-md p-4 rounded-lg">
 
@@ -76,11 +96,16 @@ export default function Stats() {
 
 
           {/* Recent Games Table */}
+
+          {/* Full-width table with soft padding and white card-style background */}
           <div className="bg-white shadow-md rounded-lg overflow-hidden">
 
             <table className="min-w-full text-sm">
+
+              {/* thead is table header */}
               <thead className="bg-gray-100 text-gray-700">
 
+                  {/* tr - table row */}
                   <tr>
 
                     <th className="px-6 py-3 text-left">
@@ -110,7 +135,15 @@ export default function Stats() {
               </thead>
 
               <tbody>
+
+                {/* Creates array with 5 items that are all undefined at the start */}
+                {/* The _ in .map((_, i)) is the contend in the Array so like Array[1] or Array[3] etc 
+                which is going to be undefined at first so its just a _  */}
+                {/* This loops through the array and returns 5 <tr> elements */}
+
                 {[...Array(5)].map((_, i) =>(
+
+                    // Need a key for rendering the <tr> elements that are returned from the loop
                     <tr key={i} className="border-b hover:bg-gray-50">
 
                       <td className="px-6 py-4">AI v{i}</td>
@@ -137,11 +170,6 @@ export default function Stats() {
 
 
       </div>
-
-
-
-
-
 
       
       <Board/>
