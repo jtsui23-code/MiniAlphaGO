@@ -36,7 +36,7 @@ export default function Nav(){
                 <div className="space-x-6 text-black-600 font-medium"> 
                     
 
-                    <a href="https://online-go.com/play" className = "hover:text-white transition-colors"> Play </a>
+                    <a href="/play" className = "hover:text-white transition-colors"> Play </a>
                     <a href="/stats" className= "hover:text-white transition-colors"> Stats </a>
                     <a href="/settings" className = "hover:text-white transition-colors"> Settings </a>
 
