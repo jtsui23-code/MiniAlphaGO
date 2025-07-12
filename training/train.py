@@ -44,7 +44,7 @@ def train(network: GoNet, buffer: ReplayBuffer, batchSize=64, epochs=10, learnin
         # Combine the two losses into total loss
         loss = loss_pi + loss_z
 
-        # Backpropagation step
+   # Backpropagation step
         optimizer.zero_grad()   # Clear previous gradients
         loss.backward()         # Compute new gradients
         optimizer.step()        # Apply parameter update
