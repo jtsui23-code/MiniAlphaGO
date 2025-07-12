@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Nav from "@/components/nav";
-import Board
+import GoBoard
  from "@/components/board";
 export default function Home() {
   return (
@@ -10,8 +10,12 @@ export default function Home() {
       <p>It's blank now. let's get to work</p>
 
       
-      <Board/>
+      <main style={{ padding: 20 }}>
+        <h1>Go Game</h1>
+        <GoBoard />
+    </main>
     </div>
+    
     </>
   );
 }
