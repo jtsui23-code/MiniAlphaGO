@@ -1,14 +1,6 @@
 {
   "app": {
-<<<<<<< HEAD
-    "[project]/app/page": [
-=======
-    "[project]/app/_not-found/page": [
-      "static/media/or3nQ6H_1_WfwkMZI_qYFrcdmhHkjko-s.p.be19f591.woff2",
-      "static/media/gyByhwUxId8gMEwcGFWNOITd-s.p.da1ebef7.woff2"
-    ],
-    "[project]/app/stats/page": [
->>>>>>> 204bc55fba20424091981704afef284d6e30de44
+    "[project]/app/play/page": [
       "static/media/gyByhwUxId8gMEwcGFWNOITd-s.p.da1ebef7.woff2",
       "static/media/or3nQ6H_1_WfwkMZI_qYFrcdmhHkjko-s.p.be19f591.woff2"
     ]
