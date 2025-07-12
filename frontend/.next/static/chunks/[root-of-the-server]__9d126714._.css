@@ -448,6 +448,10 @@
     margin-bottom: calc(var(--spacing) * 10);
   }
 
+  .block {
+    display: block;
+  }
+
   .flex {
     display: flex;
   }
