@@ -2,11 +2,14 @@ from model.net import GoNet
 import os
 from training.evaluation2 import evalateModel
 from training.train2 import createModel
-from training.selfPlay import playOneGame
-from training.replayBuffer import ReplayBuffer
+from training.selfPlay2 import playOneGame
+from training.replayBuffer2 import ReplayBuffer
 import torch
 import re # For pattern recognition in strings
 
+# Detects GPU is possible
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
 
 
 """
@@ -47,6 +50,7 @@ def startPipline(numGames=50, genNum=2):
     currentModel = GoNet(boardSize=9, channels=17)
     currentModel.load_state_dict(torch.load(f"models/bestModel{genNum-1}.pt"))
 
+    currentModel.to(device)
     currentModel.eval()
 
     # Creating buffer object to save self-play games.
@@ -64,7 +68,7 @@ def startPipline(numGames=50, genNum=2):
     # Playing a set amount of self-play games and saving them.
     for i in range(1, numGames + 1):
         print(f"-------------------------------------------- Generating self-play game data --------------------------------------------")
-        playOneGame(buffer=buffer, network=currentModel, mctSimulations=400, gameNumber=i)
+        playOneGame(buffer=buffer, network=currentModel, mctSimulations=400, gameNumber=i, device=device)
 
         if i % saveInterval == 0:
             buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + highestBufferNumber}.pkl")
@@ -80,7 +84,7 @@ def startPipline(numGames=50, genNum=2):
     
     latestFiles = sortedFiles[-50:]
 
-    createModel(fileLIst=latestFiles, fileName="candidateModel.pt")
+    createModel(fileLIst=latestFiles, fileName="candidateModel.pt", device=device)
 
 
 
@@ -92,13 +96,13 @@ def startPipline(numGames=50, genNum=2):
     # Creating candiateModel that uses the newly self-play games as well as the orignal data set.
     candidateModel = GoNet(boardSize=9, channels=17)
     candidateModel.load_state_dict(torch.load("models/candidateModel.pt"))
-    # candidateModel.to(device)
+    candidateModel.to(device)
     candidateModel.eval()
 
     print(f"-------------------------------------------- Evaluating the new model --------------------------------------------")
 
     # Evaluating whether the new model is better than the current one or not.
-    return evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum)
+    return evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum, device=device)
 
 
 def extractFileNum(fileName):
@@ -143,16 +147,16 @@ def evaludateModel(genNum=3):
     
     latestFiles = sortedFiles[-50:]
 
-    createModel(fileLIst=latestFiles, fileName="candidateModel.pt")
+    createModel(fileLIst=latestFiles, fileName="candidateModel.pt", device=device)
 
 
     # Creating candiateModel that uses the newly self-play games as well as the orignal data set.
     candidateModel = GoNet(boardSize=9, channels=17)
     candidateModel.load_state_dict(torch.load("models/candidateModel.pt"))
     candidateModel.eval()
-    evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum)
+    evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum, device=device)
 
-counter = 5
+counter = 6
 while counter < 2000:
 
     evalResult = startPipline(numGames=100, genNum=counter)
