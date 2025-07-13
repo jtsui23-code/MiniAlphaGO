@@ -103,6 +103,8 @@ class MCTS:
         board_tensor = boardToTensor(node.board).to(self.device)
 
         with torch.no_grad():
+            board_tensor = torch.tensor(boardToTensor(node.board), dtype=torch.float32)
+            board_tensor = board_tensor.to(next(self.network.parameters()).device)
             policy_logits, value = self.network(board_tensor)
         
         # Numpy can't work with CPU so have to use .cpu() here even if using GPU to run pipeline and mct.

@@ -48,7 +48,7 @@ def startPipline(numGames=50, genNum=2):
 
     # Loading the current best model.
     currentModel = GoNet(boardSize=9, channels=17)
-    currentModel.load_state_dict(torch.load(f"models/bestModel{genNum-1}.pt"))
+    currentModel.load_state_dict(torch.load(f"models/bestModel{genNum-1}.pt", map_location=device))
 
     currentModel.to(device)
     currentModel.eval()
@@ -95,7 +95,7 @@ def startPipline(numGames=50, genNum=2):
 
     # Creating candiateModel that uses the newly self-play games as well as the orignal data set.
     candidateModel = GoNet(boardSize=9, channels=17)
-    candidateModel.load_state_dict(torch.load("models/candidateModel.pt"))
+    candidateModel.load_state_dict(torch.load("models/candidateModel.pt", map_location=device))
     candidateModel.to(device)
     candidateModel.eval()
 

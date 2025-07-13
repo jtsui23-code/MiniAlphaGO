@@ -80,8 +80,8 @@ if __name__ == "__main__":
 
     # currentModel.load_state_dict(torch.load("models/currentModel.pt"))
 
-    currentModel.load_state_dict(torch.load("models/bestModel.pt"))
-    candidateModel.load_state_dict(torch.load("models/candidateModel.pt"))
+    currentModel.load_state_dict(torch.load("models/bestModel.pt", map_location=device))
+    candidateModel.load_state_dict(torch.load("models/candidateModel.pt", map_location=device))
 
     currentModel.eval()
     candidateModel.eval()
