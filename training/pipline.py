@@ -1,12 +1,11 @@
 from model.net import GoNet
 import os
-from training.evaluation import evalateModel
-from training.train import createModel
+from training.evaluation2 import evalateModel
+from training.train2 import createModel
 from training.selfPlay import playOneGame
 from training.replayBuffer import ReplayBuffer
 import torch
 import re # For pattern recognition in strings
-
 
 
 
