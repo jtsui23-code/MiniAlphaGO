@@ -4,6 +4,8 @@ from model.mct2 import MCTS
 from training.replayBuffer2 import ReplayBuffer
 from utils.boardToTensor import boardToTensor  
 import torch
+from utils.symmetries import generateSymmetries
+
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -43,7 +45,7 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
             model = whiteModel
 
         # Loads the specific model into mct depending on whose turn it is.
-        mct = MCTS(network=model, simulations=300)
+        mct = MCTS(network=model,exploration_weight=1.5, simulations=300)
 
         # Plays move using the specific model according to player's turn.
         move, pi = mct.search(board)
@@ -83,7 +85,7 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
     # Creating Board and mct
     board = Board(9)
 
-    mct = MCTS(network=network, simulations=mctSimulations)
+    mct = MCTS(network=network, exploration_weight=1.5, simulations=mctSimulations)
 
     print("✅ Created the components")
 
@@ -144,7 +146,14 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
     # This is done through see which moves where done by the winner and the loser.
     for state, pi, player in gameData:
         z = 1 if player == winner == 1 else -1
-        buffer.add(state, pi, z)
+
+
+        # Generate symmetries of the current board state and pi vector to 
+        # take advantage of the fact that the go board has dihedral symmetry.
+        boardSymmetries, piSymmetries = generateSymmetries(state, pi)
+
+        for b, p in zip(boardSymmetries, piSymmetries):
+            buffer.add(b, p, z)
 
 
 

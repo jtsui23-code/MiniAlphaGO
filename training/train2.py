@@ -87,7 +87,7 @@ def createModel(fileLIst, fileName="models/currentModel.pt", device=torch.device
         buffer.loadFile(os.path.join("selfPlay", file))
 
     # Using the buffer with the network to create a model which is saved.
-    train(network=network, buffer=buffer, batchSize=64, epochs=10, device=device)
+    train(network=network, buffer=buffer, batchSize=256, epochs=10, device=device)
 
     torch.save(network.state_dict(), f"models/{fileName}")
 
