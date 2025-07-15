@@ -22,7 +22,8 @@ def generateSymmetries(board, pi):
     boardSym = []
     piSym = []
 
-    piMatrix = pi.reshape(9,9)  
+    piBoard = np.array(pi[:81]).reshape(9,9)
+    piPass = pi[81]
 
     # Using k because k is a parameter in np.rot90 meaning how many 90% rotations to perform.
     for k in range(4):
@@ -33,17 +34,17 @@ def generateSymmetries(board, pi):
         # axes - 2 axes which is rotated 
         # (-2, -1) is used here because it uses the last 2 dimesnion as the axes of rotation. 
         rotatedBoard = np.rot90(board, k, axes=(-2,-1))
-        rotatedPi = np.rot90(piMatrix, k)
+        rotatedPi = np.rot90(piBoard, k)
 
         boardSym.append(rotatedBoard)
 
         # Have to .flatten() because earlier made the pi vector into a matrix
-        piSym.append(rotatedPi.flatten())
+        piSym.append(np.append(rotatedPi.flatten(), piPass))
 
         flippedBoard = np.flip(rotatedBoard, axis=-1) # flips board horizontally
         flippedPi = np.flip(rotatedPi, axis=1)
 
         boardSym.append(flippedBoard)
-        piSym.append(flippedPi)
+        piSym.append(np.append(flippedPi.flatten(), piPass))
 
     return boardSym, piSym
