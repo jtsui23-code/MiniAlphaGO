@@ -39,7 +39,8 @@ export default function Nav(){
                     <a href="/play" className = "hover:text-white transition-colors"> Play </a>
                     <a href="/stats" className= "hover:text-white transition-colors"> Stats </a>
                     <a href="/settings" className = "hover:text-white transition-colors"> Settings </a>
-
+                    <a href="/login" className = "hover:text-white transition-colors"> Login </a>
+                    <a href="/signup" className = "hover:text-white transition-colors"> Signup </a>
                 </div>
             </div>
 

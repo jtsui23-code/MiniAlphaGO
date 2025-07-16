@@ -1,31 +1,36 @@
 "use client";
 import { useState } from "react";
 import Nav from "@/components/nav";
-export default function Login() {
+
+export default function Signup() {
   const [msg, setMsg] = useState("");
 
-  async function login(e) {
+  async function handleSignup(e) {
     e.preventDefault();
+
     const form = new FormData(e.target);
-    const res = await fetch("http://localhost:8080/api/login", {
+
+    const res = await fetch("http://localhost:8080/api/signup", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: form.get("username"),
         password: form.get("password"),
       }),
-      headers: { "Content-Type": "application/json" },
     });
+
     const text = await res.text();
     setMsg(text);
   }
 
   return (
     <>
-      <Nav/>
-      <form onSubmit={login}>
+    <Nav/>
+      <h2>Sign Up</h2>
+      <form onSubmit={handleSignup}>
         <input name="username" placeholder="Username" required />
         <input name="password" placeholder="Password" type="password" required />
-        <button>Login</button>
+        <button>Sign Up</button>
       </form>
       <p>{msg}</p>
     </>
