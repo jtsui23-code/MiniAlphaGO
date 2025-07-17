@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useImperativeHandle, forwardRef } from 'react';
 
 const BOARD_SIZE = 19;
 const CELL_SIZE = 30;
 const STONE_RADIUS = 10;
 
-export default function GoBoard() {
+const Board = forwardRef((props, ref) => {
   const [board, setBoard] = useState(
     Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null))
   );
@@ -22,17 +22,24 @@ export default function GoBoard() {
     setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black');
   };
 
+  useImperativeHandle(ref, () => ({
+    setBoardFromJSON: (jsonBoard) => {
+      const validated = jsonBoard.map((row = []) =>
+        Array.from({ length: BOARD_SIZE }, (_, i) => row[i] ?? null)
+      );
+      setBoard(validated);
+    },
+  }));
+
   return (
     <svg
       width={CELL_SIZE * (BOARD_SIZE - 1)}
       height={CELL_SIZE * (BOARD_SIZE - 1)}
       style={{ backgroundColor: '#deb887', display: 'block' }}
     >
-      {/* Draw grid lines */}
       {Array.from({ length: BOARD_SIZE }).map((_, i) => (
-        <>
+        <g key={`grid-${i}`}>
           <line
-            key={`v-${i}`}
             x1={i * CELL_SIZE}
             y1={0}
             x2={i * CELL_SIZE}
@@ -40,17 +47,15 @@ export default function GoBoard() {
             stroke="black"
           />
           <line
-            key={`h-${i}`}
             x1={0}
             y1={i * CELL_SIZE}
             x2={(BOARD_SIZE - 1) * CELL_SIZE}
             y2={i * CELL_SIZE}
             stroke="black"
           />
-        </>
+        </g>
       ))}
 
-      {/* Draw stones */}
       {board.map((row, y) =>
         row.map((cell, x) =>
           cell ? (
@@ -70,10 +75,13 @@ export default function GoBoard() {
               r={CELL_SIZE / 2}
               fill="transparent"
               onClick={() => handleClick(x, y)}
+              style={{ cursor: 'pointer' }}
             />
           )
         )
       )}
     </svg>
   );
-}
+});
+
+export default Board;
