@@ -2,25 +2,15 @@
 
 import { useState, useImperativeHandle, forwardRef } from 'react';
 
-const BOARD_SIZE = 19;
-const CELL_SIZE = 30;
-const STONE_RADIUS = 10;
+const BOARD_SIZE = 9; // ← changed from 19
+const CELL_SIZE = 40;
+const STONE_RADIUS = 12;
 
-const Board = forwardRef((props, ref) => {
+const Board = forwardRef(({ onCellClick }, ref) => {
   const [board, setBoard] = useState(
     Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null))
   );
   const [currentPlayer, setCurrentPlayer] = useState('black');
-
-  const handleClick = (x, y) => {
-    if (board[y][x]) return;
-
-    const newBoard = board.map((row, j) =>
-      row.map((cell, i) => (i === x && j === y ? currentPlayer : cell))
-    );
-    setBoard(newBoard);
-    setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black');
-  };
 
   useImperativeHandle(ref, () => ({
     setBoardFromJSON: (jsonBoard) => {
@@ -28,6 +18,9 @@ const Board = forwardRef((props, ref) => {
         Array.from({ length: BOARD_SIZE }, (_, i) => row[i] ?? null)
       );
       setBoard(validated);
+    },
+    setPlayerTurn: (player) => {
+      setCurrentPlayer(player);
     },
   }));
 
@@ -60,7 +53,7 @@ const Board = forwardRef((props, ref) => {
         row.map((cell, x) =>
           cell ? (
             <circle
-              key={`${x}-${y}`}
+              key={`stone-${x}-${y}`}
               cx={x * CELL_SIZE}
               cy={y * CELL_SIZE}
               r={STONE_RADIUS}
@@ -69,12 +62,12 @@ const Board = forwardRef((props, ref) => {
             />
           ) : (
             <circle
-              key={`${x}-${y}-click`}
+              key={`clickable-${x}-${y}`}
               cx={x * CELL_SIZE}
               cy={y * CELL_SIZE}
               r={CELL_SIZE / 2}
               fill="transparent"
-              onClick={() => handleClick(x, y)}
+              onClick={() => onCellClick({ x, y })}
               style={{ cursor: 'pointer' }}
             />
           )

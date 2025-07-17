@@ -12,7 +12,6 @@ export default function Home() {
       
       <main style={{ padding: 20 }}>
         <h1>Go Game</h1>
-        <GoBoard />
     </main>
     </div>
     
