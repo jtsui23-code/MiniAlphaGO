@@ -149,7 +149,7 @@ def AiMove(board,Zy,Zx):
             x, y = divmod(move, 9)
             
             # Playing the move choosen by the mct.
-            board.playMove(x,y, board.currentPlayer)
+            board.playMove(x,y, -1)
 
             print(f"Player played at ", {x}, {y}, " position on the board")
 
