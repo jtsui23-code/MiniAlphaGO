@@ -28,7 +28,6 @@ export default function PlayPage() {
   );
   const [playerTurn, setPlayerTurn] = useState('black');
 
-
   const handleStartGame = async () => {
     alert("sent POST request to server ['start game vs cpu]");
     try {
@@ -50,15 +49,15 @@ export default function PlayPage() {
     }
   };
 
-  const handleCellClick = async ({ x, y }) => {  // remove player from params
-    alert("sent PUT request to server. making move")
-    if (boardData[y]?.[x]) return; // ignore if cell occupied
+  const handleCellClick = async ({ x, y }) => {
+    alert("sent PUT request to server. making move");
+    if (boardData[y]?.[x]) return;
 
     try {
       const res = await fetch('http://localhost:8000/move', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ x, y, player: playerTurn }),  // use current player state here
+        body: JSON.stringify({ x, y }),
       });
 
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -68,14 +67,13 @@ export default function PlayPage() {
       setBoardData(data);
       boardRef.current?.setBoardFromJSON(data);
 
-      const nextPlayer = playerTurn === 'black' ? 'white' : 'black';
-      setPlayerTurn(nextPlayer);
-      boardRef.current?.setPlayerTurn(nextPlayer);
+      const next = playerTurn === 'black' ? 'white' : 'black';
+      setPlayerTurn(next);
+      boardRef.current?.setPlayerTurn(next);
     } catch (err) {
       alert('Failed to send move: ' + err.message);
     }
   };
-
 
   return (
     <>
