@@ -50,7 +50,7 @@ export default function PlayPage() {
   };
 
   const handleCellClick = async ({ x, y }) => {
-    alert("sent PUT request to server. making move");
+    //alert("sent PUT request to server. making move");
     if (boardData[y]?.[x]) return;
 
     try {

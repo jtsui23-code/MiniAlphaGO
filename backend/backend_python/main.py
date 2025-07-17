@@ -39,8 +39,10 @@ def numpy_array_to_json(arr):
             return val.item()
         return val
 
-    nested_list = [[convert_val(v) for v in row] for row in arr]
-    return nested_list  # Return list, not json.dumps here
+    # Transpose to flip X and Y
+    nested_list = [[convert_val(v) for v in col] for col in arr.T]
+    return nested_list
+
 
 
 board = Board(9)
@@ -97,7 +99,7 @@ def make_move(move: MoveRequest):
 
     ## AI MAKES HIS MOVE
     global board
-    board = AiMove(board,Zy,Zx)
+    board = AiMove(board,Zx,Zy)
 
     
         # Validate coordinates
@@ -124,13 +126,14 @@ def make_move(move: MoveRequest):
     return numpy_array_to_json(board)
 
 
-def AiMove(board,Zy,Zx):
+def AiMove(board,Zx,Zy):
     # Gets the best move and the pi vector which is the probability of all the moves.
         network = GoNet(9,17)
         mct = MCTS(network=network,exploration_weight=1.5, simulations=500)
 
 
         board.playMove(Zx,Zy,1)
+        print(Zx, Zy)
         move, pi = mct.search(board)
 
         # Converts the board into a tensor which is the expected form for saving the gameData.
