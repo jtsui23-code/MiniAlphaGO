@@ -1,8 +1,13 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
+<<<<<<< HEAD
   "/login/page": "app/login/page.js",
   "/play/page": "app/play/page.js",
   "/settings/page": "app/settings/page.js",
   "/stats/page": "app/stats/page.js"
+=======
+  "/play/page": "app/play/page.js",
+  "/signup/page": "app/signup/page.js"
+>>>>>>> 5ba8489288db86bdd35239a6173acf4c53087680
 }

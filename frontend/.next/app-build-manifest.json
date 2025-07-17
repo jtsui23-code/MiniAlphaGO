@@ -13,6 +13,7 @@
       "static/chunks/_e69f0d32._.js",
       "static/chunks/_93808211._.js"
     ],
+<<<<<<< HEAD
     "/login/page": [
       "static/chunks/node_modules_next_dist_1a6ee436._.js",
       "static/chunks/app_favicon_ico_mjs_659ce808._.js",
@@ -28,13 +29,20 @@
       "static/chunks/_e69f0d32._.js",
       "static/chunks/_93808211._.js"
     ],
+=======
+>>>>>>> 5ba8489288db86bdd35239a6173acf4c53087680
     "/play/page": [
       "static/chunks/node_modules_next_dist_1a6ee436._.js",
       "static/chunks/app_favicon_ico_mjs_659ce808._.js",
       "static/chunks/[root-of-the-server]__9d126714._.css",
       "static/chunks/app_layout_tsx_c0237562._.js",
+<<<<<<< HEAD
       "static/chunks/_f9516ba8._.js",
       "static/chunks/app_play_page_tsx_b2f3bef0._.js",
+=======
+      "static/chunks/_c80497f9._.js",
+      "static/chunks/app_play_page_jsx_b2f3bef0._.js",
+>>>>>>> 5ba8489288db86bdd35239a6173acf4c53087680
       "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_fd44f5a4._.js",
       "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
       "static/chunks/node_modules_next_dist_client_8f19e6fb._.js",
@@ -43,11 +51,16 @@
       "static/chunks/_e69f0d32._.js",
       "static/chunks/_93808211._.js"
     ],
+<<<<<<< HEAD
     "/settings/page": [
+=======
+    "/signup/page": [
+>>>>>>> 5ba8489288db86bdd35239a6173acf4c53087680
       "static/chunks/node_modules_next_dist_1a6ee436._.js",
       "static/chunks/app_favicon_ico_mjs_659ce808._.js",
       "static/chunks/[root-of-the-server]__9d126714._.css",
       "static/chunks/app_layout_tsx_c0237562._.js",
+<<<<<<< HEAD
       "static/chunks/_f9516ba8._.js",
       "static/chunks/app_settings_page_tsx_b2f3bef0._.js",
       "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_fd44f5a4._.js",
@@ -66,6 +79,10 @@
       "static/chunks/node_modules_next_dist_b78c7500._.js",
       "static/chunks/components_board_jsx_5bfcc103._.js",
       "static/chunks/app_stats_page_tsx_b2f3bef0._.js",
+=======
+      "static/chunks/_82f1eea5._.js",
+      "static/chunks/app_signup_page_jsx_b2f3bef0._.js",
+>>>>>>> 5ba8489288db86bdd35239a6173acf4c53087680
       "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_fd44f5a4._.js",
       "static/chunks/node_modules_next_dist_compiled_2ce9398a._.js",
       "static/chunks/node_modules_next_dist_client_8f19e6fb._.js",

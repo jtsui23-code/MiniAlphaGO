@@ -6,7 +6,7 @@
 var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
 {
 __turbopack_context__.s({
-    "default": (()=>GoBoard)
+    "default": (()=>__TURBOPACK__default__export__)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
@@ -17,13 +17,13 @@ var _s = __turbopack_context__.k.signature();
 const BOARD_SIZE = 19;
 const CELL_SIZE = 30;
 const STONE_RADIUS = 10;
-function GoBoard() {
+const GoBoard = /*#__PURE__*/ _s((0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["forwardRef"])(_c = _s(function GoBoard(_, ref) {
     _s();
     const [board, setBoard] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(Array.from({
         length: BOARD_SIZE
     }, {
-        "GoBoard.useState": ()=>Array(BOARD_SIZE).fill(null)
-    }["GoBoard.useState"]));
+        "GoBoard.GoBoard.useState": ()=>Array(BOARD_SIZE).fill(null)
+    }["GoBoard.GoBoard.useState"]));
     const [currentPlayer, setCurrentPlayer] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('black');
     const handleClick = (x, y)=>{
         if (board[y][x]) return;
@@ -31,6 +31,24 @@ function GoBoard() {
         setBoard(newBoard);
         setCurrentPlayer(currentPlayer === 'black' ? 'white' : 'black');
     };
+    // Expose this to parent via ref
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useImperativeHandle"])(ref, {
+        "GoBoard.GoBoard.useImperativeHandle": ()=>({
+                setBoardFromJSON: ({
+                    "GoBoard.GoBoard.useImperativeHandle": (jsonBoard)=>{
+                        if (!Array.isArray(jsonBoard)) return;
+                        const validated = jsonBoard.map({
+                            "GoBoard.GoBoard.useImperativeHandle.validated": (row = [])=>Array.from({
+                                    length: BOARD_SIZE
+                                }, {
+                                    "GoBoard.GoBoard.useImperativeHandle.validated": (_, i)=>row[i] ?? null
+                                }["GoBoard.GoBoard.useImperativeHandle.validated"])
+                        }["GoBoard.GoBoard.useImperativeHandle.validated"]);
+                        setBoard(validated);
+                    }
+                })["GoBoard.GoBoard.useImperativeHandle"]
+            })
+    }["GoBoard.GoBoard.useImperativeHandle"]);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
         width: CELL_SIZE * (BOARD_SIZE - 1),
         height: CELL_SIZE * (BOARD_SIZE - 1),
@@ -41,7 +59,7 @@ function GoBoard() {
         children: [
             Array.from({
                 length: BOARD_SIZE
-            }).map((_, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+            }).map((_, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("g", {
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
                             x1: i * CELL_SIZE,
@@ -49,9 +67,9 @@ function GoBoard() {
                             x2: i * CELL_SIZE,
                             y2: (BOARD_SIZE - 1) * CELL_SIZE,
                             stroke: "black"
-                        }, `v-${i}`, false, {
+                        }, void 0, false, {
                             fileName: "[project]/components/board.jsx",
-                            lineNumber: 34,
+                            lineNumber: 45,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("line", {
@@ -60,13 +78,17 @@ function GoBoard() {
                             x2: (BOARD_SIZE - 1) * CELL_SIZE,
                             y2: i * CELL_SIZE,
                             stroke: "black"
-                        }, `h-${i}`, false, {
+                        }, void 0, false, {
                             fileName: "[project]/components/board.jsx",
-                            lineNumber: 42,
+                            lineNumber: 52,
                             columnNumber: 11
                         }, this)
                     ]
-                }, void 0, true)),
+                }, `grid-${i}`, true, {
+                    fileName: "[project]/components/board.jsx",
+                    lineNumber: 44,
+                    columnNumber: 9
+                }, this)),
             board.map((row, y)=>row.map((cell, x)=>cell ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
                         cx: x * CELL_SIZE,
                         cy: y * CELL_SIZE,
@@ -75,30 +97,34 @@ function GoBoard() {
                         stroke: "black"
                     }, `${x}-${y}`, false, {
                         fileName: "[project]/components/board.jsx",
-                        lineNumber: 57,
+                        lineNumber: 66,
                         columnNumber: 13
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
                         cx: x * CELL_SIZE,
                         cy: y * CELL_SIZE,
                         r: CELL_SIZE / 2,
                         fill: "transparent",
-                        onClick: ()=>handleClick(x, y)
+                        onClick: ()=>handleClick(x, y),
+                        style: {
+                            cursor: 'pointer'
+                        }
                     }, `${x}-${y}-click`, false, {
                         fileName: "[project]/components/board.jsx",
-                        lineNumber: 66,
+                        lineNumber: 75,
                         columnNumber: 13
                     }, this)))
         ]
     }, void 0, true, {
         fileName: "[project]/components/board.jsx",
-        lineNumber: 26,
+        lineNumber: 37,
         columnNumber: 5
     }, this);
-}
-_s(GoBoard, "Yx4atKbOJ4mWAXytNkxjGXDCnLo=");
-_c = GoBoard;
-var _c;
-__turbopack_context__.k.register(_c, "GoBoard");
+}, "02O6Q7m+YKGDArNB3pfapQw/mTQ=")), "02O6Q7m+YKGDArNB3pfapQw/mTQ=");
+_c1 = GoBoard;
+const __TURBOPACK__default__export__ = GoBoard;
+var _c, _c1;
+__turbopack_context__.k.register(_c, "GoBoard$forwardRef");
+__turbopack_context__.k.register(_c1, "GoBoard");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
 }
