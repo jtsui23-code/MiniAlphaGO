@@ -20,10 +20,7 @@ def getStats(User):
         data = response.json()
 
         return data
-
+    
     except requests.RequestException as e:
         return {"error": "Failed to connect to java backend server", "detail": str(e)}
 
-
-    # <-- GET request from Java backend
-    return {"message": "dobby"}

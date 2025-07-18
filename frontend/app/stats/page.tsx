@@ -3,7 +3,22 @@ import Nav from "@/components/nav";
 import Board from "@/components/board";
 import "./page.css";
 
+
 export default function Stats() {
+
+  async function userStats() {
+
+    const request = await fetch('http://localhost:8000/stats', {
+
+      method: 'GET',
+
+    });
+
+    const data = await request.json()
+
+  }
+
+
   return (
     <>
       <Nav />

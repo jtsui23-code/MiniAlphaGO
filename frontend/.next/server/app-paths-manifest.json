@@ -2,11 +2,8 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
   "/login/page": "app/login/page.js",
-<<<<<<< HEAD
-=======
   "/page": "app/page.js",
   "/play/page": "app/play/page.js",
->>>>>>> d8136609ffcc57bf89c1873bc657c8357fac56f2
   "/settings/page": "app/settings/page.js",
   "/signup/page": "app/signup/page.js",
   "/stats/page": "app/stats/page.js"

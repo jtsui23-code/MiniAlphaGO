@@ -78,3 +78,7 @@ h1 {
   color: #7A6641;
   font-style: italic;
 }
+
+.setting-header {
+  text-align: center
+}
