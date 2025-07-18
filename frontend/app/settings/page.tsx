@@ -2,12 +2,13 @@
 import Image from "next/image";
 import './setting.css'
 import Nav from "@/components/nav";
-import {useState} from 'react';
+import {useState, useRef} from 'react';
 
 
 export default function Home() {
 
   const [avatar, setAvatar] = useState("/default-avatar.png")
+  const avatarInput = useRef<HTMLInputElement>(null);
 
   return (
   <>
@@ -17,7 +18,6 @@ export default function Home() {
     <div className="setting-page">
 
       <h1 className="setting-header">Settings</h1>
-      <p className="setting-header">Customize your Go Journey</p>
 
 
       <div className="setting-container">
@@ -26,9 +26,9 @@ export default function Home() {
               {/* Avatar Section */}
               <div className="avatar-section">
 
+                <span className="avatar-label">Profile</span>
                 <img 
                   src={avatar}
-                  alt="User Avatar"
                   className="avatar-image"
                 />
 
@@ -37,6 +37,8 @@ export default function Home() {
 
                   // '/*' allows any file type that is an iamge 
                   accept="image/*"
+                  style={{display: 'none'}}
+                  ref={avatarInput}
 
                   onChange = {(e) => {
 
@@ -52,6 +54,19 @@ export default function Home() {
                   }}
 
                 />
+
+                <button 
+                  onClick={ ()=> avatarInput.current?.click()}
+                  style={{
+                    backgroundColor: '#6B4829',
+                    color: 'white',
+                    padding: '0.5rem 1rem',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer'
+                  }}
+
+                >Change Avatar</button>
 
 
 
