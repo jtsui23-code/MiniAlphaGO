@@ -47,4 +47,22 @@ public class AuthController {
 
         return ResponseEntity.status(401).body("Invalid username or password");
     }
+
+    @GetMapping("/getallbyuser")
+    public ResponseEntity<?> getAllByUser(@RequestParam String username) {
+        if (username == null || username.isEmpty()) {
+            return ResponseEntity.badRequest().body("Username is required");
+        }
+
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                // Return the entire User object (all data)
+                return ResponseEntity.ok(user);
+            }
+        }
+
+        // Username not found
+        return ResponseEntity.status(404).body("User not found");
+    }
+
 }
