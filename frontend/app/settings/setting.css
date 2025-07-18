@@ -1,9 +1,40 @@
+
+
 .setting-page {
     
     min-height: 100vh;
     background-color: #E1D7C6;
 
 
+}
+
+/* Text above the avatar image in settings page. */
+.avatar-label {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #6B4829;
+
+    /* Adding space between label and the avatar image in the settings page. */
+    margin-bottom: 1rem;
+
+    /* Makes the label take up the entire width of the screen instead of just inline text. */
+    display: block;
+}
+
+.avatar-image {
+    width: 120px;
+    height:120px;
+
+    /* This creates rounded corners so the border is a circle around the image. */
+    border-radius: 50%;
+    border: 3px solid #6B4829;
+
+    /* Crops the image if its not a circular image */
+    object-fit: cover;
+    display:block;
+
+    /* Centers the image and adds spacing under the image */
+    margin: 0 auto 1rem auto;
 }
 
 .avatar-section {
