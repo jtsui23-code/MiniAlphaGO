@@ -48,6 +48,13 @@
   font-size: 1rem;
   color: #5A462B;
 }
+.login-heading {
+  text-align:center;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-top: 4rem;
+  color: #6B4829;
+}
 
 body {
   background-color: #E1D7C6;
@@ -55,3 +62,4 @@ body {
   font-family: var(--font-geist-sans, sans-serif);
   color: #4B3B1B;
 }
+

@@ -3,7 +3,22 @@ import Nav from "@/components/nav";
 import Board from "@/components/board";
 import "./page.css";
 
+
 export default function Stats() {
+
+  async function userStats() {
+
+    const request = await fetch('http://localhost:8000/stats', {
+
+      method: 'GET',
+
+    });
+
+    const data = await request.json()
+
+  }
+
+
   return (
     <>
       <Nav />
@@ -50,7 +65,7 @@ export default function Stats() {
               </tr>
             </thead>
             <tbody>
-              {[...Array(5)].map((_, i) => (
+              {[...Array(10)].map((_, i) => (
                 <tr key={i}>
                   <td>AI v{i}</td>
                   <td className={i % 2 === 0 ? "win" : "loss"}>
@@ -65,7 +80,7 @@ export default function Stats() {
           </table>
         </div>
 
-        <Board />
+ 
       </div>
     </>
   );

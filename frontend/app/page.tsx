@@ -7,11 +7,11 @@ export default function Home() {
     <>
       <Nav />
       <div className="hero">
-        <h1>Go Game</h1>
+        <h1>Go</h1>
 
         <div className="page-content">
           <p>
-            Welcome to the Go Game website. Explore the ancient strategy game of Go. Play against our advanced Go AI, create an account to track your progress, and soon challenge your friends!
+            Welcome to the Go website. Explore the ancient strategy game of Go. Play against our advanced Go AI, create an account to track your progress, and soon challenge your friends!
           </p>
 
           <section>
@@ -29,7 +29,6 @@ export default function Home() {
             <ul>
               <li>Play against AI with multiple difficulty levels.</li>
               <li>Save and review your game history.</li>
-              <li>Access tutorials from beginner to advanced.</li>
               <li>Secure account system with profiles and stats.</li>
             </ul>
           </section>
@@ -37,7 +36,7 @@ export default function Home() {
           <section>
             <h2>Get Started</h2>
             <p>
-              Use the navigation menu to sign up or log in. Start a new game anytime. Check out the tutorials to sharpen your skills.
+              Use the navigation menu to sign up or log in. Start a new game anytime.
             </p>
             <Link href="/play">
               <button className="cta-button">Start Playing Now</button>
