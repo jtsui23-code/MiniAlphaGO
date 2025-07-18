@@ -1,25 +1,8 @@
 'use client';
-
+import "./page.css";
 import React, { useRef, useState } from 'react';
 import Nav from '@/components/nav';
 import Board from '@/components/board';
-
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '1rem',
-  },
-  button: {
-    backgroundColor: '#0070f3',
-    color: 'white',
-    border: 'none',
-    padding: '0.5rem 1rem',
-    cursor: 'pointer',
-    marginBottom: '1rem',
-  },
-};
 
 export default function PlayPage() {
   const boardRef = useRef(null);
@@ -50,7 +33,6 @@ export default function PlayPage() {
   };
 
   const handleCellClick = async ({ x, y }) => {
-    //alert("sent PUT request to server. making move");
     if (boardData[y]?.[x]) return;
 
     try {
@@ -78,17 +60,19 @@ export default function PlayPage() {
   return (
     <>
       <Nav />
-      <div style={styles.container}>
-        <p>This is the play page</p>
+      <div className="play-container">
+        <p className="play-intro">
+          Ready to challenge the Go AI? Click “Start Game” and enjoy a classic game of strategy.
+        </p>
         <button
-          style={styles.button}
+          className="play-button"
           onClick={handleStartGame}
-          onMouseOver={e => (e.currentTarget.style.backgroundColor = '#005bb5')}
-          onMouseOut={e => (e.currentTarget.style.backgroundColor = '#0070f3')}
         >
           Start Game
         </button>
-        <Board ref={boardRef} onCellClick={handleCellClick} />
+        <div className="board-wrapper">
+          <Board ref={boardRef} onCellClick={handleCellClick} />
+        </div>
       </div>
     </>
   );
