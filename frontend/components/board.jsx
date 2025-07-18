@@ -2,9 +2,9 @@
 
 import { useState, useImperativeHandle, forwardRef } from 'react';
 
-const BOARD_SIZE = 9; // ← changed from 19
+const BOARD_SIZE = 9;
 const CELL_SIZE = 40;
-const STONE_RADIUS = 12;
+const STONE_RADIUS = 18;
 
 const Board = forwardRef(({ onCellClick }, ref) => {
   const [board, setBoard] = useState(
@@ -24,12 +24,42 @@ const Board = forwardRef(({ onCellClick }, ref) => {
     },
   }));
 
+  const svgSize = CELL_SIZE * (BOARD_SIZE - 1);
+  const halfCell = CELL_SIZE / 2;
+
   return (
     <svg
-      width={CELL_SIZE * (BOARD_SIZE - 1)}
-      height={CELL_SIZE * (BOARD_SIZE - 1)}
+      width={svgSize + CELL_SIZE}
+      height={svgSize + CELL_SIZE}
+      viewBox={`-${halfCell} -${halfCell} ${svgSize + CELL_SIZE} ${svgSize + CELL_SIZE}`}
       style={{ backgroundColor: '#deb887', display: 'block' }}
     >
+      <defs>
+        {/* Texture Filter */}
+        <filter id="stoneNoise">
+          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" result="turbulence"/>
+          <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="1" />
+        </filter>
+
+        {/* Drop Shadow for White Stones */}
+        <filter id="whiteStoneShadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="0" dy="0" stdDeviation="1" floodColor="#555" floodOpacity="0.6" />
+        </filter>
+
+        {/* Textured Gradients */}
+        <radialGradient id="blackStone" cx="30%" cy="30%" r="70%">
+          <stop offset="0%" stopColor="#777" />
+          <stop offset="40%" stopColor="#222" />
+          <stop offset="100%" stopColor="#000" />
+        </radialGradient>
+        <radialGradient id="whiteStone" cx="30%" cy="30%" r="70%">
+          <stop offset="0%" stopColor="#fefefe" />
+          <stop offset="40%" stopColor="#ddd" />
+          <stop offset="100%" stopColor="#aaa" />
+        </radialGradient>
+      </defs>
+
+      {/* Grid Lines */}
       {Array.from({ length: BOARD_SIZE }).map((_, i) => (
         <g key={`grid-${i}`}>
           <line
@@ -49,6 +79,7 @@ const Board = forwardRef(({ onCellClick }, ref) => {
         </g>
       ))}
 
+      {/* Stones and Click Zones */}
       {board.map((row, y) =>
         row.map((cell, x) =>
           cell ? (
@@ -57,8 +88,10 @@ const Board = forwardRef(({ onCellClick }, ref) => {
               cx={x * CELL_SIZE}
               cy={y * CELL_SIZE}
               r={STONE_RADIUS}
-              fill={cell}
-              stroke="black"
+              fill={cell === 'black' ? 'url(#blackStone)' : 'url(#whiteStone)'}
+              stroke={cell === 'black' ? '#222' : '#444'}
+              strokeWidth="1.5"
+              filter={cell === 'black' ? 'url(#stoneNoise)' : 'url(#whiteStoneShadow)'}
             />
           ) : (
             <circle
