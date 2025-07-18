@@ -45,15 +45,19 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
             model = whiteModel
 
         # Loads the specific model into mct depending on whose turn it is.
-        mct = MCTS(network=model,exploration_weight=1.5, simulations=300)
+        mct = MCTS(network=model,exploration_weight=1.5, simulations=500)
 
         # Plays move using the specific model according to player's turn.
         move, pi = mct.search(board)
 
-        x,y = divmod(move, 9)
-        board.playMove(x,y, board.currentPlayer)
-        
+        if move is not None:
+            x,y = divmod(move, 9)
+            board.playMove(x,y, board.currentPlayer)
 
+        else:
+            board.playMove(1,1, board.currentPlayer, passTurn=True)
+
+        
         count += 1
     
     

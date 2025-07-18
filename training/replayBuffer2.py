@@ -51,7 +51,10 @@ class ReplayBuffer:
 
         # Converting pis into a single dimensionaly numpy array before making it a tensor for 
         # efficiency.
-        pis = torch.tensor(np.array(pis), dtype=torch.float32).to(device)
+        # pis = torch.tensor(np.array(pis), dtype=torch.float32).to(device)
+        
+        # Avoids numpy conversion oto tensors if already in GPU.
+        pis = torch.stack(pis).to(device)
         zs = torch.tensor(zs, dtype=torch.float32).to(device)
 
         return states, pis, zs
