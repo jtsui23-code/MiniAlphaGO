@@ -1,61 +1,79 @@
 'use client';
-
-import { useRef } from 'react';
+import "./page.css";
+import React, { useRef, useState } from 'react';
 import Nav from '@/components/nav';
-import Board from '@/components/board'; // Make sure Board supports ref and setBoardFromJSON
+import Board from '@/components/board';
 
-export default function Home() {
+export default function PlayPage() {
   const boardRef = useRef(null);
+  const [boardData, setBoardData] = useState(
+    Array(9).fill(null).map(() => Array(9).fill(null))
+  );
+  const [playerTurn, setPlayerTurn] = useState('black');
 
-  const handleStartGame = () => {
-    const jsonBoard = [
-      [null, null, null, null, null],
-      [null, 'black', null, 'white', null],
-      [null, null, 'black', null, null],
-      [null, 'white', null, 'black', null],
-      [null, null, null, null, null],
-    ];
+  const handleStartGame = async () => {
+    alert("sent POST request to server ['start game vs cpu]");
+    try {
+      const res = await fetch('http://localhost:8000/newgame', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ opponent: 'CPU' }),
+      });
 
-    if (boardRef.current && boardRef.current.setBoardFromJSON) {
-      boardRef.current.setBoardFromJSON(jsonBoard);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      
+      const data = await res.json();
+      setBoardData(data);
+      setPlayerTurn('black');
+      boardRef.current?.setBoardFromJSON(data);
+      boardRef.current?.setPlayerTurn('black');
+    } catch (err) {
+      alert('Failed to start game: ' + err.message);
+    }
+  };
+
+  const handleCellClick = async ({ x, y }) => {
+    if (boardData[y]?.[x]) return;
+
+    try {
+      const res = await fetch('http://localhost:8000/move', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ x, y }),
+      });
+
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      const data = await res.json();
+
+      setBoardData(data);
+      boardRef.current?.setBoardFromJSON(data);
+
+      const next = playerTurn === 'black' ? 'white' : 'black';
+      setPlayerTurn(next);
+      boardRef.current?.setPlayerTurn(next);
+    } catch (err) {
+      alert('Failed to send move: ' + err.message);
     }
   };
 
   return (
     <>
       <Nav />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: '100vh',
-          padding: '20px',
-          gap: '20px',
-          fontFamily: 'Arial, sans-serif',
-        }}
-      >
-        <p>This is the play page</p>
-
+      
+      <div className="play-container">
+        <p className="play-intro">
+          Ready to challenge the Go AI? Click “Start Game” and enjoy a classic game of strategy.
+        </p>
         <button
+          className="play-button"
           onClick={handleStartGame}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#0070f3',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            fontSize: '16px',
-          }}
-          onMouseOver={e => (e.currentTarget.style.backgroundColor = '#005bb5')}
-          onMouseOut={e => (e.currentTarget.style.backgroundColor = '#0070f3')}
         >
-          Start
+          Start Game
         </button>
-
-        <Board ref={boardRef} />
+        <div className="board-wrapper">
+          <Board ref={boardRef} onCellClick={handleCellClick} />
+        </div>
       </div>
     </>
   );

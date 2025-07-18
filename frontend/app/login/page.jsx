@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import Nav from "@/components/nav";
+import "./page.css";
+
 export default function Login() {
   const [msg, setMsg] = useState("");
 
@@ -21,8 +23,8 @@ export default function Login() {
 
   return (
     <>
-      <Nav/>
-      <form onSubmit={login}>
+      <Nav />
+      <form onSubmit={login} className="login-form">
         <input name="username" placeholder="Username" required />
         <input name="password" placeholder="Password" type="password" required />
         <button>Login</button>
