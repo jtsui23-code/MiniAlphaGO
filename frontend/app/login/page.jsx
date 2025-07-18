@@ -24,6 +24,7 @@ export default function Login() {
   return (
     <>
       <Nav />
+      <h2 className="login-heading">Login</h2>
       <form onSubmit={login} className="login-form">
         <input name="username" placeholder="Username" required />
         <input name="password" placeholder="Password" type="password" required />
