@@ -60,6 +60,7 @@ export default function PlayPage() {
   return (
     <>
       <Nav />
+      
       <div className="play-container">
         <p className="play-intro">
           Ready to challenge the Go AI? Click “Start Game” and enjoy a classic game of strategy.

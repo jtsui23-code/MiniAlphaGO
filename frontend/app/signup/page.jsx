@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Nav from "@/components/nav";
+import "./page.css";
 
 export default function Signup() {
   const [msg, setMsg] = useState("");
@@ -25,9 +26,9 @@ export default function Signup() {
 
   return (
     <>
-    <Nav/>
-      <h2>Sign Up</h2>
-      <form onSubmit={handleSignup}>
+      <Nav />
+      <h2 className="signup-heading">Sign Up</h2>
+      <form onSubmit={handleSignup} className="signup-form">
         <input name="username" placeholder="Username" required />
         <input name="password" placeholder="Password" type="password" required />
         <button>Sign Up</button>

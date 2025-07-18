@@ -10,7 +10,6 @@ export default function Home() {
       <p>It's blank now. let's get to work</p>
 
       
-      <Board/>
     </div>
     </>
   );
