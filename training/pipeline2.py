@@ -157,13 +157,15 @@ def evaludateModel(genNum=3):
     evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum, device=device)
 
 counter = 6
-# while counter < 2000:
-
-#     evalResult = startPipline(numGames=100, genNum=counter)
-#     if evalResult == 1:
-#         counter+= 1
 
 evaludateModel(genNum=counter)
+
+while counter < 2000:
+
+    evalResult = startPipline(numGames=100, genNum=counter)
+    if evalResult == 1:
+        counter+= 1
+
 
 
 

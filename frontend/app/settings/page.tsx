@@ -7,8 +7,16 @@ import {useState, useRef} from 'react';
 
 export default function Home() {
 
+  const [username, setUsername] = useState("Player")
   const [avatar, setAvatar] = useState("/default-avatar.png")
   const avatarInput = useRef<HTMLInputElement>(null);
+
+
+  const handleSaveUsername = () => {
+      //Implement backend for storing username here later.
+
+      console.log("Saving username:", username);
+  };
 
   return (
   <>
@@ -56,14 +64,7 @@ export default function Home() {
                 />
                 <button 
                   onClick={ ()=> avatarInput.current?.click()}
-                  style={{
-                    backgroundColor: '#6B4829',
-                    color: 'white',
-                    padding: '0.5rem 1rem',
-                    border: 'none',
-                    borderRadius: '8px',
-                    cursor: 'pointer'
-                  }}
+                  className="primary-button"
 
                 >Change Avatar</button>
 
@@ -72,15 +73,37 @@ export default function Home() {
 
           </div>
 
-          <div className="setting-box">
+          
 
-              <label>Username</label>
-              {/* This is where the player user name can be changed */}
-              <input type="text" defaultValue="PlayerUser"/>
+              <div className="setting-box">
+
+                <label className="input-label">Username</label>
+
+                <div className="input-with-button">
+                    {/* This is where the player user name can be changed */}
+                    <input 
+                      type="text" 
+                      value={username}
+                      onChange = { (e) => setUsername(e.target.value)}
+                      className="styled-input"
+                      placeholder={username}
+
+                      />
+
+                      <button 
+                        onClick={handleSaveUsername}
+                        className="secondary-button"
+                      >
+                        Save
+                      </button>
 
 
-          </div>
 
+                </div>
+            
+            </div>
+
+           
 
       </div>
       
