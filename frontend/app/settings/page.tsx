@@ -54,7 +54,6 @@ export default function Home() {
                   }}
 
                 />
-
                 <button 
                   onClick={ ()=> avatarInput.current?.click()}
                   style={{
@@ -68,10 +67,18 @@ export default function Home() {
 
                 >Change Avatar</button>
 
-
-
-            </div>
             
+            </div>
+
+          </div>
+
+          <div className="setting-box">
+
+              <label>Username</label>
+              {/* This is where the player user name can be changed */}
+              <input type="text" defaultValue="PlayerUser"/>
+
+
           </div>
 
 
