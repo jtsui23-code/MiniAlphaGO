@@ -158,7 +158,7 @@ def evaludateModel(genNum=3):
 
 counter = 6
 
-# evaludateModel(genNum=counter)
+evaludateModel(genNum=counter)
 
 while counter < 2000:
 
