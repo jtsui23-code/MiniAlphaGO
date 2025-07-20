@@ -8,14 +8,21 @@ import {useState, useRef} from 'react';
 export default function Home() {
 
   const [username, setUsername] = useState("Player")
+  const [password, setPassword] = useState("Password")
+
   const [avatar, setAvatar] = useState("/default-avatar.png")
   const avatarInput = useRef<HTMLInputElement>(null);
 
 
-  const handleSaveUsername = () => {
-      //Implement backend for storing username here later.
+  const handleSavedPassword = () => {
+    //Implement backend for changing password here later.
 
-      console.log("Saving username:", username);
+    console.log("Saving new password", password);
+  }
+  const handleSaveUsername = () => {
+      //Implement backend for changing username here later.
+
+      console.log("Saving new username:", username);
   };
 
   return (
@@ -92,6 +99,31 @@ export default function Home() {
 
                       <button 
                         onClick={handleSaveUsername}
+                        className="secondary-button"
+                      >
+                        Save
+                      </button>
+
+
+
+                </div>
+
+
+                <label className="input-label">Password</label>
+
+                <div className="input-with-button">
+                    {/* This is where the player user name can be changed */}
+                    <input 
+                      type="text" 
+                      value={password}
+                      onChange = { (e) => setUsername(e.target.value)}
+                      className="styled-input"
+                      placeholder={password}
+
+                      />
+
+                      <button 
+                        onClick={handleSavedPassword}
                         className="secondary-button"
                       >
                         Save
