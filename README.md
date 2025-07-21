@@ -2,7 +2,7 @@
 A full-stack web application with user authentication that allows players to compete against Go AI bots of varying difficulty levels. Each AI is built from the ground up using a custom Go engine, reinforcement learning, Monte Carlo Tree Search (MCTS), and a self-trained neural policy/value network.
 
 ---
-<img width="1873" height="867" alt="goHomePage" src="https://github.com/user-attachments/assets/184c8dd3-bb28-4a5e-91d1-63f0fb194238" />
+![Uploading goDemo.gif…]()
 
 
 ## Features
