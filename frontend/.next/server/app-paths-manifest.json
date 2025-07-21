@@ -1,3 +1,9 @@
 {
+<<<<<<< HEAD
+=======
+  "/_not-found/page": "app/_not-found/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/page": "app/page.js",
+>>>>>>> 320a8e63b89dbcf57f2a9758803e64fa38cc052d
   "/play/page": "app/play/page.js"
 }
