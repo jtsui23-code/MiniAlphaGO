@@ -45,18 +45,10 @@ export default function Home() {
   const [avatar, setAvatar] = useState("/default-avatar.png");
   const avatarInput = useRef(null);
 
-<<<<<<< HEAD
-  const [username, setUsername] = useState("Player")
-  const [password, setPassword] = useState("Password")
-
-  const [avatar, setAvatar] = useState("/default-avatar.png")
-  const avatarInput = useRef<HTMLInputElement>(null);
-=======
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [passwordMsg, setPasswordMsg] = useState("");
   const [msg, setMsg] = useState("");
->>>>>>> e2cba215e293b539c3695253b5935d5db339bb66
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (usr) => {
@@ -69,18 +61,6 @@ export default function Home() {
       }
       setUser(usr);
 
-<<<<<<< HEAD
-  const handleSavedPassword = () => {
-    //Implement backend for changing password here later.
-
-    console.log("Saving new password", password);
-  }
-  const handleSaveUsername = () => {
-      //Implement backend for changing username here later.
-
-      console.log("Saving new username:", username);
-  };
-=======
       // Load username & avatar from Firestore
       const docRef = doc(db, "users", usr.uid);
       const docSnap = await getDoc(docRef);
@@ -147,7 +127,6 @@ export default function Home() {
       setPasswordMsg("Password change failed: " + e.message);
     }
   }
->>>>>>> e2cba215e293b539c3695253b5935d5db339bb66
 
   return (
     <>
@@ -178,61 +157,6 @@ export default function Home() {
             </div>
           </div>
 
-<<<<<<< HEAD
-          
-
-              <div className="setting-box">
-
-                <label className="input-label">Username</label>
-
-                <div className="input-with-button">
-                    {/* This is where the player user name can be changed */}
-                    <input 
-                      type="text" 
-                      value={username}
-                      onChange = { (e) => setUsername(e.target.value)}
-                      className="styled-input"
-                      placeholder={username}
-
-                      />
-
-                      <button 
-                        onClick={handleSaveUsername}
-                        className="secondary-button"
-                      >
-                        Save
-                      </button>
-
-
-
-                </div>
-
-
-                <label className="input-label">Password</label>
-
-                <div className="input-with-button">
-                    {/* This is where the player user name can be changed */}
-                    <input 
-                      type="text" 
-                      value={password}
-                      onChange = { (e) => setUsername(e.target.value)}
-                      className="styled-input"
-                      placeholder={password}
-
-                      />
-
-                      <button 
-                        onClick={handleSavedPassword}
-                        className="secondary-button"
-                      >
-                        Save
-                      </button>
-
-
-
-                </div>
-            
-=======
           <div className="setting-box">
             <label className="input-label">Username</label>
             <div className="input-with-button">
@@ -248,7 +172,6 @@ export default function Home() {
               >
                 Save
               </button>
->>>>>>> e2cba215e293b539c3695253b5935d5db339bb66
             </div>
             <p>{msg}</p>
           </div>
