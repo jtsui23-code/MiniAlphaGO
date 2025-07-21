@@ -32,9 +32,20 @@ export default function PlayPage() {
     }
   };
 
-  const handleCellClick = async ({ x, y }) => {
-    if (boardData[y]?.[x]) return;
+const handleCellClick = async ({ x, y }) => {
+  if (boardData[y]?.[x]) return;
 
+  // Optimistically show the player's move on the board
+  const updatedBoard = boardData.map((row, rowIndex) =>
+    row.map((cell, colIndex) =>
+      rowIndex === y && colIndex === x ? playerTurn : cell
+    )
+  );
+  setBoardData(updatedBoard);
+  boardRef.current?.setBoardFromJSON(updatedBoard);
+
+  // Wait 1 second before sending move to backend
+  setTimeout(async () => {
     try {
       const res = await fetch('http://localhost:8000/move', {
         method: 'PUT',
@@ -45,7 +56,6 @@ export default function PlayPage() {
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
       const data = await res.json();
-
       setBoardData(data);
       boardRef.current?.setBoardFromJSON(data);
 
@@ -55,7 +65,9 @@ export default function PlayPage() {
     } catch (err) {
       alert('Failed to send move: ' + err.message);
     }
-  };
+  }, 1000); // 1000ms = 1 second
+};
+
 
   return (
     <>
