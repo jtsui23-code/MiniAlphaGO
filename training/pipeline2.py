@@ -156,7 +156,7 @@ def evaludateModel(genNum=3):
     candidateModel.eval()
     evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum, device=device)
 
-counter = 6
+counter = 7
 
 evaludateModel(genNum=counter)
 
