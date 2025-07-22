@@ -5,6 +5,7 @@ A full-stack web application with user authentication that allows players to com
 
 ![goDemo](https://github.com/user-attachments/assets/066aeed3-c383-45c5-a3e0-35d10633cbe8)
 <img width="1882" height="862" alt="goHome" src="https://github.com/user-attachments/assets/22122647-6f3d-447e-9d5d-c3354e0ff2a2" />
+<img width="1917" height="865" alt="goLogin" src="https://github.com/user-attachments/assets/a622e1c5-a67a-4738-802e-e81e71a2cc0e" />
 
 
 ## Features
