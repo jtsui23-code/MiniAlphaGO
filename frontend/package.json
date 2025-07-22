@@ -2,12 +2,16 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+  "dev": "next dev --turbopack",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint",
+  "backend": "cd ../backend && uvicorn backend_python.main:app --reload --port 8000"
+
   },
+  
   "dependencies": {
     "firebase": "^12.0.0",
     "next": "15.3.4",
