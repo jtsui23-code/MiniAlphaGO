@@ -25,7 +25,7 @@ export default function Stats() {
 
   async function fetchGames(userEmail) {
     try {
-      const res = await fetch(`http://localhost:8000/stats?user=${encodeURIComponent(userEmail)}`);
+      const res = await fetch(`http://localhost:8000/stats?uid=${encodeURIComponent(userEmail)}`);
       if (!res.ok) throw new Error("Failed to load games");
       const data = await res.json();
       setGames(data);

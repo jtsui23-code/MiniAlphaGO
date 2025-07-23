@@ -11,6 +11,7 @@ export default function Login() {
   const router = useRouter();
 
   async function login(e) {
+    alert("Login attempt started");
     e.preventDefault();
     setMsg("");
     try {
@@ -39,7 +40,7 @@ export default function Login() {
       <h2 className="login-heading">Login</h2>
       <form onSubmit={login} className="login-form">
         <input
-          name="username"
+          name="email"
           type="email"
           placeholder="Email"
           required
@@ -54,7 +55,7 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button>Login</button>
+        <button type="submit">Login</button>
       </form>
       <p>{msg}</p>
     </>

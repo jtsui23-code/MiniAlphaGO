@@ -1,0 +1,163 @@
+[
+  {
+    "game_id": "c8805ab1-d2e8-4d94-8fc2-45c665b4bb35",
+    "board": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "white"
+      ],
+      [
+        null,
+        null,
+        "black",
+        null,
+        null,
+        null,
+        "black",
+        null,
+        null
+      ],
+      [
+        "white",
+        "black",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        "black",
+        null,
+        null,
+        null,
+        "black",
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "white",
+        null,
+        "white",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        "white",
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "moves": [
+      {
+        "player": "black",
+        "x": 2,
+        "y": 1
+      },
+      {
+        "player": "white",
+        "x": 5,
+        "y": 7
+      },
+      {
+        "player": "black",
+        "x": 6,
+        "y": 1
+      },
+      {
+        "player": "white",
+        "x": 0,
+        "y": 2
+      },
+      {
+        "player": "black",
+        "x": 1,
+        "y": 2
+      },
+      {
+        "player": "white",
+        "x": 8,
+        "y": 0
+      },
+      {
+        "player": "black",
+        "x": 2,
+        "y": 4
+      },
+      {
+        "player": "white",
+        "x": 2,
+        "y": 6
+      },
+      {
+        "player": "black",
+        "x": 6,
+        "y": 4
+      },
+      {
+        "player": "white",
+        "x": 0,
+        "y": 6
+      }
+    ],
+    "current_turn": "black",
+    "opponent": "CPU",
+    "date": "2025-07-23",
+    "uid": "csprincedaniel@gmail.com",
+    "winner": null
+  }
+]

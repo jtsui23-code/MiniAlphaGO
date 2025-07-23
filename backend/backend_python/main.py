@@ -15,7 +15,7 @@ import numpy as np
 
 BOARD_SIZE = 9
 GAMES_FILE = "saved_games.json"
-ACCOUNTS_FILE = "accounts.json"
+USERS_FILE = "users.json"
 
 app = FastAPI()
 
@@ -27,59 +27,49 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Account storage init
-if not os.path.exists(ACCOUNTS_FILE):
-    with open(ACCOUNTS_FILE, "w") as f:
-        json.dump({}, f)
-
-# Game storage init
-if os.path.exists(GAMES_FILE):
-    with open(GAMES_FILE, "r") as f:
-        saved_games = json.load(f)
-else:
-    saved_games = []
-
-def save_games():
-    with open(GAMES_FILE, "w") as f:
-        json.dump(saved_games, f)
-
-# Models
 class StartGameRequest(BaseModel):
     opponent: str
-    uid: Optional[str]  # user email from frontend
+    uid: str
 
 class MoveRequest(BaseModel):
     x: int
     y: int
 
-class User(BaseModel):
+class LoginRequest(BaseModel):
     email: str
     password: str
 
-# Account endpoints
-@app.post("/signup")
-def signup(user: User):
-    with open(ACCOUNTS_FILE, "r") as f:
-        accounts = json.load(f)
-    if user.email in accounts:
-        return {"error": "Email already exists"}
-    accounts[user.email] = user.password
-    with open(ACCOUNTS_FILE, "w") as f:
-        json.dump(accounts, f)
-    return {"success": True}
+class SignupRequest(BaseModel):
+    email: str
+    password: str
 
-@app.post("/login")
-def login(user: User):
-    with open(ACCOUNTS_FILE, "r") as f:
-        accounts = json.load(f)
-    if accounts.get(user.email) != user.password:
-        return {"error": "Invalid credentials"}
-    return {"success": True}
+def load_json_file(filename):
+    if os.path.exists(filename):
+        try:
+            with open(filename, "r") as f:
+                content = f.read().strip()
+                if content:
+                    return json.loads(content)
+        except json.JSONDecodeError:
+            pass
+    # if file doesn't exist or invalid content, create empty file with []
+    with open(filename, "w") as f:
+        f.write("[]")
+    return []
 
-# Game state global variables
+saved_games = load_json_file(GAMES_FILE)
+users = load_json_file(USERS_FILE)
+
+def save_games():
+    with open(GAMES_FILE, "w") as f:
+        json.dump(saved_games, f, indent=2)
+
+def save_users():
+    with open(USERS_FILE, "w") as f:
+        json.dump(users, f, indent=2)
+
 game_state = {}
 board = Board(BOARD_SIZE)
-opponent_counter = 0
 
 def numpy_array_to_json(arr):
     if not isinstance(arr, np.ndarray):
@@ -104,16 +94,28 @@ def numpy_array_to_json(arr):
     nested_list = [[convert_val(v) for v in col] for col in arr.T]
     return nested_list
 
-# Start new game
+@app.post("/signup")
+def signup(request: SignupRequest):
+    for user in users:
+        if user["email"] == request.email:
+            return {"success": False, "error": "User already exists"}
+    users.append({"email": request.email, "password": request.password})
+    save_users()
+    return {"success": True}
+
+@app.post("/login")
+def login(request: LoginRequest):
+    for user in users:
+        if user["email"] == request.email and user["password"] == request.password:
+            return {"success": True}
+    return {"success": False, "error": "Invalid email or password"}
+
 @app.post("/newgame")
 def new_game(request: StartGameRequest):
-    global game_state, opponent_counter, board
-
-    if not request.uid:
-        raise HTTPException(status_code=400, detail="User ID required")
-
-    opponent_counter += 1
-    opponent_name = f"{request.opponent} v{opponent_counter}"
+    global game_state, board
+    # Require uid to exist in users
+    if not any(user["email"] == request.uid for user in users):
+        raise HTTPException(status_code=400, detail="Invalid user")
 
     game_id = str(uuid.uuid4())
     board = Board(BOARD_SIZE)  # reset board
@@ -123,14 +125,14 @@ def new_game(request: StartGameRequest):
         "board": [[None]*BOARD_SIZE for _ in range(BOARD_SIZE)],
         "moves": [],
         "current_turn": "black",
-        "opponent": opponent_name,
+        "opponent": request.opponent,
         "date": str(datetime.date.today()),
-        "user": request.uid,
+        "uid": request.uid,
+        "winner": None,
     }
 
-    return {"board": game_state["board"], "game_id": game_id, "opponent": opponent_name}
+    return {"board": game_state["board"], "game_id": game_id, "opponent": request.opponent}
 
-# Make move
 @app.put("/move")
 def make_move(move: MoveRequest, game_id: Optional[str] = Query(None)):
     global game_state, saved_games, board
@@ -146,32 +148,35 @@ def make_move(move: MoveRequest, game_id: Optional[str] = Query(None)):
     if game_state["board"][y][x] is not None:
         raise HTTPException(status_code=400, detail="Cell already occupied")
 
-    # Player move (black)
-    board.playMove(x, y, 1)
+    # Player (black) move on backend Board object and game_state
+    board.playMove(x, y, 1)  # 1 = black
     game_state["board"][y][x] = "black"
     game_state["moves"].append({"player": "black", "x": x, "y": y})
 
-    # AI move
+    # AI move with MCTS
     network = GoNet(9, 17)
     mct = MCTS(network=network, exploration_weight=1.5, simulations=500)
+
     move_ai, _ = mct.search(board)
 
     if move_ai is None or move_ai == 81:
-        pass  # AI pass logic if needed
+        # AI pass move, implement pass logic if needed
+        game_state["winner"] = "black"  # simplistic winner on pass
     else:
         ai_x, ai_y = divmod(move_ai, BOARD_SIZE)
-        board.playMove(ai_x, ai_y, -1)
+        board.playMove(ai_x, ai_y, -1)  # -1 = white
         game_state["board"][ai_y][ai_x] = "white"
         game_state["moves"].append({"player": "white", "x": ai_x, "y": ai_y})
 
     mct.update_root(move_ai)
 
-    # Save/update saved_games with user info
+    # Save or update saved_games for this user
     for g in saved_games:
         if g["game_id"] == game_state["game_id"]:
             g.update({
                 "board": game_state["board"],
                 "moves": game_state["moves"],
+                "winner": game_state.get("winner"),
             })
             break
     else:
@@ -181,11 +186,11 @@ def make_move(move: MoveRequest, game_id: Optional[str] = Query(None)):
 
     return numpy_array_to_json(board)
 
-# Fetch stats filtered by user (query param)
 @app.get("/stats")
-def get_stats(user: Optional[str] = None):
-    if not user:
-        return []
-
-    user_games = [g for g in saved_games if g.get("user") == user]
+def get_stats(uid: Optional[str] = Query(None)):
+    # Filter games by uid (user email)
+    if uid:
+        user_games = [g for g in saved_games if g.get("uid") == uid]
+    else:
+        user_games = []
     return user_games
