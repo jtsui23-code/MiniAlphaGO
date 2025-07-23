@@ -1,5 +1,9 @@
 # Mini AlphaGo (9x9) - Work In Progress
-A full-stack web application with user authentication that allows players to compete against Go AI bots of varying difficulty levels. Each AI is built from the ground up using a custom Go engine, reinforcement learning, Monte Carlo Tree Search (MCTS), and a self-trained neural policy/value network. This project is developed by Jack Tsui and Daniel Prince.
+A full-stack web application that lets users play 9x9 Go against AI opponents of varying difficulty. Each AI is built from scratch using a custom Go engine, reinforcement learning, Monte Carlo Tree Search (MCTS), and a self-trained neural policy/value network.
+
+The project includes a React + WebSocket frontend, FastAPI + Spring Boot backend, and a PyTorch-based training pipeline. Users can log in, play matches, and view past games through a replay system.
+
+Developed by Jack Tsui and Daniel Prince.
 
 ---
 
