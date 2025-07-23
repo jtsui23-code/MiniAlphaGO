@@ -33,7 +33,7 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
 
     # Have a turn cap of 125 to end the game.
     count = 0
-    max = 125
+    max = 300
 
     while not board.isGameOver() and count < max:
 
@@ -45,7 +45,7 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
             model = whiteModel
 
         # Loads the specific model into mct depending on whose turn it is.
-        mct = MCTS(network=model,exploration_weight=1.5, simulations=500)
+        mct = MCTS(network=model,exploration_weight=1.5, simulations=800)
 
         # Plays move using the specific model according to player's turn.
         move, pi = mct.search(board)
