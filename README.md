@@ -28,10 +28,11 @@ A full-stack web application with user authentication that allows players to com
 -  **Policy & Value Network** – PyTorch neural network for move prediction and win estimation.
 -  **MCTS Integration** – Search algorithm guided by neural policy and value.
 -  **Self-Play Training** – Replay buffer + reinforcement learning loop.
-
-###  Work In Progress
 -  **Interactive Web App** – Play against the AI in real-time via React + WebSocket frontend.
 -  **Login & Game Logs** – View previous games after logging in.
+
+###  Work In Progress
+
 -  **Dockerized Deployment** – Reproducible containerized setup.
 
 ---
