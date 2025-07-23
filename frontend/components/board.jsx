@@ -6,6 +6,44 @@ const BOARD_SIZE = 9;
 const CELL_SIZE = 40;
 const STONE_RADIUS = 18;
 
+function cloneBoard(board) {
+  return board.map(row => [...row]);
+}
+
+function isOnBoard(x, y) {
+  return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
+}
+
+function getGroup(board, x, y, color, visited = new Set()) {
+  const key = `${x},${y}`;
+  if (!isOnBoard(x, y) || board[y][x] !== color || visited.has(key)) return [];
+
+  visited.add(key);
+  let group = [[x, y]];
+
+  [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => {
+    group = group.concat(getGroup(board, x + dx, y + dy, color, visited));
+  });
+
+  return group;
+}
+
+function hasLiberty(board, group) {
+  return group.some(([x, y]) =>
+    [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => {
+      const nx = x + dx;
+      const ny = y + dy;
+      return isOnBoard(nx, ny) && board[ny][nx] === null;
+    })
+  );
+}
+
+function removeGroup(board, group) {
+  group.forEach(([x, y]) => {
+    board[y][x] = null;
+  });
+}
+
 const Board = forwardRef(({ onCellClick }, ref) => {
   const [board, setBoard] = useState(
     Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null))
@@ -24,9 +62,28 @@ const Board = forwardRef(({ onCellClick }, ref) => {
     },
     playMove: (x, y, player) => {
       setBoard(prev => {
-        if (prev[y][x] !== null) return prev; // ignore if occupied
-        const newBoard = prev.map(row => [...row]);
-        newBoard[y][x] = player === 1 ? 'black' : 'white';
+        if (prev[y][x] !== null) return prev;
+
+        const newBoard = cloneBoard(prev);
+        const color = player === 1 ? 'black' : 'white';
+        const enemy = player === 1 ? 'white' : 'black';
+
+        newBoard[y][x] = color;
+
+        // Check and remove enemy groups with no liberties
+        [[1,0], [-1,0], [0,1], [0,-1]].forEach(([dx, dy]) => {
+          const nx = x + dx;
+          const ny = y + dy;
+          if (isOnBoard(nx, ny) && newBoard[ny][nx] === enemy) {
+            const group = getGroup(newBoard, nx, ny, enemy);
+            if (!hasLiberty(newBoard, group)) {
+              removeGroup(newBoard, group);
+            }
+          }
+        });
+
+        // Suicide check (optional, not implemented here)
+
         return newBoard;
       });
     },
@@ -43,38 +100,30 @@ const Board = forwardRef(({ onCellClick }, ref) => {
       style={{ display: 'block' }}
     >
       <defs>
-        {/* Wood grain pattern */}
         <pattern id="woodGrain" patternUnits="userSpaceOnUse" width="40" height="40">
           <rect width="40" height="40" fill="#deb887" />
           <rect y="0" width="1" height="40" fill="#d0a060" />
           <rect y="10" width="1" height="40" fill="#c89b56" />
           <rect y="20" width="1" height="40" fill="#b88540" />
         </pattern>
-
-        {/* Noise texture over wood */}
         <filter id="boardNoise">
-          <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="1" result="turb"/>
+          <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="1" result="turb" />
           <feColorMatrix type="saturate" values="0.2" />
           <feComposite in="turb" in2="SourceGraphic" operator="in" />
           <feBlend in="SourceGraphic" in2="turb" mode="multiply" />
         </filter>
-
-        {/* Stone filters */}
         <filter id="stoneNoise">
-          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" result="turbulence"/>
+          <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" result="turbulence" />
           <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="1" />
         </filter>
-
         <filter id="whiteStoneShadow" x="-50%" y="-50%" width="200%" height="200%">
           <feDropShadow dx="0" dy="0" stdDeviation="1" floodColor="#555" floodOpacity="0.6" />
         </filter>
-
         <radialGradient id="blackStone" cx="30%" cy="30%" r="70%">
           <stop offset="0%" stopColor="#777" />
           <stop offset="40%" stopColor="#222" />
           <stop offset="100%" stopColor="#000" />
         </radialGradient>
-
         <radialGradient id="whiteStone" cx="30%" cy="30%" r="70%">
           <stop offset="0%" stopColor="#fefefe" />
           <stop offset="40%" stopColor="#ddd" />
@@ -82,7 +131,6 @@ const Board = forwardRef(({ onCellClick }, ref) => {
         </radialGradient>
       </defs>
 
-      {/* Textured board background */}
       <rect
         x={-halfCell}
         y={-halfCell}
@@ -92,7 +140,6 @@ const Board = forwardRef(({ onCellClick }, ref) => {
         filter="url(#boardNoise)"
       />
 
-      {/* Board lines */}
       {Array.from({ length: BOARD_SIZE }).map((_, i) => (
         <g key={`grid-${i}`}>
           <line
@@ -114,7 +161,6 @@ const Board = forwardRef(({ onCellClick }, ref) => {
         </g>
       ))}
 
-      {/* Stones */}
       {board.map((row, y) =>
         row.map((cell, x) =>
           cell ? (
