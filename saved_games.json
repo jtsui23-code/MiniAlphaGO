@@ -1,1 +1,167 @@
+<<<<<<< HEAD
 [{"game_id": "3f9f0a35-51d8-4fb9-8f4f-0937ecd4e4cf", "board": [["white", null, null, null, null, null, null, null, null], [null, null, null, "black", null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null]], "moves": [{"player": "black", "x": 3, "y": 1}, {"player": "white", "x": 0, "y": 0}], "current_turn": "black", "opponent": "CPU", "date": "2025-07-22"}, {"game_id": "b0f20e62-aa0b-43b3-bc5c-d9c0df1931a9", "board": [["black", "white", "white", "black", "white", "white", "black", "white", "black"], ["white", "white", "black", "white", "white", null, null, null, null], [null, "black", null, null, "black", null, null, null, null], [null, null, null, null, null, null, "black", null, null], [null, null, null, "black", null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null]], "moves": [{"player": "black", "x": 0, "y": 0}, {"player": "white", "x": 1, "y": 0}, {"player": "black", "x": 4, "y": 2}, {"player": "white", "x": 2, "y": 0}, {"player": "black", "x": 3, "y": 0}, {"player": "white", "x": 4, "y": 0}, {"player": "black", "x": 2, "y": 1}, {"player": "white", "x": 5, "y": 0}, {"player": "black", "x": 6, "y": 0}, {"player": "white", "x": 7, "y": 0}, {"player": "black", "x": 8, "y": 0}, {"player": "white", "x": 0, "y": 1}, {"player": "black", "x": 1, "y": 2}, {"player": "white", "x": 1, "y": 1}, {"player": "black", "x": 3, "y": 4}, {"player": "white", "x": 3, "y": 1}, {"player": "black", "x": 6, "y": 3}, {"player": "white", "x": 4, "y": 1}], "current_turn": "black", "opponent": "CPU v1", "date": "2025-07-22"}, {"game_id": "8143c8a8-5112-4f4f-a5ec-184d938dc514", "board": [[null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null], [null, null, "black", "white", null, null, null, null, null], [null, null, "white", null, "white", "black", "black", "white", null], [null, null, "black", null, "black", "white", "white", "black", null], [null, null, "white", null, null, "black", "black", null, null], [null, null, null, null, null, "white", null, null, null], [null, null, "black", null, null, null, null, null, null], [null, null, null, null, null, "white", null, null, null]], "moves": [{"player": "black", "x": 2, "y": 2}, {"player": "white", "x": 5, "y": 4}, {"player": "black", "x": 5, "y": 3}, {"player": "white", "x": 6, "y": 4}, {"player": "black", "x": 4, "y": 4}, {"player": "white", "x": 3, "y": 2}, {"player": "black", "x": 7, "y": 4}, {"player": "white", "x": 4, "y": 3}, {"player": "black", "x": 6, "y": 3}, {"player": "white", "x": 5, "y": 6}, {"player": "black", "x": 5, "y": 5}, {"player": "white", "x": 2, "y": 5}, {"player": "black", "x": 6, "y": 5}, {"player": "white", "x": 5, "y": 8}, {"player": "black", "x": 2, "y": 7}, {"player": "white", "x": 7, "y": 3}, {"player": "black", "x": 2, "y": 4}, {"player": "white", "x": 2, "y": 3}], "current_turn": "black", "opponent": "CPU v1", "date": "2025-07-22"}, {"game_id": "f88ce436-cd97-4269-872f-08c359d00393", "board": [[null, null, null, null, null, null, "white", null, null], [null, null, null, "white", null, "black", "white", "white", null], [null, "white", null, "white", "black", "white", "black", null, null], [null, null, null, "black", null, "black", "black", null, null], [null, null, null, null, null, null, "white", null, null], [null, null, null, null, "black", null, null, null, null], [null, null, null, "black", "white", "black", null, null, null], [null, null, null, "black", "black", null, null, null, null], [null, null, null, null, "white", null, null, "white", null]], "moves": [{"player": "black", "x": 4, "y": 2}, {"player": "white", "x": 7, "y": 8}, {"player": "black", "x": 6, "y": 3}, {"player": "white", "x": 5, "y": 2}, {"player": "black", "x": 5, "y": 3}, {"player": "white", "x": 4, "y": 6}, {"player": "black", "x": 4, "y": 5}, {"player": "white", "x": 6, "y": 0}, {"player": "black", "x": 5, "y": 6}, {"player": "white", "x": 1, "y": 2}, {"player": "black", "x": 5, "y": 1}, {"player": "white", "x": 4, "y": 8}, {"player": "black", "x": 3, "y": 7}, {"player": "white", "x": 6, "y": 1}, {"player": "black", "x": 6, "y": 2}, {"player": "white", "x": 3, "y": 1}, {"player": "black", "x": 3, "y": 3}, {"player": "white", "x": 3, "y": 2}, {"player": "black", "x": 3, "y": 6}, {"player": "white", "x": 7, "y": 1}, {"player": "black", "x": 4, "y": 7}, {"player": "white", "x": 6, "y": 4}], "current_turn": "black", "opponent": "CPU v1", "date": "2025-07-22"}]
+=======
+[
+  {
+    "game_id": "c8805ab1-d2e8-4d94-8fc2-45c665b4bb35",
+    "board": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "white"
+      ],
+      [
+        null,
+        null,
+        "black",
+        null,
+        null,
+        null,
+        "black",
+        null,
+        null
+      ],
+      [
+        "white",
+        "black",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        "black",
+        null,
+        null,
+        null,
+        "black",
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "white",
+        null,
+        "white",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        "white",
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "moves": [
+      {
+        "player": "black",
+        "x": 2,
+        "y": 1
+      },
+      {
+        "player": "white",
+        "x": 5,
+        "y": 7
+      },
+      {
+        "player": "black",
+        "x": 6,
+        "y": 1
+      },
+      {
+        "player": "white",
+        "x": 0,
+        "y": 2
+      },
+      {
+        "player": "black",
+        "x": 1,
+        "y": 2
+      },
+      {
+        "player": "white",
+        "x": 8,
+        "y": 0
+      },
+      {
+        "player": "black",
+        "x": 2,
+        "y": 4
+      },
+      {
+        "player": "white",
+        "x": 2,
+        "y": 6
+      },
+      {
+        "player": "black",
+        "x": 6,
+        "y": 4
+      },
+      {
+        "player": "white",
+        "x": 0,
+        "y": 6
+      }
+    ],
+    "current_turn": "black",
+    "opponent": "CPU",
+    "date": "2025-07-23",
+    "uid": "csprincedaniel@gmail.com",
+    "winner": null
+  }
+]
+>>>>>>> 375de32fee8ba8aa9492d2fb2aaf8022ad479854
