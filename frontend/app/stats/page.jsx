@@ -8,20 +8,30 @@ import "./page.css";
 export default function Stats() {
   const [games, setGames] = useState([]);
   const [replaying, setReplaying] = useState(false);
+  const [user, setUser] = useState(null);
   const boardRef = useRef(null);
 
   useEffect(() => {
-    fetchGames();
+    const loggedUser = localStorage.getItem("fakeUser");
+    if (!loggedUser) {
+      alert("Please log in to see your stats.");
+      setGames([]);
+      setUser(null);
+      return;
+    }
+    setUser(loggedUser);
+    fetchGames(loggedUser);
   }, []);
 
-  async function fetchGames() {
+  async function fetchGames(userEmail) {
     try {
-      const res = await fetch("http://localhost:8000/stats");
+      const res = await fetch(`http://localhost:8000/stats?user=${encodeURIComponent(userEmail)}`);
       if (!res.ok) throw new Error("Failed to load games");
       const data = await res.json();
       setGames(data);
     } catch (err) {
       alert("Error fetching games: " + err.message);
+      setGames([]);
     }
   }
 
@@ -63,7 +73,7 @@ export default function Stats() {
             className="avatar"
           />
           <div>
-            <h1 className="username">Your Username</h1>
+            <h1 className="username">{user || "Guest"}</h1>
             <p className="rank">Rank: Dan 5</p>
             <p className="joined">Member since July 8th 2025</p>
           </div>

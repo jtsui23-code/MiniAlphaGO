@@ -1,6 +1,6 @@
 'use client';
 import "./page.css";
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Nav from '@/components/nav';
 import Board from '@/components/board';
 
@@ -15,13 +15,25 @@ export default function PlayPage() {
   const [waitingForAI, setWaitingForAI] = useState(false);
   const [gameId, setGameId] = useState(null);
   const [opponent, setOpponent] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const uid = localStorage.getItem("fakeUser");
+    setIsLoggedIn(!!uid);
+  }, []);
 
   const handleStartGame = async () => {
+    const uid = localStorage.getItem("fakeUser");
+    if (!uid) {
+      alert("Please log in first.");
+      return;
+    }
+
     try {
       const res = await fetch('http://localhost:8000/newgame', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ opponent: 'CPU' }),
+        body: JSON.stringify({ opponent: 'CPU', uid }),
       });
 
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -46,7 +58,6 @@ export default function PlayPage() {
 
     moveAudio.current?.play();
 
-    // Update board immediately with player's move (black)
     const updatedBoard = boardData.map((row, rowIndex) =>
       row.map((cell, colIndex) =>
         rowIndex === y && colIndex === x ? 'black' : cell
@@ -81,6 +92,11 @@ export default function PlayPage() {
     }, 1000);
   };
 
+  const handleSignOut = () => {
+    localStorage.removeItem("fakeUser");
+    window.location.reload();
+  };
+
   return (
     <>
       <Nav />
@@ -89,13 +105,23 @@ export default function PlayPage() {
         <p className="play-intro">
           Ready to challenge the Go AI? Click “Start Game” and enjoy a classic game of strategy.
         </p>
-        <button
-          className="play-button"
-          onClick={handleStartGame}
-          disabled={waitingForAI}
-        >
-          Start Game
-        </button>
+
+        {!isLoggedIn ? (
+          <p style={{ color: 'red' }}>You must be logged in to play.</p>
+        ) : (
+          <>
+            <button
+              className="play-button"
+              onClick={handleStartGame}
+              disabled={waitingForAI}
+            >
+              Start Game
+            </button>
+            <button onClick={handleSignOut} className="play-button" style={{ marginLeft: '1rem' }}>
+              Sign Out
+            </button>
+          </>
+        )}
 
         <p>Opponent: {opponent || 'None'}</p>
         <p>Game ID: {gameId || 'None'}</p>
