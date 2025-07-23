@@ -22,6 +22,14 @@ const Board = forwardRef(({ onCellClick }, ref) => {
     setPlayerTurn: (player) => {
       setCurrentPlayer(player);
     },
+    playMove: (x, y, player) => {
+      setBoard(prev => {
+        if (prev[y][x] !== null) return prev; // ignore if occupied
+        const newBoard = prev.map(row => [...row]);
+        newBoard[y][x] = player === 1 ? 'black' : 'white';
+        return newBoard;
+      });
+    },
   }));
 
   const svgSize = CELL_SIZE * (BOARD_SIZE - 1);
@@ -51,7 +59,7 @@ const Board = forwardRef(({ onCellClick }, ref) => {
           <feBlend in="SourceGraphic" in2="turb" mode="multiply" />
         </filter>
 
-        {/* Stone filters same as before */}
+        {/* Stone filters */}
         <filter id="stoneNoise">
           <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" result="turbulence"/>
           <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="1" />
@@ -127,7 +135,7 @@ const Board = forwardRef(({ onCellClick }, ref) => {
               cy={y * CELL_SIZE}
               r={CELL_SIZE / 2}
               fill="transparent"
-              onClick={() => onCellClick({ x, y })}
+              onClick={() => onCellClick && onCellClick({ x, y })}
               style={{ cursor: 'pointer' }}
             />
           )
