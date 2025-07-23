@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Nav from "@/components/nav";
 import Board from "@/components/board";
+import { getAuth } from "firebase/auth";
 import "./page.css";
 
 export default function Stats() {
@@ -14,12 +15,16 @@ export default function Stats() {
     fetchGames();
   }, []);
 
+  useEffect(() => {
+    getUserStats();
+
+  }, []);
+
   async function fetchGames() {
     try {
       const res = await fetch("http://localhost:8000/stats");
       if (!res.ok) throw new Error("Failed to load games");
       const data = await res.json();
-      setGames(data);
     } catch (err) {
       alert("Error fetching games: " + err.message);
     }
@@ -50,9 +55,40 @@ export default function Stats() {
     }, 500);
   }
 
+  async function getUserStats() {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if(!user){
+      console.error("No user logined in.");
+      return;
+    }
+
+    const idToken = await user.getIdToken();
+
+    const response = await fetch("http://localhost:8000/stats", {
+      method:"GET",
+      headers: {
+        "Authorization": `Bearer ${idToken}`,
+      },
+
+    });
+
+    if (!response.ok){
+      const error = await response.json();
+      console.error("Failed to fetch user stats", error);
+      return;
+    }
+
+    const data = await response.json();
+    console.log("Stats", data);
+    return data;
+  }
+
   return (
     <>
       <Nav />
+
       <div className="stats-container">
         <div className="profile-header">
           <Image
