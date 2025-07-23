@@ -13,9 +13,10 @@ export default function PlayPage() {
   );
   const [playerTurn, setPlayerTurn] = useState('black');
   const [waitingForAI, setWaitingForAI] = useState(false);
+  const [gameId, setGameId] = useState(null);
+  const [opponent, setOpponent] = useState(null);
 
   const handleStartGame = async () => {
-    alert("sent POST request to server ['start game vs cpu]");
     try {
       const res = await fetch('http://localhost:8000/newgame', {
         method: 'POST',
@@ -26,18 +27,21 @@ export default function PlayPage() {
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
       const data = await res.json();
-      setBoardData(data);
+      setBoardData(data.board);
+      setGameId(data.game_id);
+      setOpponent(data.opponent);
       setPlayerTurn('black');
       setWaitingForAI(false);
-      boardRef.current?.setBoardFromJSON(data);
+      boardRef.current?.setBoardFromJSON(data.board);
       boardRef.current?.setPlayerTurn('black');
+      alert(`New game started vs ${data.opponent}`);
     } catch (err) {
       alert('Failed to start game: ' + err.message);
     }
   };
 
   const handleCellClick = async ({ x, y }) => {
-    if (waitingForAI) return;
+    if (waitingForAI || !gameId) return;
     if (boardData[y]?.[x]) return;
 
     moveAudio.current?.play();
@@ -55,7 +59,7 @@ export default function PlayPage() {
 
     setTimeout(async () => {
       try {
-        const res = await fetch('http://localhost:8000/move', {
+        const res = await fetch(`http://localhost:8000/move?game_id=${gameId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ x, y }),
@@ -67,7 +71,6 @@ export default function PlayPage() {
         setBoardData(data);
         boardRef.current?.setBoardFromJSON(data);
 
-        // AI moved, now player's turn again, so keep black
         setPlayerTurn('black');
         boardRef.current?.setPlayerTurn('black');
       } catch (err) {
@@ -93,6 +96,10 @@ export default function PlayPage() {
         >
           Start Game
         </button>
+
+        <p>Opponent: {opponent || 'None'}</p>
+        <p>Game ID: {gameId || 'None'}</p>
+
         <div className="board-wrapper">
           <Board ref={boardRef} onCellClick={handleCellClick} />
         </div>

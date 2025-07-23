@@ -1,23 +1,51 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional
+import uuid
+import json
+import os
+import datetime
 
 from board.go import Board  
 from model.mct2 import MCTS
 from utils.boardToTensor import boardToTensor
-from  model.net import GoNet
-
+from model.net import GoNet
 import numpy as np
-import json
 
-import numpy as np
-import json
+BOARD_SIZE = 9
+GAMES_FILE = "saved_games.json"
 
-import numpy as np
-import json
+app = FastAPI()
 
-import numpy as np
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class StartGameRequest(BaseModel):
+    opponent: str
+
+class MoveRequest(BaseModel):
+    x: int
+    y: int
+
+if os.path.exists(GAMES_FILE):
+    with open(GAMES_FILE, "r") as f:
+        saved_games = json.load(f)
+else:
+    saved_games = []
+
+def save_games():
+    with open(GAMES_FILE, "w") as f:
+        json.dump(saved_games, f)
+
+game_state = {}
+opponent_counter = 0
+board = Board(BOARD_SIZE)
 
 def numpy_array_to_json(arr):
     if not isinstance(arr, np.ndarray):
@@ -39,126 +67,81 @@ def numpy_array_to_json(arr):
             return val.item()
         return val
 
-    # Transpose to flip X and Y
     nested_list = [[convert_val(v) for v in col] for col in arr.T]
     return nested_list
 
-
-
-board = Board(9)
-
-app = FastAPI()
-
-origins = [
-    "http://localhost:3000",  # React dev server origin
-    "http://localhost:8000",  # Same origin
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,  # or ["*"] for dev
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-BOARD_SIZE = 9
-
-class StartGameRequest(BaseModel):
-    opponent: str
-
-class MoveRequest(BaseModel):
-    x: int
-    y: int
-
-# Store board in memory for demo purposes
-game_state = {
-    "board": [[None for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)],
-    "current_turn": "black",
-}
-
 @app.post("/newgame")
 def new_game(request: StartGameRequest):
-    # Reset the board and current turn
-    game_state["board"] = [[None for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
-    game_state["current_turn"] = "black"
-    print(f"New game started against opponent: {request.opponent}")
+    global game_state, opponent_counter, board
+    opponent_counter += 1
+    opponent_name = f"{request.opponent} v{opponent_counter}"
 
-    global board
-    board = Board(9)
+    game_id = str(uuid.uuid4())
+    board = Board(BOARD_SIZE)  # reset board
 
-    return game_state["board"]
+    game_state = {
+        "game_id": game_id,
+        "board": [[None]*BOARD_SIZE for _ in range(BOARD_SIZE)],
+        "moves": [],
+        "current_turn": "black",
+        "opponent": opponent_name,
+        "date": str(datetime.date.today()),
+    }
+
+    return {"board": game_state["board"], "game_id": game_id, "opponent": opponent_name}
 
 @app.put("/move")
-def make_move(move: MoveRequest):
-    Zx, Zy = move.x, move.y
+def make_move(move: MoveRequest, game_id: Optional[str] = Query(None)):
+    global game_state, saved_games, board
 
+    if game_id != game_state.get("game_id"):
+        raise HTTPException(status_code=400, detail="Invalid or missing game_id")
 
-    # Make the move
-    #game_state["board"][y][x] = player
+    x, y = move.x, move.y
 
-    ## AI MAKES HIS MOVE
-    global board
-    board = AiMove(board,Zx,Zy)
+    if not (0 <= x < BOARD_SIZE and 0 <= y < BOARD_SIZE):
+        raise HTTPException(status_code=400, detail="Move out of board bounds")
 
-    
-        # Validate coordinates
-    #if not (0 <= x < BOARD_SIZE and 0 <= y < BOARD_SIZE):
-     #   raise HTTPException(status_code=400, detail="Move out of board bounds")
+    if game_state["board"][y][x] is not None:
+        raise HTTPException(status_code=400, detail="Cell already occupied")
 
-    # Validate player
-    #if player not in ("black", "white"):
-     #   raise HTTPException(status_code=400, detail="Invalid player")
+    # Player (black) move on backend Board object and game_state
+    board.playMove(x, y, 1)  # 1 = black
+    game_state["board"][y][x] = "black"
+    game_state["moves"].append({"player": "black", "x": x, "y": y})
 
-    # Check if it's this player's turn
-    #if player != game_state["current_turn"]:
-     #   raise HTTPException(status_code=400, detail=f"Not {player}'s turn")
+    # AI move with MCTS
+    network = GoNet(9, 17)
+    mct = MCTS(network=network, exploration_weight=1.5, simulations=500)
 
-    # Check if the cell is empty
-    #if game_state["board"][y][x] is not None:
-        #raise HTTPException(status_code=400, detail="Cell is already occupied")
-    
+    move_ai, _ = mct.search(board)
 
-    # Swap turns
-    #game_state["current_turn"] = "white" if player == "black" else "black"
+    if move_ai is None or move_ai == 81:
+        # AI pass move, implement pass logic if needed
+        pass
+    else:
+        ai_x, ai_y = divmod(move_ai, BOARD_SIZE)
+        board.playMove(ai_x, ai_y, -1)  # -1 = white
+        game_state["board"][ai_y][ai_x] = "white"
+        game_state["moves"].append({"player": "white", "x": ai_x, "y": ai_y})
 
-    # Return updated board (frontend can track turns itself)
+    mct.update_root(move_ai)
+
+    # Save or update saved_games
+    for g in saved_games:
+        if g["game_id"] == game_state["game_id"]:
+            g.update({
+                "board": game_state["board"],
+                "moves": game_state["moves"],
+            })
+            break
+    else:
+        saved_games.append(game_state.copy())
+
+    save_games()
+
     return numpy_array_to_json(board)
 
-
-def AiMove(board,Zx,Zy):
-    # Gets the best move and the pi vector which is the probability of all the moves.
-        network = GoNet(9,17)
-        mct = MCTS(network=network,exploration_weight=1.5, simulations=500)
-
-
-        board.playMove(Zx,Zy,1)
-        print(Zx, Zy)
-        move, pi = mct.search(board)
-
-        # Converts the board into a tensor which is the expected form for saving the gameData.
-        # boardState = boardToTensor(board).to(device)
-
-        boardState = boardToTensor(board)
-
-        # 0 - 80 are the only valid moves on a 9x9 board. Move 81 is set to being a pass.
-        if move is None or move == 81:
-            print("AI passed")
-            # Player passes if that is the move choosen by the mct.
-            board.playMove(1,1, -1, passTurn=True)
-        else:
-            # Converting move which is a single int representation of the board position into 
-            # a row and col representation of the 9x9 board.
-            x, y = divmod(move, 9)
-            
-            # Playing the move choosen by the mct.
-            board.playMove(x,y, -1)
-
-            print(f"Player played at ", {x}, {y}, " position on the board")
-
-
-        # Saves the game data each turn. 
-        mct.update_root(move)
-
-
-        return board
+@app.get("/stats")
+def get_stats():
+    return saved_games
