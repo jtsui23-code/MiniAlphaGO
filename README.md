@@ -5,7 +5,9 @@ A full-stack web application with user authentication that allows players to com
 
 ### Home Page
 <img width="1882" height="862" alt="Replay Viewer" src="https://github.com/user-attachments/assets/22122647-6f3d-447e-9d5d-c3354e0ff2a2" />
+
 ### Gameplay Demo
+
 ![goDemo](https://github.com/user-attachments/assets/def36e66-61d4-473a-83a6-b9738141cc37)
 
 
