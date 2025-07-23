@@ -39,7 +39,7 @@ METHODS:
     copyBoardState():                       Creates and returns a deep copy of the current board state.
     isGameOver():                           Checks if the game has ended due to two consecutive passes.
     simulatedCapture(board, position, color): Simulates the removal of stones on a temporary board to check for valid moves (e.g., ko).
-
+    getCurrentScore():                      Returns the current score of each player which is the number of stones each player has captured so far.
 
 PACKAGES:
     import numpy as np: Used for efficient numerical operations, especially for the board representation as a 2D array.
@@ -1335,6 +1335,23 @@ class Board:
 
         # Switches to the next player's turn.
         self.currentPlayer *= -1
+
+    """
+    METHOD: getCurrentScore
+
+    INPUT:
+        N/A
+    RETURN:
+        N/A
+
+    DESCRIPTION:
+        Returns the current score of each player which is the number of stones each respective player has 
+        captured so far. 
+        self.blackStonePrisoners are all of the stones black has captured so far and
+        self.whiteStonePrisoners are all of the stones white has captured so far.
+    """
+    def getCurrentScore(self):
+        return self.blackStonePrisoners, self.whiteStonePrisoners
             
         
         

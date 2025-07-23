@@ -9,7 +9,6 @@ javaBackendUrl = "http://localhost:8080/getallbyuser"
 
 @app.get("/stats")
 def getStats(User):
-
     try:
         response = requests.get(javaBackendUrl)
 
