@@ -13,6 +13,10 @@ from utils.boardToTensor import boardToTensor
 from model.net import GoNet
 import numpy as np
 
+
+from backend.backend_python.pvp import router as pvp_router
+
+
 BOARD_SIZE = 9
 GAMES_FILE = "saved_games.json"
 USERS_FILE = "users.json"
