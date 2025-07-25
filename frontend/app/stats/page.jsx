@@ -24,16 +24,7 @@ export default function Stats() {
     fetchGames(loggedUser);
   }, []);
 
-<<<<<<< HEAD:frontend/app/stats/page.tsx
-  useEffect(() => {
-    getUserStats();
-
-  }, []);
-
-  async function fetchGames() {
-=======
   async function fetchGames(userEmail) {
->>>>>>> 375de32fee8ba8aa9492d2fb2aaf8022ad479854:frontend/app/stats/page.jsx
     try {
       const res = await fetch(`http://localhost:8000/stats?uid=${encodeURIComponent(userEmail)}`);
       if (!res.ok) throw new Error("Failed to load games");
