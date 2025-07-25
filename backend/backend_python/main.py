@@ -1,11 +1,11 @@
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional
-import uuid
+from fastapi.middleware.cors import CORSMiddleware # Used to connect to frontend
+from pydantic import BaseModel # Used for login/sign
+from typing import Optional # Used for if query is not required
+import uuid # Generates unique ID's for games
 import json
 import os
-import datetime
+import datetime # Stores the data when games start
 
 from board.go import Board  
 from model.mct2 import MCTS
@@ -19,6 +19,8 @@ USERS_FILE = "users.json"
 
 app = FastAPI()
 
+# Allow port on frontend to interact with this specific backend
+# and use any request method.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -26,6 +28,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 class StartGameRequest(BaseModel):
     opponent: str
@@ -52,10 +55,12 @@ def load_json_file(filename):
                     return json.loads(content)
         except json.JSONDecodeError:
             pass
+
     # if file doesn't exist or invalid content, create empty file with []
     with open(filename, "w") as f:
         f.write("[]")
     return []
+
 
 saved_games = load_json_file(GAMES_FILE)
 users = load_json_file(USERS_FILE)
@@ -94,25 +99,37 @@ def numpy_array_to_json(arr):
     nested_list = [[convert_val(v) for v in col] for col in arr.T]
     return nested_list
 
+
 @app.post("/signup")
 def signup(request: SignupRequest):
+
+    # Prevents multiple accounts from sharing the same email.
     for user in users:
         if user["email"] == request.email:
             return {"success": False, "error": "User already exists"}
+        
     users.append({"email": request.email, "password": request.password})
     save_users()
     return {"success": True}
 
+
 @app.post("/login")
 def login(request: LoginRequest):
+
+    # Logins into account if it exist.
     for user in users:
         if user["email"] == request.email and user["password"] == request.password:
             return {"success": True}
+        
     return {"success": False, "error": "Invalid email or password"}
+
 
 @app.post("/newgame")
 def new_game(request: StartGameRequest):
+
+    # game_state is stores data for json.
     global game_state, board
+
     # Require uid to exist in users
     if not any(user["email"] == request.uid for user in users):
         raise HTTPException(status_code=400, detail="Invalid user")
@@ -133,9 +150,12 @@ def new_game(request: StartGameRequest):
 
     return {"board": game_state["board"], "game_id": game_id, "opponent": request.opponent}
 
+
 @app.put("/move")
 def make_move(move: MoveRequest, game_id: Optional[str] = Query(None)):
+
     global game_state, saved_games, board
+    
 
     if game_id != game_state.get("game_id"):
         raise HTTPException(status_code=400, detail="Invalid or missing game_id")
@@ -155,7 +175,7 @@ def make_move(move: MoveRequest, game_id: Optional[str] = Query(None)):
 
     # AI move with MCTS
     network = GoNet(9, 17)
-    mct = MCTS(network=network, exploration_weight=1.5, simulations=500)
+    mct = MCTS(network=network, exploration_weight=1.5, simulations=800)
 
     move_ai, _ = mct.search(board)
 
@@ -186,6 +206,7 @@ def make_move(move: MoveRequest, game_id: Optional[str] = Query(None)):
 
     return numpy_array_to_json(board)
 
+
 @app.get("/stats")
 def get_stats(uid: Optional[str] = Query(None)):
     # Filter games by uid (user email)
@@ -194,3 +215,5 @@ def get_stats(uid: Optional[str] = Query(None)):
     else:
         user_games = []
     return user_games
+
+
