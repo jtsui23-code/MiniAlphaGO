@@ -16,7 +16,8 @@ Developed by Jack Tsui and Daniel Prince.
 
 
 ### Login & Registration
-![Login](https://github.com/user-attachments/assets/a622e1c5-a67a-4738-802e-e81e71a2cc0e)
+![login](https://github.com/user-attachments/assets/9915bfd3-c662-4759-85ed-cae670e99e73)
+
 
 ### Replay System
 ![Replay](https://github.com/user-attachments/assets/80263c12-5f53-4cdd-9d0f-d07fa7aa9290)
