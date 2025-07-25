@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
@@ -47,14 +47,14 @@ class PvpMove(BaseModel):
 
 
 
-app = FastAPI()
+router = APIRouter()
 
 def generateInviteCode(length=6):
     chars = string.ascii_uppercase + string.digits
     return ''.join(random.choice(chars) for _ in range(length))
 
 
-@app.post("/pvpStart")
+@router.post("/pvpStart")
 def start_pvp(request:StartPvP):
 
     global pvp_games
@@ -86,7 +86,7 @@ def start_pvp(request:StartPvP):
     return {"board": game_state["board"], "game_id": game_id, "invite_code": inviteCode}
 
 
-@app.post("/join")
+@router.post("/join")
 def joinPvp(request: JoinPvp, inviteCode: Optional[str] = Query(None)):
     
     global pvp_games
@@ -107,7 +107,7 @@ def joinPvp(request: JoinPvp, inviteCode: Optional[str] = Query(None)):
 
 
 
-@app.put("/pvpMove")
+@router.put("/pvpMove")
 def pvp_move(move :PvpMove, inviteCode: Optional[str] = Query(None)):
     
     global pvp_games
