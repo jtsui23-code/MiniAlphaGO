@@ -33,6 +33,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(pvp_router, prefix="/api/pvp", tags=["pvp"])
 
 class StartGameRequest(BaseModel):
     opponent: str
