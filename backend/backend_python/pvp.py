@@ -19,10 +19,10 @@ import numpy as np
 import random 
 import string
 
-from backend.backend_python.main import users
-from backend.backend_python.main import save_games
-from backend.backend_python.main import saved_games
-from backend.backend_python.main import numpy_array_to_json
+from backend.backend_python.share import users
+from backend.backend_python.share import save_games
+from backend.backend_python.share import saved_games
+from backend.backend_python.share import numpy_array_to_json
 
 
 
