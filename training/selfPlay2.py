@@ -33,9 +33,15 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
 
     # Have a turn cap of 125 to end the game.
     count = 0
-    # max = 300
+    max = 150
 
-    while not board.isGameOver():
+    # Include max move count of 300 as an 
+    # alternative to end games for evaluation games. 
+    # For self-play game generation just use double pass 
+    # for end game condition.
+    while not board.isGameOver() and count < max:
+
+    # while not board.isGameOver():
 
         # Loads the model in respect to whose turn it is.
         if board.currentPlayer == 1:
@@ -94,7 +100,7 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
     print("✅ Created the components")
 
     # Have a counter as a hard cap so the game doesn't loop forever.
-    max = 125
+    max = 150
     count = 0
 
     # gameData is the data saved throughout a single game not all of them.
@@ -102,7 +108,7 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
                 #                                z  - tracks all of the moves made by the winner as a +1 and -1 for 
                 #                                     all the moves by the loser.
 
-    while count < max + 1:
+    while not board.isGameOver() and count < max:
         print("--------------- Current Game is ", gameNumber, "----------------")
 
         print(f"The current player is " , {board.currentPlayer})

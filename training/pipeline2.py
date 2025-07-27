@@ -25,7 +25,7 @@ DESCRIPTION:
     The new model is then evaluated to see if its the new best model.
     
 """
-def startPipline(numGames=50, genNum=2):
+def startPipline(numGames=50, genNum=2, mct=100):
     print("Entered function")
     # Gets all of the self-play game files and appends them into an array. 
     # This is to prevent override when saving replay buffer and correctly naming the replay buffer as well.
@@ -68,7 +68,7 @@ def startPipline(numGames=50, genNum=2):
     # Playing a set amount of self-play games and saving them.
     for i in range(1, numGames + 1):
         print(f"-------------------------------------------- Generating self-play game data --------------------------------------------")
-        playOneGame(buffer=buffer, network=currentModel, mctSimulations=800, gameNumber=i, device=device)
+        playOneGame(buffer=buffer, network=currentModel, mctSimulations=mct, gameNumber=i, device=device)
 
         if i % saveInterval == 0:
             buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + highestBufferNumber}.pkl")
@@ -156,15 +156,64 @@ def evaludateModel(genNum=3):
     candidateModel.eval()
     evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum, device=device)
 
-counter = 8
 
-evaludateModel(genNum=counter)
+"""
+METHOD: freshStart
+INPUT:
+    N/A
 
-while counter < 2000:
+RETURN:
+    N/A
 
-    evalResult = startPipline(numGames=100, genNum=counter)
+DESCRIPTION:
+    This function creates a model from scratch without any previous training data.
+    
+"""
+def freshStart(mct=0, games=500):
+    # Create initial random model
+    initial_model = GoNet(boardSize=9, channels=17)
+    torch.save(initial_model.state_dict(), "models/bestModel0.pt")
+    
+    # Generate initial self-play data with random model
+    buffer = ReplayBuffer(capacity=1000)
+    for i in range(games):  # Generate some initial games
+        playOneGame(buffer=buffer, network=initial_model, mctSimulations=mct, gameNumber=i, device=device)
+        if i % 10 == 0:
+            buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i}.pkl")
+
+
+gen = 1
+
+freshStart(mct=100, games=1000)
+
+while gen < 2000:
+
+    mct = 100
+
+    if gen > 3 and gen < 6:
+        mct = 200
+    elif gen >= 6:
+        mct = 400
+    
+    evalResult = startPipline(numGames=1000, genNum=gen, mct=mct)
+    
     if evalResult == 1:
-        counter+= 1
+        gen += 1
+
+
+# evaludateModel(genNum=counter)
+
+# while counter < 2000:
+
+#     evalResult = startPipline(numGames=100, genNum=counter)
+#     if evalResult == 1:
+#         counter+= 1
+
+
+
+
+
+
 
 
 
