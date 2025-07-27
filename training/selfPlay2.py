@@ -33,9 +33,9 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
 
     # Have a turn cap of 125 to end the game.
     count = 0
-    max = 300
+    # max = 300
 
-    while not board.isGameOver() and count < max:
+    while not board.isGameOver():
 
         # Loads the model in respect to whose turn it is.
         if board.currentPlayer == 1:
