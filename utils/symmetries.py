@@ -30,8 +30,12 @@ def generateSymmetries(board, pi):
     # Convert pi to tensor on GPU
     # Need 2 variables because the 82th element in the list is pass which would not fit in a 
     # 9x9 matrix.
-    piBoard = torch.tensor(pi[:81], device=device, dtype=torch.float32).reshape(9, 9)
-    piPass = torch.tensor([pi[81]], device=device, dtype=torch.float32)  # Keep as tensor
+    # piBoard = torch.tensor(pi[:81], device=device, dtype=torch.float32).reshape(9, 9)
+    # piPass = torch.tensor([pi[81]], device=device, dtype=torch.float32)  # Keep as tensor
+
+    piBoard = pi[:81].to(device).reshape(9, 9)
+    piPass = pi[81:82].to(device)
+
 
     # piBoard = torch.tensor(pi[:81], device=device).reshape(9,9)
 
