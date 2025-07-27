@@ -2,7 +2,6 @@ import math
 import numpy as np
 import torch
 import torch.nn.functional as F
-from collections import defaultdict
 from utils.boardToTensor import boardToTensor  
 
 class Node:
@@ -18,15 +17,13 @@ class Node:
         return len(self.children) > 0
     
     def value(self):
-        if self.visit_count == 0:
-            return 0
-        return self.value_sum / self.visit_count
+        return 0 if self.visit_count == 0 else self.value_sum / self.visit_count
     
     def ucb_score(self, exploration_weight):
         if self.visit_count == 0:
             return float('inf') if self.prior > 0 else float('-inf')
-        return (self.value() + 
-                exploration_weight * self.prior * 
+        return (self.value() +
+                exploration_weight * self.prior *
                 math.sqrt(self.parent.visit_count) / (1 + self.visit_count))
 
 class MCTS:
@@ -95,7 +92,7 @@ class MCTS:
             policy_logits, value = self.network(board_tensor)
 
         policy = F.softmax(policy_logits, dim=1).squeeze(0).cpu().numpy()
-        valid_moves = node.board.getAllValidMoves()
+        valid_moves = node.board.getAllValidMoves(node.board.currentPlayer)
 
         for move in valid_moves:
             if move == 'pass':
@@ -106,34 +103,37 @@ class MCTS:
                     prior=policy[81],
                     board=pass_board
                 )
-            else:
-                x, y = move
-                action = x * 9 + y
-                if action >= len(policy):
-                    continue
+                continue
 
-                # ADDED: Skip suicidal moves
-                if node.board.isSuicidal(x, y, node.board.currentPlayer):
-                    continue
+            x, y = move
+            action = x * node.board.size + y
+            if action >= len(policy):
+                continue
 
-                # ADDED: Discourage filling own eyes by reducing prior
-                if node.board.isFillingOwnEye(x, y, node.board.currentPlayer):
-                    policy[action] *= 0.1  # Downweight
+            # Skip suicidal moves
+            if node.board.isSuicidal(x, y, node.board.currentPlayer):
+                continue
 
-                new_board = node.board.copyBoardState()
-                success = new_board.playMove(x, y, new_board.currentPlayer)
-                if not success:
-                    continue
+            # Downweight moves filling own eye
+            prior = policy[action]
+            if node.board.isFillingOwnEye(x, y, node.board.currentPlayer):
+                prior *= 0.1
 
-                # ADDED: Skip moves that result in 0 liberties (redundant if playMove fails on suicide)
-                if new_board.countLiberties(x, y) == 0:
-                    continue
+            # Try move
+            new_board = node.board.copyBoardState()
+            if not new_board.playMove(x, y, new_board.currentPlayer):
+                continue
 
-                node.children[action] = Node(
-                    parent=node,
-                    prior=policy[action],
-                    board=new_board
-                )
+            # Confirm move results in non-zero liberties (precaution)
+            liberties = new_board.checkLiberties((x, y), new_board.board[x, y])
+            if liberties == 0:
+                continue
+
+            node.children[action] = Node(
+                parent=node,
+                prior=prior,
+                board=new_board
+            )
         
         return value.item()
     
