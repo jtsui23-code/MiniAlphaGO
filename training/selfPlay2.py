@@ -33,13 +33,17 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
 
     # Have a turn cap of 125 to end the game.
     count = 0
-    max = 150
+    max = 100
+    hardCap = False
 
     # Include max move count of 300 as an 
     # alternative to end games for evaluation games. 
     # For self-play game generation just use double pass 
     # for end game condition.
-    while not board.isGameOver() and count < max:
+    while not board.isGameOver():
+        if count >= max:
+            hardCap = True
+            break
 
     # while not board.isGameOver():
 
@@ -68,7 +72,7 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
     
     
     # Gets the score of the game to see who won.
-    score = board.score()
+    score = board.score(hardCap=hardCap)
 
     return score
             
@@ -97,18 +101,22 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
 
     mct = MCTS(network=network, exploration_weight=1.5, simulations=mctSimulations)
 
-    print("✅ Created the components")
+    # print("✅ Created the components")
 
     # Have a counter as a hard cap so the game doesn't loop forever.
-    max = 150
+    max = 100
     count = 0
+    hardCap = False
 
     # gameData is the data saved throughout a single game not all of them.
     gameData = [] # Stores tuple of (state, pi, z) pi - vector of probability of all moves, 
                 #                                z  - tracks all of the moves made by the winner as a +1 and -1 for 
                 #                                     all the moves by the loser.
 
-    while not board.isGameOver() and count < max:
+    while not board.isGameOver():
+        if count >= max:
+            hardCap = True
+            break
         # print("Current Game is ", gameNumber, "")
 
         # print(f"The current player is " , {board.currentPlayer})
@@ -150,7 +158,7 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
     # print("------------------------------------------------------------------------------------\n Game Over ------------------------------------------------------------------------------------")
 
     # .score() returns 1 or -1 to indicate winner.
-    winner = board.score()
+    winner = board.score(hardCap=hardCap)
 
     # Loops through each turn to see which moves where good and bad. T
     # This is done through see which moves where done by the winner and the loser.
@@ -167,30 +175,30 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
 
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Running on {device}")
+#     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#     print(f"Running on {device}")
 
 
-    buffer = ReplayBuffer(capacity=10000)
-    # network = GoNet(9, 17).to(device)
+#     buffer = ReplayBuffer(capacity=10000)
+#     # network = GoNet(9, 17).to(device)
 
-    network = GoNet(9, 17).to(device)
+#     network = GoNet(9, 17).to(device)
     
-    network.eval()
+#     network.eval()
 
-    numberOfGames = 150
-    saveInterval = 10
+#     numberOfGames = 150
+#     saveInterval = 10
 
-    for i in range(1, numberOfGames + 1):
-        print("------------------------- Starting Game ", i , "-------------------------")
-        playOneGame(buffer=buffer, network=network, gameNumber=i)
+#     for i in range(1, numberOfGames + 1):
+#         print("------------------------- Starting Game ", i , "-------------------------")
+#         playOneGame(buffer=buffer, network=network, gameNumber=i)
 
-        if i % saveInterval == 0:
-            buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + 350}.pkl")
-            print(f"Saved replay buffer after {i} games.")
+#         if i % saveInterval == 0:
+#             buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + 350}.pkl")
+#             print(f"Saved replay buffer after {i} games.")
 
 
 

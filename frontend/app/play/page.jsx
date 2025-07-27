@@ -3,8 +3,16 @@ import "./page.css";
 import React, { useRef, useState, useEffect } from 'react';
 import Nav from '@/components/nav';
 import Board from '@/components/board';
+import { json } from "stream/consumers";
 
 export default function PlayPage() {
+
+
+  const [mode, setMode] = useState('AI');
+  const [inviteCode, setInviteCode] = useState('');
+
+
+
   const boardRef = useRef(null);
   const moveAudio = useRef(typeof Audio !== "undefined" ? new Audio('/play/impact.mp3') : null);
 
@@ -16,6 +24,72 @@ export default function PlayPage() {
   const [gameId, setGameId] = useState(null);
   const [opponent, setOpponent] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+
+  // For PvP ----------------------------------------------------
+  const handlePvpStart = async () => {
+
+    // Retrieves browser local storage to see if user is login
+    // If the user is not login, then they will have a fakeUser value.
+    const uid = localStorage.getItem("fakeUser")
+
+    if (!uid) return alert("Please login")
+    
+    // Sending POST request to api/pvp/pvpStart endpoint
+    const res = await fetch('http://localhost:8000/api/pvp/pvpStart', {
+        method: 'POST',
+
+        // Tells server we are sending json data.
+        headers: {'Content-Type': 'application/json'},
+
+        // Specificies the content of the JSON which is the user ID.
+        body: JSON.stringify({uid}),
+    });
+  
+  // Parse the JSON returned from the backend pvp/pvpStart endpoint
+  const data = await res.json();
+  
+  // Update components based off of the Parsed JSON
+  setGameId(data.game_id);
+  setInviteCode(data.inviteCode);
+  setBoardData(data.board);
+  setPlayerTurn("black");
+  
+  // Checks if boardRef.current exist before calling method from <board> to set the board up
+  boardRef.current?.setBoardFromJSON(data.board);
+  alert(`PvP Game Created. Share this invite code: ${data.invite_code}`);
+
+  };
+  
+
+
+
+  const handlePvpJoin = async () => {
+
+    // Checks if the user is login based off of the browser local storage
+    const uid = localStorage.getItem("fakeUser");
+    if (!uid || !inviteCode) return alert("Missing user or invite code");
+
+    
+    const res = await fetch(`http://localhost:8000/api/pvp/join?inviteCode=${inviteCode}`, {
+        method:'POST',
+        headers:{ 'Content-Type': 'application/json' },
+        body: JSON.stringify({uid}),
+    
+    });
+
+    const result = await res.json();
+    if(result?.Success){
+      alert("Successfully joined game")
+
+    }
+
+
+
+  };
+
+  // ------------------------------------------------------------
+
 
   useEffect(() => {
     const uid = localStorage.getItem("fakeUser");

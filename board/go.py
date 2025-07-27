@@ -957,7 +957,7 @@ class Board:
     METHOD: score
 
     INPUT:
-        N/A
+        hardCap(bool) : If the game ends because of hard cap use Tromp_Taylor scoring system instead because game is incomplete.
 
     RETURN:
         Returns 1 or -1 to indicate the winner of the game.
@@ -967,28 +967,30 @@ class Board:
         iteratively checks for dead stones to remove from the board and use for scoring. Also, the method iteratively
         checks for the stone count of alive stones and territory count for the scoring process.
     """
-    def score(self):
-  
+    def score(self, hardCap=False):
 
-        # First, identify and remove dead stones
-        deadStones = self.identifyDeadStones()
-
-
-        capturedDeadStones = {1:0, -1:0}
-        # Create a copy of the board with dead stones removed
-        # np.copy() performs a deep copy while self.board.copy() is a shallow copy
         scoringBoard = np.copy(self.board)
+        capturedDeadStones = {1:0, -1:0}
 
-        # Filters through the dead stones to get all of the prisoner stones. 
-        for x, y in deadStones:
 
-            if scoringBoard[x,y] == 1:
-                capturedDeadStones[1] += 1
+        if not hardCap:
+            # First, identify and remove dead stones
+            deadStones = self.identifyDeadStones()
 
-            elif scoringBoard[x,y] == -1:
-                capturedDeadStones[-1] += 1
 
-            scoringBoard[x, y] = 0
+            # Create a copy of the board with dead stones removed
+            # np.copy() performs a deep copy while self.board.copy() is a shallow copy
+
+            # Filters through the dead stones to get all of the prisoner stones. 
+            for x, y in deadStones:
+
+                if scoringBoard[x,y] == 1:
+                    capturedDeadStones[1] += 1
+
+                elif scoringBoard[x,y] == -1:
+                    capturedDeadStones[-1] += 1
+
+                scoringBoard[x, y] = 0
         
         # Temporarily update board for scoring
         originalBoard = self.board
@@ -1032,11 +1034,11 @@ class Board:
             -1: stoneCount[-1] + territoryScores[-1] + capturedDeadStones[1] + self.whiteStonePrisoners + self.komi
         }
 
-        print("dead stones: ", deadStones)
-        print("stone count: ", stoneCount)
-        print("territory :", territoryScores)
-        print("captured dead stones: ", capturedDeadStones)
-        print("Final score: " , finalScores)
+        # print("dead stones: ", deadStones)
+        # print("stone count: ", stoneCount)
+        # print("territory :", territoryScores)
+        # print("captured dead stones: ", capturedDeadStones)
+        # print("Final score: " , finalScores)
 
         if finalScores[1] > finalScores[-1]:
             return 1
@@ -1335,6 +1337,76 @@ class Board:
 
         # Switches to the next player's turn.
         self.currentPlayer *= -1
+
+
+    """
+    METHOD: isSuicidal
+
+    INPUT:
+        x (int):      The x-coordinate where the stone is to be played.
+        y (int):      The y-coordinate where the stone is to be played.
+        player (int): The color of the player making the move (1 for black, -1 for white).
+
+    RETURN:
+        bool: True if the move is suicide.
+
+    DESCRIPTION:
+        Checks if move is suicide.
+    """
+    def isSuicidal(self, x, y, player):
+        if self.board[x, y] != 0:
+            return False  # can't be suicidal if spot is already occupied
+
+        tempBoard = self.board.copy()
+        tempBoard[x, y] = player
+        captured = False
+        enemy = -player
+
+        for nx, ny in self.getSurroundingStones(x, y):
+            if 0 <= nx < self.size and 0 <= ny < self.size and tempBoard[nx, ny] == enemy:
+                if self.checkLiberties((nx, ny), enemy, visited=set(), board=tempBoard) == 0:
+                    captured = True
+                    break
+
+        if captured:
+            return False
+
+        return True
+    
+
+    """
+    METHOD: isFillingOwnEye
+
+    INPUT:
+        x (int):      The x-coordinate where the stone is to be played.
+        y (int):      The y-coordinate where the stone is to be played.
+        player (int): The color of the player making the move (1 for black, -1 for white).
+
+    RETURN:
+        bool: True if the move fills up an eye.
+
+    DESCRIPTION:
+        Checks if the position is an eye first then returns True if the position fills up the eye.
+    """
+    def isFillingOwnEye(self, x, y, player):
+        if self.board[x, y] != 0:
+            return False
+
+        # Create a temp board to simulate placing the stone
+        tempBoard = self.board.copy()
+        tempBoard[x, y] = player
+
+        # Get the group that would be formed
+        group = self.getGroup(x, y) or {(x, y)}
+        eyeRegions = self.findEyeSpace(group, player)
+
+        # Checks if the move is within the eye space
+        for region in eyeRegions:
+            if (x, y) in region and self.isValidEye(region, player):
+                return True
+
+        return False
+
 
     """
     METHOD: getCurrentScore
