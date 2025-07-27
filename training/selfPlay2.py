@@ -33,9 +33,15 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
 
     # Have a turn cap of 125 to end the game.
     count = 0
-    # max = 300
+    max = 150
 
-    while not board.isGameOver():
+    # Include max move count of 300 as an 
+    # alternative to end games for evaluation games. 
+    # For self-play game generation just use double pass 
+    # for end game condition.
+    while not board.isGameOver() and count < max:
+
+    # while not board.isGameOver():
 
         # Loads the model in respect to whose turn it is.
         if board.currentPlayer == 1:
@@ -94,7 +100,7 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
     print("✅ Created the components")
 
     # Have a counter as a hard cap so the game doesn't loop forever.
-    max = 125
+    max = 150
     count = 0
 
     # gameData is the data saved throughout a single game not all of them.
@@ -102,13 +108,13 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
                 #                                z  - tracks all of the moves made by the winner as a +1 and -1 for 
                 #                                     all the moves by the loser.
 
-    while count < max + 1:
-        print("--------------- Current Game is ", gameNumber, "----------------")
+    while not board.isGameOver() and count < max:
+        # print("Current Game is ", gameNumber, "")
 
-        print(f"The current player is " , {board.currentPlayer})
-        print("------------------------------------------------------------------------------------")
-        board.printBoard()
-        print("------------------------------------------------------------------------------------")
+        # print(f"The current player is " , {board.currentPlayer})
+        # print("------------------------------------------------------------------------------------")
+        # board.printBoard()
+        # print("------------------------------------------------------------------------------------")
 
         # Gets the best move and the pi vector which is the probability of all the moves.
         move, pi = mct.search(board)
@@ -120,7 +126,7 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
 
         # 0 - 80 are the only valid moves on a 9x9 board. Move 81 is set to being a pass.
         if move is None or move == 81:
-            print("AI passed")
+            # print("AI passed")
             # Player passes if that is the move choosen by the mct.
             board.playMove(1,1, board.currentPlayer, passTurn=True)
         else:
@@ -131,7 +137,7 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
             # Playing the move choosen by the mct.
             board.playMove(x,y, board.currentPlayer)
 
-            print(f"Player played at ", {x}, {y}, " position on the board")
+            # print(f"Player played at ", {x}, {y}, " position on the board")
 
 
         # Saves the game data each turn. 
@@ -140,8 +146,8 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
         count = count + 1
 
 
-    print(board.score())
-    print("------------------------------------------------------------------------------------\n Game Over ------------------------------------------------------------------------------------")
+    # print(board.score())
+    # print("------------------------------------------------------------------------------------\n Game Over ------------------------------------------------------------------------------------")
 
     # .score() returns 1 or -1 to indicate winner.
     winner = board.score()
