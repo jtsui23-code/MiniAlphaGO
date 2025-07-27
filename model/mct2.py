@@ -81,6 +81,10 @@ class MCTS:
         
         # pi is a vector of the probabilities of all the moves and the board and passing.
         pi = visited_counts/ visited_counts.sum()
+        # if visited_counts.sum() == 0:
+        #     pi = np.ones(len(visited_counts)) / len(visited_counts)  # uniform distribution
+        # else:
+        #     pi = visited_counts / visited_counts.sum()
 
         # Returns the best move and the pi vector.
         return move, torch.tensor(pi, device=self.device, dtype=torch.float32) # keeps pi on the GPU
