@@ -72,6 +72,7 @@ def startPipline(numGames=50, genNum=2, mct=100):
 
         if i % saveInterval == 0:
             buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i + highestBufferNumber}.pkl")
+            print(f"Finished {i}th batch of games")
         
 
 
@@ -180,6 +181,8 @@ def freshStart(mct=0, games=500):
         playOneGame(buffer=buffer, network=initial_model, mctSimulations=mct, gameNumber=i, device=device)
         if i % 10 == 0:
             buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i}.pkl")
+            print(f"Finished {i}th batch of games")
+
 
 
 gen = 1
