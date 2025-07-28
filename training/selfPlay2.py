@@ -55,7 +55,7 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
             model = whiteModel
 
         # Loads the specific model into mct depending on whose turn it is.
-        mct = MCTS(network=model,exploration_weight=3.0, simulations=800)
+        mct = MCTS(network=model,exploration_weight=2.5, simulations=800)
 
         # Plays move using the specific model according to player's turn.
         move, pi = mct.search(board)
@@ -99,7 +99,7 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
     # Creating Board and mct
     board = Board(9)
 
-    mct = MCTS(network=network, exploration_weight=3.0, simulations=mctSimulations)
+    mct = MCTS(network=network, exploration_weight=2.5, simulations=mctSimulations)
 
     # print("✅ Created the components")
 
@@ -117,11 +117,11 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
         if count >= max:
             hardCap = True
             break
-        # print("Current Game is ", gameNumber, "")
+        print("Current Game is ", gameNumber, "")
 
         # print(f"The current player is " , {board.currentPlayer})
         # print("------------------------------------------------------------------------------------")
-        # board.printBoard()
+        board.printBoard()
         # print("------------------------------------------------------------------------------------")
 
         # Gets the best move and the pi vector which is the probability of all the moves.
@@ -193,7 +193,7 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
 #     saveInterval = 10
 
 #     for i in range(1, numberOfGames + 1):
-#         print("------------------------- Starting Game ", i , "-------------------------")
+# #         print("------------------------- Starting Game ", i , "-------------------------")
 #         playOneGame(buffer=buffer, network=network, gameNumber=i)
 
 #         if i % saveInterval == 0:

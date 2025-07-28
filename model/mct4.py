@@ -97,31 +97,29 @@ class MCTS:
             noise = np.random.dirichlet([0.03] * len(policy))
             policy = 0.75 * policy + 0.25 * noise
         
-        # Create children for all legal moves
+        # Create children for all legal moves - FIX: Pass currentPlayer
         valid_moves = node.board.getAllValidMoves(node.board.currentPlayer)
         
         for move in valid_moves:
             if move == 'pass':
                 # Handle pass move
                 new_board = node.board.copyBoardState()
-                new_board.playMove(0, 0, new_board.currentPlayer, passTurn=True)
-                
-                # Assuming pass is the last action in policy vector
-                pass_action = len(policy) - 1
-                node.children[pass_action] = Node(
-                    parent=node,
-                    prior=policy[pass_action],
-                    board=new_board
-                )
+                if new_board.playMove(0, 0, new_board.currentPlayer, passTurn=True):
+                    pass_action = len(policy) - 1
+                    node.children[pass_action] = Node(
+                        parent=node,
+                        prior=policy[pass_action],
+                        board=new_board
+                    )
             else:
                 x, y = move
-                action = x * node.board.size + y
+                action = x * node.board.size + y  # FIX: Use board.size not hardcoded 9
                 
                 # Skip if action index is out of bounds
-                if action >= len(policy) - 1:  # -1 for pass action
+                if action >= len(policy) - 1:  # FIX: -1 for pass action
                     continue
                 
-                # Try the move
+                # Try the move - FIX: Check if move succeeded
                 new_board = node.board.copyBoardState()
                 if new_board.playMove(x, y, new_board.currentPlayer):
                     node.children[action] = Node(
@@ -142,16 +140,7 @@ class MCTS:
         elif scores[current_player] < scores[opponent]:
             return -1.0
         else:
-            return 0.
-        
-    def evaluate_terminal(self, node, root_player):  
-    scores = node.board.score()  
-    if scores[root_player] > scores[-root_player]:  
-        return 1.0  
-    elif scores[root_player] < scores[-root_player]:  
-        return -1.0  
-    else:  
-        return 0.0  
+            return 0.0
     
     def backup(self, search_path, value):
         for node in reversed(search_path):
@@ -161,8 +150,12 @@ class MCTS:
     
     def get_action_probs(self):
         if not self.root.children:
-            # No legal moves, return uniform distribution
-            return None, None
+            # No legal moves, return pass move
+            board_size = self.root.board.size
+            total_actions = board_size * board_size + 1
+            pi = np.zeros(total_actions)
+            pi[-1] = 1.0  # Set pass move to 100%
+            return total_actions - 1, torch.tensor(pi, device=self.device, dtype=torch.float32)
         
         # Get visit counts
         actions = list(self.root.children.keys())

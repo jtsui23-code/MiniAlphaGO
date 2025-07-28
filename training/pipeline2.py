@@ -193,30 +193,30 @@ def freshStart(mct=0, games=500):
 gen = 1
 count = 0
 
-freshStart(mct=800, games=500)
+freshStart(mct=300, games=1000)
+freshStart(mct=800, games=200)
+
 
 
 while count < 2000:
+    mct = 300
+
 
     numGames = 1000
-    
-    if count == 0:
-        numGames = 600
-        
-    mct = 100
 
-    if gen > 3 and gen < 6:
-        mct = 200
-    elif gen >= 6:
-        mct = 400
-    
+    if count == 0:
+        mct = 100
+
+    freshStart(mct=mct, games=numGames)
+
+    mct = 300
+
     evalResult = startPipline(numGames=numGames, genNum=gen, mct=mct)
     
     if evalResult == 1:
         gen += 1
 
 
-# evaludateModel(genNum=counter)
 
 # while counter < 2000:
 
