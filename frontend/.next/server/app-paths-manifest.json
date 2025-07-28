@@ -3,5 +3,7 @@
   "/favicon.ico/route": "app/favicon.ico/route.js",
   "/login/page": "app/login/page.js",
   "/play/page": "app/play/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/signup/page": "app/signup/page.js",
   "/stats/page": "app/stats/page.js"
 }
