@@ -26,7 +26,7 @@ DESCRIPTION:
     
 """
 def startPipline(numGames=50, genNum=2, mct=100):
-    print("Entered function")
+    # print("Entered function")
     # Gets all of the self-play game files and appends them into an array. 
     # This is to prevent override when saving replay buffer and correctly naming the replay buffer as well.
     existingBufferfiles = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
@@ -43,7 +43,7 @@ def startPipline(numGames=50, genNum=2, mct=100):
     # This is applied to all of the existing buffer files in selfPlay/
     bufferNumber = [int(f.split("_")[1].split(".")[0]) for f in existingBufferfiles]
     highestBufferNumber = max(bufferNumber, default=0)
-    print("Passed the buffer counting")
+    # print("Passed the buffer counting")
 
 
     # Loading the current best model.
@@ -57,17 +57,17 @@ def startPipline(numGames=50, genNum=2, mct=100):
     buffer = ReplayBuffer(capacity=1000)
 
 
-    print("Creating components")
+    # print("Creating components")
 
     numGames = numGames
     saveInterval = 10
 
-    print("Right before the for loop")
+    # print("Right before the for loop")
 
 
     # Playing a set amount of self-play games and saving them.
     for i in range(1, numGames + 1):
-        print(f"-------------------------------------------- Generating self-play game data --------------------------------------------")
+        # print(f"-------------------------------------------- Generating self-play game data --------------------------------------------")
         playOneGame(buffer=buffer, network=currentModel, mctSimulations=mct, gameNumber=i, device=device)
 
         if i % saveInterval == 0:
@@ -191,11 +191,17 @@ def freshStart(mct=0, games=500):
 
 
 gen = 1
+count = 0
 
-freshStart(mct=100, games=1000)
+# freshStart(mct=100, games=1000)
 
-while gen < 2000:
+while count < 2000:
 
+    numGames = 1000
+    
+    if count == 0:
+        numGames = 600
+        
     mct = 100
 
     if gen > 3 and gen < 6:
@@ -203,7 +209,7 @@ while gen < 2000:
     elif gen >= 6:
         mct = 400
     
-    evalResult = startPipline(numGames=1000, genNum=gen, mct=mct)
+    evalResult = startPipline(numGames=numGames, genNum=gen, mct=mct)
     
     if evalResult == 1:
         gen += 1
