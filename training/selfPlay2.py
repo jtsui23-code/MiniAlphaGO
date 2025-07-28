@@ -1,6 +1,6 @@
 from board.go import Board  
 from model.net import GoNet
-from model.mct2 import MCTS
+from model.mct4 import MCTS
 from training.replayBuffer2 import ReplayBuffer
 from utils.boardToTensor import boardToTensor  
 import torch
@@ -55,7 +55,7 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
             model = whiteModel
 
         # Loads the specific model into mct depending on whose turn it is.
-        mct = MCTS(network=model,exploration_weight=1.5, simulations=800)
+        mct = MCTS(network=model,exploration_weight=3.0, simulations=800)
 
         # Plays move using the specific model according to player's turn.
         move, pi = mct.search(board)
@@ -99,7 +99,7 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
     # Creating Board and mct
     board = Board(9)
 
-    mct = MCTS(network=network, exploration_weight=1.5, simulations=mctSimulations)
+    mct = MCTS(network=network, exploration_weight=3.0, simulations=mctSimulations)
 
     # print("✅ Created the components")
 
