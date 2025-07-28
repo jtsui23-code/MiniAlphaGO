@@ -175,17 +175,17 @@ def freshStart(mct=0, games=500):
     initial_model = GoNet(boardSize=9, channels=17)
     torch.save(initial_model.state_dict(), "models/bestModel0.pt")
 
-    # allDataFiles = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
+    allDataFiles = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
     # print(len(allDataFiles))
 
     # Generate initial self-play data with random model
     buffer = ReplayBuffer(capacity=1000)
     for i in range(1, games + 1):  # Generate some initial games
 
-        # fileNum = i + (len(allDataFiles) * 10)
+        fileNum = i + (len(allDataFiles) * 10)
         playOneGame(buffer=buffer, network=initial_model, mctSimulations=mct, gameNumber=i, device=device)
         if i % 10 == 0:
-            buffer.saveToFile(f"selfPlay/selfPlayBuffer_{i}.pkl")
+            buffer.saveToFile(f"selfPlay/selfPlayBuffer_{fileNum}.pkl")
             print(f"Finished {i}th batch of games")
 
 
@@ -193,29 +193,30 @@ def freshStart(mct=0, games=500):
 gen = 1
 count = 0
 
-# freshStart(mct=100, games=1000)
+freshStart(mct=300, games=1000)
+freshStart(mct=800, games=200)
+
+
 
 while count < 2000:
+    mct = 300
+
 
     numGames = 1000
-    
-    if count == 0:
-        numGames = 600
-        
-    mct = 100
 
-    if gen > 3 and gen < 6:
-        mct = 200
-    elif gen >= 6:
-        mct = 400
-    
+    if count == 0:
+        mct = 100
+
+    freshStart(mct=mct, games=numGames)
+
+    mct = 300
+
     evalResult = startPipline(numGames=numGames, genNum=gen, mct=mct)
     
     if evalResult == 1:
         gen += 1
 
 
-# evaludateModel(genNum=counter)
 
 # while counter < 2000:
 
