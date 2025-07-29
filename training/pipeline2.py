@@ -1,6 +1,6 @@
 from model.net import GoNet
 import os
-from training.evaluation2 import evalateModel
+from training.evaluation2 import evaluateModel
 from training.train2 import createModel, updateExistingModel
 from training.selfPlay2 import playOneGame
 from training.replayBuffer2 import ReplayBuffer
@@ -25,7 +25,7 @@ DESCRIPTION:
     The new model is then evaluated to see if its the new best model.
     
 """
-def startPipline(numGames=50, genNum=2, mct=100, freshStart=False):
+def startPipline(numGames=50, genNum=2, mct=100, freshStart=False, evalGames=50):
 
     if not freshStart:
         # print("Entered function")
@@ -49,13 +49,13 @@ def startPipline(numGames=50, genNum=2, mct=100, freshStart=False):
 
 
         # Loading the current best model.
-        currentModel = GoNet(boardSize=9, channels=17)
+        currentModel = GoNet(boardSize=9, channels=17).to(device)
         currentModel.load_state_dict(torch.load(f"models/bestModel{genNum-1}.pt", map_location=device))
 
         currentModel.to(device)
         currentModel.eval()
     else:
-        currentModel = GoNet(boardSize=9, channels=17)
+        currentModel = GoNet(boardSize=9, channels=17).to(device)
         torch.save(currentModel.state_dict(), "models/bestModel0.pt")
 
 
@@ -100,7 +100,7 @@ def startPipline(numGames=50, genNum=2, mct=100, freshStart=False):
 
     torch.save(currentModel.state_dict(), "models/candidateModel.pt")
 
-    candidateModel = GoNet(boardSize=9, channels=17)
+    candidateModel = GoNet(boardSize=9, channels=17).to(device)
 
     # Save the updated model
     candidateModel.load_state_dict(torch.load("models/candidateModel.pt", map_location=device))
@@ -111,7 +111,8 @@ def startPipline(numGames=50, genNum=2, mct=100, freshStart=False):
     print(f"-------------------------------------------- Evaluating the new model --------------------------------------------")
 
     # Evaluating whether the new model is better than the current one or not.
-    return evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum, device=device)
+    return evaluateModel(candiateModel=candidateModel, championModel=currentModel, numGames=evalGames, genNum=genNum, device=device)
+
 
 
 def extractFileNum(fileName):
@@ -138,16 +139,21 @@ DESCRIPTION:
     whenever the pipline cannot be fully ran because of time contraint.
     
 """
-def evaludateModel(genNum=3):
+def evaluate(genNum=3):
 
+
+    
     # Loading the current best model.
-    currentModel = GoNet(boardSize=9, channels=17)
+    
+    currentModel = GoNet(boardSize=9, channels=17).to(device)
     currentModel.load_state_dict(torch.load(f"models/bestModel{genNum-1}.pt"))
 
     currentModel.eval()
 
 
-    # numTrainData = len(existingBufferfiles)
+
+
+       # numTrainData = len(existingBufferfiles)
     # numBuffers = numTrainData + numGames/10
     allDataFiles = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
 
@@ -156,14 +162,22 @@ def evaludateModel(genNum=3):
     
     latestFiles = sortedFiles[-100:]
 
-    createModel(fileLIst=latestFiles, fileName="candidateModel.pt", device=device)
+    updateExistingModel(existing_model=currentModel, fileLIst=latestFiles, epochs=10, device=device)
 
 
-    # Creating candiateModel that uses the newly self-play games as well as the orignal data set.
-    candidateModel = GoNet(boardSize=9, channels=17)
-    candidateModel.load_state_dict(torch.load("models/candidateModel.pt"))
+    torch.save(currentModel.state_dict(), "models/candidateModel.pt")
+
+    candidateModel = GoNet(boardSize=9, channels=17).to(device)
+
+    # Save the updated model
+    candidateModel.load_state_dict(torch.load("models/candidateModel.pt", map_location=device))
+    
+    candidateModel.to(device)
     candidateModel.eval()
-    evalateModel(candiateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum, device=device)
+
+
+    
+    return evaluateModel(candidateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum, device=device)
 
 
 """
@@ -180,7 +194,7 @@ DESCRIPTION:
 """
 def freshStart(mct=0, games=500):
     # Create initial random model
-    initial_model = GoNet(boardSize=9, channels=17)
+    initial_model = GoNet(boardSize=9, channels=17).to(device)
     torch.save(initial_model.state_dict(), "models/bestModel0.pt")
 
     allDataFiles = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
@@ -202,10 +216,19 @@ def freshStart(mct=0, games=500):
 gen = 1
 count = 0
 
+evalResult = evaluate(genNum=gen)
+
+if evalResult == 1:
+    gen += 1
 
 while count < 2000:
+    allModels = [f for f in os.listdir("models") if f.startswith("bestModel") and f.endswith(".pt")]
+
+    gen = len(allModels)
+
     mct = 400
     numGames = 200
+    evalGames = 50
 
     if gen < 4:
         mct = 300
@@ -214,17 +237,20 @@ while count < 2000:
     elif 4 < gen < 11:
         mct = 500
         numGames = 300
+        evalGames = 75
     
     elif 11 < gen < 25:
         numGames = 400
         mct = 700
+        evalGames = 100
     
     elif 25 < gen < 51:
         numGames = 500
         mct = 1000
+        evalGames = 150
 
 
-    evalResult = startPipline(numGames=numGames, genNum=gen, mct=mct)
+    evalResult = startPipline(numGames=numGames, genNum=gen, mct=mct, evalGames=evalGames)
     
     if evalResult == 1:
         gen += 1
