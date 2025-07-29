@@ -1,6 +1,6 @@
 from board.go import Board  
 from model.net import GoNet
-from model.mct4 import MCTS
+from model.mct5 import MCTS
 from training.replayBuffer2 import ReplayBuffer
 from utils.boardToTensor import boardToTensor  
 import torch
@@ -24,7 +24,8 @@ DESCRIPTION:
     is the new best one.
     
 """
-def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
+def modelTesting(blackModel, whiteModel, device=torch.device("cpu"),dirichletAlpha=0.3,
+                dirichletEpsilon=0.25, temperature=1.0, mct=400, explore=1.5):
 
     # Creating board, model, and mct.
     board = Board(9)
@@ -55,7 +56,8 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu")):
             model = whiteModel
 
         # Loads the specific model into mct depending on whose turn it is.
-        mct = MCTS(network=model,exploration_weight=2.5, simulations=800)
+        mct = MCTS(network=model, simulations=mct, dirichlet_alpha=dirichletAlpha, 
+               dirichlet_epsilon=dirichletEpsilon, temperature=temperature, exploration_weight=explore)
 
         # Plays move using the specific model according to player's turn.
         move, pi = mct.search(board)
@@ -94,12 +96,14 @@ DESCRIPTION:
     result of the game for training the network.
     
 """
-def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.device("cpu")):
+def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.device("cpu"), dirichletAlpha=0.3,
+                dirichletEpsilon=0.25, temperature=1.0, explore=1.5):
 
     # Creating Board and mct
     board = Board(9)
 
-    mct = MCTS(network=network, exploration_weight=2.5, simulations=mctSimulations)
+    mct = MCTS(network=network, simulations=mctSimulations, dirichlet_alpha=dirichletAlpha, 
+               dirichlet_epsilon=dirichletEpsilon, temperature=temperature, exploration_weight=explore)
 
     # print("✅ Created the components")
 
@@ -117,11 +121,11 @@ def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.
         if count >= max:
             hardCap = True
             break
-        print("Current Game is ", gameNumber, "")
+        # print("Current Game is ", gameNumber, "")
 
         # print(f"The current player is " , {board.currentPlayer})
         # print("------------------------------------------------------------------------------------")
-        board.printBoard()
+        # board.printBoard()
         # print("------------------------------------------------------------------------------------")
 
         # Gets the best move and the pi vector which is the probability of all the moves.

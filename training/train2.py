@@ -92,3 +92,29 @@ def createModel(fileLIst, fileName="models/currentModel.pt", device=torch.device
     torch.save(network.state_dict(), f"models/{fileName}")
 
 
+
+"""
+METHOD: createModel
+INPUT:
+    existing_model (GoNet)  : Existing that is being updated with the training data.
+    fileLIst     (list)     : Stores all of the files that will be loaded into the model.
+    epochs                  : Number of times goes through training data.
+    device                  : Making the model on the GPU for faster pipeline running.
+
+RETURN:
+    N/A
+DESCRIPTION:
+    This function updates the exisitng model with the new training data in the pipeline.    
+"""
+def updateExistingModel(existing_model, fileLIst, epochs=10, device=torch.device("cpu")):
+    buffer = ReplayBuffer(capacity=1000)
+
+    # Load training data
+    for file in fileLIst:
+        buffer.loadFile(os.path.join("selfPlay", file))
+
+    # Train the existing model (don't create new one)
+    train(network=existing_model, buffer=buffer, batchSize=256, epochs=epochs, device=device)
+    
+
+
