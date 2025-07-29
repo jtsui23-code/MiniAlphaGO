@@ -25,12 +25,11 @@ DESCRIPTION:
     
 """
 def modelTesting(blackModel, whiteModel, device=torch.device("cpu"),dirichletAlpha=0.3,
-                dirichletEpsilon=0.25, temperature=1.0, mct=400, explore=1.5):
+                dirichletEpsilon=0.25, temperature=1.0, mctSim=400, explore=1.5):
 
     # Creating board, model, and mct.
     board = Board(9)
     model = None
-    mct = None
 
     # Have a turn cap of 125 to end the game.
     count = 0
@@ -56,8 +55,8 @@ def modelTesting(blackModel, whiteModel, device=torch.device("cpu"),dirichletAlp
             model = whiteModel
 
         # Loads the specific model into mct depending on whose turn it is.
-        mct = MCTS(network=model, simulations=mct, dirichlet_alpha=dirichletAlpha, 
-               dirichlet_epsilon=dirichletEpsilon, temperature=temperature, exploration_weight=explore)
+        mct = MCTS(network=model, simulations=mctSim, dirichlet_alpha=dirichletAlpha, 
+               dirichlet_epsilon=dirichletEpsilon, temperature=temperature, exploration_weight=explore, device=device)
 
         # Plays move using the specific model according to player's turn.
         move, pi = mct.search(board)

@@ -7,7 +7,7 @@ import torch
 
 
 """
-METHOD: evalateModel
+METHOD: evaluateModel
 INPUT:
     candiateModel (GoNet)      :  The model that is being checked if it might be the best.
     championModel (GoNet)      :  The model that is the current best.
@@ -20,13 +20,13 @@ DESCRIPTION:
     the model is saved.
     
 """
-def evalateModel(candiateModel, championModel, numGames=20, genNum=2, device=torch.device("cpu")):
+def evaluateModel(candidateModel, championModel, numGames=20, genNum=2, device=torch.device("cpu")):
 
 
-    candiateModel.to(device)
+    candidateModel .to(device)
     championModel.to(device)
 
-    candiateModel.eval()
+    candidateModel .eval()
     championModel.eval()
     
     # Counter of all of the wins by the candiateModel.
@@ -40,7 +40,8 @@ def evalateModel(candiateModel, championModel, numGames=20, genNum=2, device=tor
         if i % 2 == 0:
             
             # The championModel gets the play as black this game.
-            winner = modelTesting(blackModel=championModel, whiteModel=candiateModel, device=device) 
+            winner = modelTesting(blackModel=championModel, whiteModel=candidateModel, device=device, dirichletAlpha=0.3,
+                dirichletEpsilon=0.25, temperature=1.0, mctSim=400, explore=1.5) 
 
             # Checking if the winner was the candiateModel if so then increment wins.
             if winner == -1:
@@ -48,7 +49,8 @@ def evalateModel(candiateModel, championModel, numGames=20, genNum=2, device=tor
 
         else:
             # The candiateModel gets the play as black this game.
-            winner = modelTesting(blackModel=candiateModel, whiteModel=championModel, device=device)
+            winner = modelTesting(blackModel=candidateModel, whiteModel=championModel, device=device,
+                            dirichletAlpha=0.3,dirichletEpsilon=0.25, temperature=1.0, mctSim=400, explore=1.5)
 
             # Checking if the winner was the candiateModel if so then increment wins.
             if winner == 1:
@@ -62,7 +64,7 @@ def evalateModel(candiateModel, championModel, numGames=20, genNum=2, device=tor
     print(f"Candiate model has a win rate of {winRate*100}%")
 
     if winRate > 0.55:
-        torch.save(candiateModel.state_dict(), f"models/bestModel{genNum}.pt")
+        torch.save(candidateModel.state_dict(), f"models/bestModel{genNum}.pt")
         return 1
     else:
         print("Candiate rejected")
@@ -85,7 +87,7 @@ if __name__ == "__main__":
 
     currentModel.eval()
     candidateModel.eval()
-    evalateModel(candiateModel=candidateModel, championModel=currentModel, device=device)
+    evaluateModel(candiateModel=candidateModel, championModel=currentModel, device=device)
 
     # Creating the new candiateModel
     # The 7th save file was rejected i.e numTrainData=8
