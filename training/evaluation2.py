@@ -11,6 +11,9 @@ METHOD: evaluateModel
 INPUT:
     candiateModel (GoNet)      :  The model that is being checked if it might be the best.
     championModel (GoNet)      :  The model that is the current best.
+    numGames (int)             :  Number of evaluation games.
+    genNum (int)               :  The generation number of the next model.
+    device                     :  Determines which device the evaluation games are ran.
 
 RETURN:
     N/A
@@ -40,8 +43,8 @@ def evaluateModel(candidateModel, championModel, numGames=20, genNum=2, device=t
         if i % 2 == 0:
             
             # The championModel gets the play as black this game.
-            winner = modelTesting(blackModel=championModel, whiteModel=candidateModel, device=device, dirichletAlpha=0.3,
-                dirichletEpsilon=0.25, temperature=1.0, mctSim=400, explore=1.5) 
+            winner = modelTesting(blackModel=championModel, whiteModel=candidateModel, device=device, dirichletAlpha=0.0,
+                dirichletEpsilon=0.0, temperature=0.1, mctSim=400, explore=1.5) 
 
             # Checking if the winner was the candiateModel if so then increment wins.
             if winner == -1:

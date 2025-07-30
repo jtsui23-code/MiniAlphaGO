@@ -16,8 +16,9 @@ print(f"Using device: {device}")
 METHOD: startPipline
 INPUT:
     numGames (int)      :  How many new games you want to add to the self-play game data set.
-    genNum   (int)      :  Generation number so older best models are not overrided for having varying bot difficulties. 
-
+    genNum   (int)      :  Generation number so older best models are not overrided for having varying bot difficulties.
+    mct      (int)      :  Number of simulations used to consider each move.
+    evalGames(int)      :  Number of evaluation games.
 RETURN:
     N/A
 DESCRIPTION:
@@ -25,38 +26,37 @@ DESCRIPTION:
     The new model is then evaluated to see if its the new best model.
     
 """
-def startPipline(numGames=50, genNum=2, mct=100, freshStart=False, evalGames=50):
+def startPipline(numGames=50, genNum=2, mct=100, evalGames=50):
 
-    if not freshStart:
-        # print("Entered function")
-        # Gets all of the self-play game files and appends them into an array. 
-        # This is to prevent override when saving replay buffer and correctly naming the replay buffer as well.
-        existingBufferfiles = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
+    
+    # print("Entered function")
+    # Gets all of the self-play game files and appends them into an array. 
+    # This is to prevent override when saving replay buffer and correctly naming the replay buffer as well.
+    existingBufferfiles = [f for f in os.listdir("selfPlay") if f.startswith("selfPlayBuffer_") and f.endswith(".pkl")]
 
-        # int(f.split("_")[1] 
-        # splits the name of the self-play files from 
-        # ["selfPlayerBuffer_200.pkl"] -> ["selfPlayerBuffer_", "200.pkl"]
-        # The [1] in int(f.split("_")[1] selects "200.pkl" in ["selfPlayerBuffer_", "200.pkl"]
-        # because that the part of the string we care about the file number.
-        # Then .split(".")[0] 
-        # splits ["200.pkl"] -> ["200", ".pkl"]
-        # and [0] in .split(".")[0] selects first element because that is the number
-        # and all of this is within an int() converting the string to an integer.
-        # This is applied to all of the existing buffer files in selfPlay/
-        bufferNumber = [int(f.split("_")[1].split(".")[0]) for f in existingBufferfiles]
-        highestBufferNumber = max(bufferNumber, default=0)
-        # print("Passed the buffer counting")
+    # int(f.split("_")[1] 
+    # splits the name of the self-play files from 
+    # ["selfPlayerBuffer_200.pkl"] -> ["selfPlayerBuffer_", "200.pkl"]
+    # The [1] in int(f.split("_")[1] selects "200.pkl" in ["selfPlayerBuffer_", "200.pkl"]
+    # because that the part of the string we care about the file number.
+    # Then .split(".")[0] 
+    # splits ["200.pkl"] -> ["200", ".pkl"]
+    # and [0] in .split(".")[0] selects first element because that is the number
+    # and all of this is within an int() converting the string to an integer.
+    # This is applied to all of the existing buffer files in selfPlay/
+    bufferNumber = [int(f.split("_")[1].split(".")[0]) for f in existingBufferfiles]
+    highestBufferNumber = max(bufferNumber, default=0)
+    # print("Passed the buffer counting")
 
 
-        # Loading the current best model.
-        currentModel = GoNet(boardSize=9, channels=17).to(device)
-        currentModel.load_state_dict(torch.load(f"models/bestModel{genNum-1}.pt", map_location=device))
+    # Loading the current best model.
+    currentModel = GoNet(boardSize=9, channels=17).to(device)
 
-        currentModel.to(device)
-        currentModel.eval()
-    else:
-        currentModel = GoNet(boardSize=9, channels=17).to(device)
-        torch.save(currentModel.state_dict(), "models/bestModel0.pt")
+    # print(f"models/bestModel{genNum-1}.pt")
+    currentModel.load_state_dict(torch.load(f"models/bestModel{genNum-1}.pt", map_location=device))
+
+    currentModel.to(device)
+    currentModel.eval()
 
 
 
@@ -75,7 +75,7 @@ def startPipline(numGames=50, genNum=2, mct=100, freshStart=False, evalGames=50)
     for i in range(1, numGames + 1):
         # print(f"-------------------------------------------- Generating self-play game data --------------------------------------------")
        
-        playOneGame(buffer=buffer, network=currentModel, mctSimulations=mct, gameNumber=i, device=device,
+        playOneGame(buffer=buffer, network=currentModel, mctSimulations=mct, device=device,
                     dirichletAlpha=0.4, dirichletEpsilon=0.35, temperature=2.0, explore=1.5)
         
 
@@ -183,7 +183,8 @@ def evaluate(genNum=3):
 """
 METHOD: freshStart
 INPUT:
-    N/A
+    mct (int)   : Number of simulations used to consider moves.
+    games (int) : Number of games played.
 
 RETURN:
     N/A
@@ -216,11 +217,15 @@ def freshStart(mct=0, games=500):
 gen = 1
 count = 0
 
-evalResult = evaluate(genNum=gen)
+
+# allModels = [f for f in os.listdir("models") if f.startswith("bestModel") and f.endswith(".pt")]
+# gen = len(allModels)
+
+# evalResult = evaluate(genNum=gen)
 
 
-if evalResult == 1:
-    gen += 1
+# if evalResult == 1:
+#     gen += 1
 
 while count < 2000:
     allModels = [f for f in os.listdir("models") if f.startswith("bestModel") and f.endswith(".pt")]
