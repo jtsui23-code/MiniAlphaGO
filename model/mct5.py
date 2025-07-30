@@ -157,7 +157,8 @@ class MCTS:
         policy = F.softmax(policy_logits, dim=1).squeeze(0).cpu().numpy()
         
         # Add Dirichlet noise for exploration (typically only at root during self-play)
-        if add_dirichlet_noise:
+        # Only add noise if dirichlet_alpha > 0
+        if add_dirichlet_noise and self.dirichlet_alpha > 0:
             noise = np.random.dirichlet([self.dirichlet_alpha] * len(policy))
             policy = (1 - self.dirichlet_epsilon) * policy + self.dirichlet_epsilon * noise
         

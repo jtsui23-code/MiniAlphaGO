@@ -48,16 +48,19 @@ export default function PlayPage() {
   
   // Parse the JSON returned from the backend pvp/pvpStart endpoint
   const data = await res.json();
+  const inviteCode = data.invite_code || '';
+  const board = data.board || Array(9).fill(null).map(() => Array(9).fill(null));
+
   
   // Update components based off of the Parsed JSON
   setGameId(data.game_id);
-  setInviteCode(data.inviteCode);
-  setBoardData(data.board);
+  setInviteCode(inviteCode);
+  setBoardData(board);
   setPlayerTurn("black");
   
   // Checks if boardRef.current exist before calling method from <board> to set the board up
   boardRef.current?.setBoardFromJSON(data.board);
-  alert(`PvP Game Created. Share this invite code: ${data.invite_code}`);
+  alert(`PvP Game Created. Share this invite code: ${inviteCode}`);
 
   };
   
@@ -189,7 +192,7 @@ export default function PlayPage() {
 
     // Using setWatingForAI to prevent player from doing multiple moves per turn and 
     // waits for backend server to update the viusals of the board.
-    setWaitingForAI(True);
+    setWaitingForAI(true);
 
     try {
       const res = await fetch(`http://localhost:8000/api/pvp/pvpMove?inviteCode=${inviteCode}`, {
@@ -242,7 +245,7 @@ export default function PlayPage() {
         
 
         {!isLoggedIn ? (
-          <p style={{ color: 'red' }}>You must be logged in to play.</p>
+          <p style={{ color: '#B8860B', fontWeight: '600' }}>You must be logged in to play.</p>
         ) : (
           <>
             <div className="pvp-controls" style={{marginBottom: '1rem'}}>
