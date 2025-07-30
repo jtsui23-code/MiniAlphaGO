@@ -16,6 +16,11 @@ INPUT:
     blackModel (GoNet)      :  The model that is playing black this game.
     whiteModel (GoNet)      :  The model that is playing white this game.
     device                  :  The device which the model testing is being done on.
+    dirichletAlpha (float)  :  Diversify the moves picked
+    dirichletEpsilon (float):  The ratio of how much to rely on the network over randomness.
+    temperature (float)     :  Higher temperature means to try unique moves for learning purposes.
+    explore (float)         :  Exploration weight is the number of times goes through the replay buffer.
+    mctSim (int)            :  Number of simulations used to think for each move.
 RETURN:
     score (int)             : Returns 1 if black wins or -1 if white wins.
 DESCRIPTION:
@@ -86,7 +91,10 @@ INPUT:
     network (GoNet)      :  Object of GoNet for play go with mct.
     mctSimulations       :  Number of simulated games by the mct.
     device                  :  The device which the model game is being played on.
-
+    dirichletAlpha (float)  :  Diversify the moves picked
+    dirichletEpsilon (float):  The ratio of how much to rely on the network over randomness.
+    temperature (float)     :  Higher temperature means to try unique moves for learning purposes.
+    explore (float)         :  Exploration weight is the number of times goes through the replay buffer.
 
 RETURN:
     N/A
@@ -95,7 +103,7 @@ DESCRIPTION:
     result of the game for training the network.
     
 """
-def playOneGame(buffer, network, mctSimulations=100, gameNumber=0, device=torch.device("cpu"), dirichletAlpha=0.3,
+def playOneGame(buffer, network, mctSimulations=100, device=torch.device("cpu"), dirichletAlpha=0.3,
                 dirichletEpsilon=0.25, temperature=1.0, explore=1.5):
 
     # Creating Board and mct
