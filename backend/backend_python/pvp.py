@@ -64,6 +64,7 @@ def start_pvp(request:StartPvP):
     game_id = str(uuid.uuid4())
     board = Board(BOARD_SIZE)
     inviteCode = generateInviteCode(6)
+    # inviteCode = "Test123"
 
     game_state = {
         "game_id": game_id,

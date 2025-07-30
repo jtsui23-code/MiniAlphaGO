@@ -159,5 +159,126 @@
     "date": "2025-07-23",
     "uid": "csprincedaniel@gmail.com",
     "winner": null
+  },
+  {
+    "game_id": "9fe9f42f-826e-4df4-badb-02a052c5c01c",
+    "board": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        "black",
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "white"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "moves": [
+      {
+        "player": "black",
+        "x": 4,
+        "y": 3
+      },
+      {
+        "player": "white",
+        "x": 8,
+        "y": 5
+      }
+    ],
+    "current_turn": "black",
+    "opponent": "CPU",
+    "date": "2025-07-30",
+    "uid": "bobby@gmail.com",
+    "winner": null
   }
 ]

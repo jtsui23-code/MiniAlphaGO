@@ -54,3 +54,23 @@
   outline: 3px solid #FFD54F;
   outline-offset: 2px;
 }
+
+.mode-select {
+  display:flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.game-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background-color: #F5F1E9;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(107, 72, 41, 0.2);
+  border: 2px solid #E1D7C6;
+  max-width: 500px;
+  width:100%;
+}
