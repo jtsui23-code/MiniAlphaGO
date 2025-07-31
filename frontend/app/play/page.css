@@ -32,6 +32,9 @@
   transition: background-color 0.25s ease;
   user-select: none;
   box-shadow: 0 4px 8px rgba(107, 72, 41, 0.3);
+  margin-top: 1rem;
+  margin-right: 1rem;
+  align-self:center;
 }
 
 .play-button:hover {
@@ -55,22 +58,37 @@
   outline-offset: 2px;
 }
 
-.mode-select {
+.mode-select-group,
+.invite-code-group {
   display:flex;
   flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
-.game-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  padding: 2rem;
-  background-color: #F5F1E9;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(107, 72, 41, 0.2);
-  border: 2px solid #E1D7C6;
-  max-width: 500px;
-  width:100%;
+.input-label {
+  font-weight: 600;
+  color: #5A462B;
+  margin-bottom: 0.5rem;
+  text-align: center;
+
 }
+
+.style-input,
+.styled-select {
+
+  outline:none;
+  border-color: #A67C52;
+  box-shadow: 0 0 0 3px rgba(166, 124, 82, 0.3);
+}
+
+.pvp-button {
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  width:100%;
+  gap: 1rem;
+}
+
+

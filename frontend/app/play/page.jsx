@@ -249,17 +249,23 @@ export default function PlayPage() {
         ) : (
           <>
             <div className="pvp-controls" style={{marginBottom: '1rem'}}>
-                <label htmlFor="mode">Mode: </label>
-                <select
-                  id="mode"
-                  value={mode}
-                  onChange={(e) => setMode(e.target.value)}
-                  style={{marginRight: '1rem'}}
-                >
-                  <option value="AI">Play vs AI</option>
-                  <option value="PVP">Play vs Player</option>
 
-                </select>
+                <div className="model-select-group">
+                  <label htmlFor="mode">Mode: </label>
+                  <select
+                    id="mode"
+                    value={mode}
+                    onChange={(e) => setMode(e.target.value)}
+                    className="styled-select"
+                  >
+                    <option value="AI">Play vs AI</option>
+                    <option value="PVP">Play vs Player</option>
+
+                  </select>
+
+                </div>
+
+              
 
                 {mode === 'AI' && (
                   <button onClick={handleStartGame} disabled={waitingForAI} className="play-button">
@@ -267,22 +273,40 @@ export default function PlayPage() {
                   </button>
                 )}
 
+              
                 {mode === 'PVP' && (
                   <>
-                    <button onClick={handlePvpStart} className="play-button">
-                      Create PVP Game
-                    </button>
-                    <input
-                      type="text"
-                      value={inviteCode}
-                      onChange={(e) => setInviteCode(e.target.value)}
-                      placeholder="Enter Invite Code"
-                      style={{marginLeft: '0.5rem', marginRight: '0.5rem'}}
-                    />
+
+                    <div className="pvp-button">
+
+                      <button onClick={handlePvpStart} className="play-button">
+                        Create PVP Game
+                      </button>
+                      
+                    </div>
+                    
+
+                    <div className="invite-code-group">
+                      
+                      <label className="input-label">
+                        {gameId? "Your Code" : "Enter Code"}
+
+                      </label>
+
+                      <input
+                        type="text"
+                        value={inviteCode}
+                        onChange={(e) => setInviteCode(e.target.value)}
+                        placeholder="Enter Invite Code"
+                        className="styled-input"
+                      />
+
+                    </div>
 
                     <button onClick={handlePvpJoin} className="play-button">
-                      Join PVP Game
+                        Join PVP Game
                     </button>
+                    
 
                   
                   </>
