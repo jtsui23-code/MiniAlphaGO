@@ -25,6 +25,69 @@ export default function PlayPage() {
   const [opponent, setOpponent] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const [pvpGameActive, setPvpGameActive] = useState(false);
+  const [pollingIntervalId, setPollingIntervalId] = useState(null);
+
+  useEffect(() => {
+
+    if(pvpGameActive && inviteCode){
+
+      fetchGameState();
+      const intervalId = setInterval(fetchGameState, 2000);
+      setPollingIntervalId(intervalId);
+
+    } else {
+
+      // Clear interval when not pvp game is not active.
+      if(pollingIntervalId){
+        clearInterval(pollingIntervalId);
+        setPollingIntervalId(null);
+      }
+    }
+
+    return () => {
+      if(pollingIntervalId) {
+        clearInterval(pollingIntervalId);
+      }
+    };
+  },[pvpGameActive, inviteCode]);
+
+  const fetchGameState = async () => {
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/pvp/gameState?inviteCode=${inviteCode}`
+
+      );
+
+      if(!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+      const data = await res.json();
+
+      // Update board if it changed.
+      if(JSON.stringify(boardData) !== JSON.stringify(data.board)) {
+        setBoardData(data.board);
+        boardRef.current?.setBoardFromJSON(data.board);
+
+      }
+
+      // Update turn indicator
+      if(playerTurn !== data.current_turn){
+        setPlayerTurn(data.current_turn);
+        boardRef.current?.setPlayerTurn(data.current_turn);
+      }
+
+      // Update opponent display
+      if(!opponent && data.opponent){
+        setOpponent(data.opponent);
+      }
+
+    } catch (err) {
+      console.error('Failed to fetch game state:', err);
+    }
+  };
+
+
+  
 
   // For PvP ----------------------------------------------------
   const handlePvpStart = async () => {
@@ -49,8 +112,11 @@ export default function PlayPage() {
   // Parse the JSON returned from the backend pvp/pvpStart endpoint
   const data = await res.json();
   const inviteCode = data.invite_code || '';
-  const board = data.board || Array(9).fill(null).map(() => Array(9).fill(null));
+  let board = data.board;
 
+  if(!Array.isArray(board) || !Array.isArray(board[0])){
+    board = Array(9).fill(null).map(() => Array(9).fill(null))
+  }
   
   // Update components based off of the Parsed JSON
   setGameId(data.game_id);
@@ -59,7 +125,8 @@ export default function PlayPage() {
   setPlayerTurn("black");
   
   // Checks if boardRef.current exist before calling method from <board> to set the board up
-  boardRef.current?.setBoardFromJSON(data.board);
+  boardRef.current?.setBoardFromJSON(board);
+  setPvpGameActive(true);
   alert(`PvP Game Created. Share this invite code: ${inviteCode}`);
 
   };
@@ -71,7 +138,13 @@ export default function PlayPage() {
 
     // Checks if the user is login based off of the browser local storage
     const uid = localStorage.getItem("fakeUser");
+
+    console.log('Join attempt - UID:', uid);
+    console.log('Join attempt - Invite Code:', inviteCode);
+
     if (!uid || !inviteCode) return alert("Missing user or invite code");
+
+    
 
     
     const res = await fetch(`http://localhost:8000/api/pvp/join?inviteCode=${inviteCode}`, {
@@ -85,8 +158,20 @@ export default function PlayPage() {
     if(result?.Success){
       alert("Successfully joined game")
 
-    }
+      setBoardData(result.data || Array(9).fill(null).map(() => Array(9).fill(null)));
+      boardRef.current?.setBoardFromJSON(result.board);
 
+      setPlayerTurn(result.current_turn || 'white');
+      boardRef.current?.setPlayerTurn('white');
+
+
+      setPvpGameActive(true);
+      await fetchGameState(); // Fetch current game state
+      
+      // Set player to white (since creator is black)
+      setPlayerTurn('white');
+
+    }
 
 
   };
@@ -126,6 +211,8 @@ export default function PlayPage() {
       boardRef.current?.setBoardFromJSON(data.board);
       boardRef.current?.setPlayerTurn('black');
       alert(`New game started vs ${data.opponent}`);
+      setPvpGameActive(true);
+
     } catch (err) {
       alert('Failed to start game: ' + err.message);
     }
@@ -211,9 +298,7 @@ export default function PlayPage() {
     boardRef.current?.setBoardFromJSON(data);
 
     // Keeps track of whose turn it is logically and visually
-    setPlayerTurn(prev => (prev == 'black' ? 'white': 'black'));
 
-    boardRef.current?.setPlayerTurn(prev => (prev === 'black' ? 'white' : 'black'));
 
     } catch(err) {
         alert('Failed to send PvP move: ' + err.message);
@@ -282,7 +367,7 @@ export default function PlayPage() {
                       <button onClick={handlePvpStart} className="play-button">
                         Create PVP Game
                       </button>
-                      
+
                     </div>
                     
 
@@ -295,7 +380,7 @@ export default function PlayPage() {
 
                       <input
                         type="text"
-                        value={inviteCode}
+                        value={inviteCode || ''}
                         onChange={(e) => setInviteCode(e.target.value)}
                         placeholder="Enter Invite Code"
                         className="styled-input"
