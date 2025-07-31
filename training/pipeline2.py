@@ -239,7 +239,7 @@ while count < 2000:
         mct = 300
         numGames = 200
     
-    elif 4 < gen < 11:
+    elif 4 <= gen < 11:
         mct = 500
         numGames = 300
         evalGames = 75
@@ -249,7 +249,7 @@ while count < 2000:
         mct = 700
         evalGames = 100
     
-    elif 25 < gen < 51:
+    elif 25 <= gen < 51:
         numGames = 500
         mct = 1000
         evalGames = 150
