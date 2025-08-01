@@ -23,7 +23,7 @@ DESCRIPTION:
     the model is saved.
     
 """
-def evaluateModel(candidateModel, championModel, numGames=20, genNum=2, device=torch.device("cpu")):
+def evaluateModel(candidateModel, championModel, numGames=20, genNum=2, device=torch.device("cpu"), mctSim=400):
 
 
     candidateModel .to(device)
