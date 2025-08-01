@@ -132,7 +132,7 @@ def extractFileNum(fileName):
 METHOD: evaludateModel
 INPUT:
     genNum   (int)      :  Generation number so older best models are not overrided for having varying bot difficulties. 
-
+    mct      (int)      :  Number of simulations used to consider each move.
 RETURN:
     N/A
 DESCRIPTION:
@@ -140,7 +140,7 @@ DESCRIPTION:
     whenever the pipline cannot be fully ran because of time contraint.
     
 """
-def evaluate(genNum=3):
+def evaluate(genNum=3, mct=400):
 
 
     
@@ -178,7 +178,7 @@ def evaluate(genNum=3):
 
 
     
-    return evaluateModel(candidateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum, device=device)
+    return evaluateModel(candidateModel=candidateModel, championModel=currentModel, numGames=50, genNum=genNum, device=device, mctSim=mct)
 
 
 """
@@ -219,10 +219,10 @@ gen = 1
 count = 0
 
 
-allModels = [f for f in os.listdir("models") if f.startswith("bestModel") and f.endswith(".pt")]
-gen = len(allModels)
+# allModels = [f for f in os.listdir("models") if f.startswith("bestModel") and f.endswith(".pt")]
+# gen = len(allModels)
 
-evaluate(genNum=gen)
+# evaluate(genNum=gen)
 
 
 
@@ -245,7 +245,7 @@ while count < 2000:
         numGames = 300
         evalGames = 75
     
-    elif 11 < gen < 25:
+    elif 11 <= gen < 25:
         numGames = 400
         mct = 700
         evalGames = 100
