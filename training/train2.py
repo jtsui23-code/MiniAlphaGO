@@ -1,0 +1,120 @@
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from model.net import GoNet
+from training.replayBuffer2 import ReplayBuffer
+import os
+
+def train(network: GoNet, buffer: ReplayBuffer, batchSize=64, epochs=10, learningRate=1e-3, device=torch.device("cpu")):
+    # Skip training if buffer doesn't have enough samples
+    if len(buffer) < batchSize:
+        print("Not enough samples in buffer. Skipping training.")
+        return
+
+    # Define the loss function for the policy head (classification of moves)
+    policyLossFn = nn.CrossEntropyLoss()
+
+    # Define the loss function for the value head (regression of game outcome)
+    valueLossFn = nn.MSELoss()
+
+    # Use Adam optimizer with L2 regularization (weight decay)
+    optimizer = optim.Adam(network.parameters(), lr=learningRate, weight_decay=1e-4)
+
+    # Set the network to training mode (affects things like dropout/batchnorm if used)
+    network.train()
+
+    for epoch in range(epochs):
+        # Sample a batch of training data from the replay buffer
+        states, pis, zs = buffer.sample(batchSize, device=device)
+
+
+
+        # Move data to device
+        states = states.to(device)
+        pis = pis.to(device)
+        zs = zs.to(device)
+
+
+        # Forward pass through the network to get predictions
+        pred_pis, pred_zs = network(states)
+
+        # Compute policy loss
+        # pred_pis: [batchSize, num_moves] logits from the network
+        # pis: [batchSize, num_moves] target policy vectors
+        # pis.argmax(dim=1): get the target move index
+        loss_pi = policyLossFn(pred_pis, pis.argmax(dim=1))
+
+        # Compute value loss
+        # pred_zs: [batchSize, 1] predicted value (win/loss score)
+        # zs: [batchSize] target scalar outcome
+        loss_z = valueLossFn(pred_zs.squeeze(), zs)
+
+        # Combine the two losses into total loss
+        loss = loss_pi + loss_z
+
+   # Backpropagation step
+        optimizer.zero_grad()   # Clear previous gradients
+        loss.backward()         # Compute new gradients
+        optimizer.step()        # Apply parameter update
+
+        # Print loss values for monitoring
+        print(f"[Epoch {epoch + 1}] Total Loss: {loss.item():.4f} | Policy: {loss_pi.item():.4f} | Value: {loss_z.item():.4f}")
+
+
+
+"""
+METHOD: createModel
+INPUT:
+    fileLIst     (list)     :  Stores all of the files that will be loaded into the model.
+    fileName     (string)   :  The name of the model file.
+    device                  :  Making the model on the GPU for faster pipeline running.
+
+RETURN:
+    N/A
+DESCRIPTION:
+    This function loads in self-play game data to create a model for playing Go better.
+    
+"""
+def createModel(fileLIst, fileName="models/currentModel.pt", device=torch.device("cpu")):
+
+    # Creating network and replay buffer
+    network =  GoNet(boardSize=9, channels=17).to(device)
+
+    buffer = ReplayBuffer(capacity=1000)
+
+    # For loop for loading in the self-play game data into the buffer.
+    for file in fileLIst:
+        buffer.loadFile(os.path.join("selfPlay", file))
+
+    # Using the buffer with the network to create a model which is saved.
+    train(network=network, buffer=buffer, batchSize=256, epochs=10, device=device)
+
+    torch.save(network.state_dict(), f"models/{fileName}")
+
+
+
+"""
+METHOD: createModel
+INPUT:
+    existing_model (GoNet)  : Existing that is being updated with the training data.
+    fileLIst     (list)     : Stores all of the files that will be loaded into the model.
+    epochs                  : Number of times goes through training data.
+    device                  : Making the model on the GPU for faster pipeline running.
+
+RETURN:
+    N/A
+DESCRIPTION:
+    This function updates the exisitng model with the new training data in the pipeline.    
+"""
+def updateExistingModel(existing_model, fileLIst, epochs=10, device=torch.device("cpu")):
+    buffer = ReplayBuffer(capacity=1000)
+
+    # Load training data
+    for file in fileLIst:
+        buffer.loadFile(os.path.join("selfPlay", file))
+
+    # Train the existing model (don't create new one)
+    train(network=existing_model, buffer=buffer, batchSize=256, epochs=epochs, device=device)
+    
+
+
