@@ -256,7 +256,7 @@ while count < 2000:
         evalGames = 150
 
     if count == 0: 
-        numGames = 110
+        numGames = 50
 
 
     evalResult = startPipline(numGames=numGames, genNum=gen, mct=mct, evalGames=evalGames)
@@ -266,11 +266,7 @@ while count < 2000:
 
 
 
-# while counter < 2000:
 
-#     evalResult = startPipline(numGames=100, genNum=counter)
-#     if evalResult == 1:
-#         counter+= 1
 
 
 
