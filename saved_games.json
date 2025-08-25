@@ -1343,5 +1343,126 @@
     "uid": "john@gmail.com",
     "winner": null,
     "inviteCode": "P1C8BI"
+  },
+  {
+    "game_id": "82861139-2d10-4fdb-b519-230071b6e7bf",
+    "board": [
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        "black",
+        "white",
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "moves": [
+      {
+        "player": "black",
+        "x": 4,
+        "y": 3
+      },
+      {
+        "player": "white",
+        "x": 5,
+        "y": 3
+      }
+    ],
+    "current_turn": "black",
+    "opponent": "CPU",
+    "date": "2025-08-25",
+    "uid": "johncena@gmail.com",
+    "winner": null
   }
 ]
