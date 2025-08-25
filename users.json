@@ -14,5 +14,9 @@
   {
     "email": "john@gmail.com",
     "password": "johnCena"
+  },
+  {
+    "email": "johncena@gmail.com",
+    "password": "theJohnCena"
   }
 ]
