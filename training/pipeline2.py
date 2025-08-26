@@ -219,10 +219,10 @@ gen = 1
 count = 0
 
 
-# allModels = [f for f in os.listdir("models") if f.startswith("bestModel") and f.endswith(".pt")]
-# gen = len(allModels)
+allModels = [f for f in os.listdir("models") if f.startswith("bestModel") and f.endswith(".pt")]
+gen = len(allModels)
 
-# evaluate(genNum=gen)
+evaluate(genNum=gen)
 
 
 while count < 2000:
@@ -253,8 +253,8 @@ while count < 2000:
         mct = 1000
         evalGames = 150
 
-    if count == 0: 
-        numGames = 130
+    # if count == 0: 
+    #     numGames = 130
 
 
     evalResult = startPipline(numGames=numGames, genNum=gen, mct=mct, evalGames=evalGames)
