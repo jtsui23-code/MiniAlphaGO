@@ -8,10 +8,11 @@ import os
 import datetime # Stores the data when games start
 
 from board.go import Board  
-from model.mct2 import MCTS
+from model.mct5 import MCTS
 from utils.boardToTensor import boardToTensor
 from model.net import GoNet
 import numpy as np
+import torch
 
 
 from backend.backend_python.pvp import router as pvp_router
@@ -20,6 +21,8 @@ from backend.backend_python.pvp import router as pvp_router
 BOARD_SIZE = 9
 GAMES_FILE = "saved_games.json"
 USERS_FILE = "users.json"
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 app = FastAPI()
 
@@ -179,7 +182,14 @@ def make_move(move: MoveRequest, game_id: Optional[str] = Query(None)):
     game_state["moves"].append({"player": "black", "x": x, "y": y})
 
     # AI move with MCTS
-    network = GoNet(9, 17)
+    network = GoNet(9, 17).to(device)
+    allModels = [f for f in os.listdir("models") if f.startswith("bestModel") and f.endswith(".pt")]
+    gen = len(allModels)
+    print(f"Model generation is {gen-1}")
+
+    network.load_state_dict(torch.load(f"models/bestModel{gen-1}.pt", map_location=device))
+
+
     mct = MCTS(network=network, exploration_weight=1.5, simulations=800)
 
     move_ai, _ = mct.search(board)
