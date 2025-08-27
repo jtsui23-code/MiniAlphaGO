@@ -189,8 +189,12 @@ def make_move(move: MoveRequest, game_id: Optional[str] = Query(None)):
 
     network.load_state_dict(torch.load(f"models/bestModel{gen-1}.pt", map_location=device))
 
+    network.to(device)
+    network.eval()
+
 
     mct = MCTS(network=network, exploration_weight=1.5, simulations=800)
+
 
     move_ai, _ = mct.search(board)
 
