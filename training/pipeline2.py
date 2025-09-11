@@ -254,7 +254,7 @@ while count < 2000:
         evalGames = 150
 
     if count == 0: 
-        numGames = 140
+        numGames = 120
 
 
     evalResult = startPipline(numGames=numGames, genNum=gen, mct=mct, evalGames=evalGames)
