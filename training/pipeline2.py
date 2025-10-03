@@ -219,10 +219,10 @@ gen = 1
 count = 0
 
 
-allModels = [f for f in os.listdir("models") if f.startswith("bestModel") and f.endswith(".pt")]
-gen = len(allModels)
+# allModels = [f for f in os.listdir("models") if f.startswith("bestModel") and f.endswith(".pt")]
+# gen = len(allModels)
 
-evaluate(genNum=gen)
+# evaluate(genNum=gen)
 
 
 while count < 2000:
