@@ -1,6 +1,6 @@
 numpy
-torch
+torch --index-url https://download.pytorch.org/whl/cpu
 fastapi
-uvicorn
+uvicorn[standard]
+python-multipart
 pytest
-collection
