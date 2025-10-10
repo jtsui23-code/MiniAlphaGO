@@ -30,7 +30,7 @@ app = FastAPI()
 # and use any request method.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["https://minialphago.onrender.com/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -106,6 +106,22 @@ def numpy_array_to_json(arr):
 
     nested_list = [[convert_val(v) for v in col] for col in arr.T]
     return nested_list
+
+
+@app.get("/")
+def read_root():
+    return {
+        "message": "Mini AlphaGo API is running",
+        "version": "1.0",
+        "endpoints": {
+            "signup": "/signup",
+            "login": "/login",
+            "newgame": "/newgame",
+            "move": "/move",
+            "stats": "/stats",
+            "pvp": "/api/pvp"
+        }
+    }
 
 
 @app.post("/signup")
