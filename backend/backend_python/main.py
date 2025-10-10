@@ -30,7 +30,11 @@ app = FastAPI()
 # and use any request method.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://minialphago.onrender.com/"],
+
+    allow_origins=["http://localhost:3000",
+                   
+    "https://minialphago-frontend.onrender.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
